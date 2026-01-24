@@ -16,7 +16,9 @@
         "request-interceptor.js",
         "style-inserter.js",
         "modal.js",
-        "button-inserter.js"
+        "button-inserter.js",
+        "exporter/csv-builder.js",
+        "exporter/qualities-to-csv.js"
       ],
       "run_at": "document_start"
     }

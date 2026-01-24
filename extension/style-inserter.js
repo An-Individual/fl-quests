@@ -14,7 +14,7 @@
 // never identify what. So heck with it,
 // we're just doing it inline.
 const cssRaw = `
-.flquestsModalWrapper {
+.flq-modal-wrapper {
     display: none;
     position: fixed;
     z-index: 500; /* The mobile footer menu is 450 */
@@ -27,7 +27,7 @@ const cssRaw = `
     background-color: rgba(0,0,0,0.65);
 }
 
-.flquestsModalBox {
+.flq-modal-box {
     margin: 15% auto;
     padding: 4px;
     max-width: 600px;
@@ -37,7 +37,7 @@ const cssRaw = `
     font-family: "Roboto Slab",Georgia,Times,serif;
 }
 
-.flquestsOutline {
+.flq-outline {
     margin: 0px;
     height: 100%;
     border: 2px solid #897d67;
@@ -45,27 +45,23 @@ const cssRaw = `
     box-sizing: border-box;
 }
 
-.flquestsOutline hr {
+.flq-outline hr {
     margin: 0px 20px;
     border: 1px solid #897d67;
 }
 
-.flquestsTitle {
+.flq-title {
     margin: 20px;
     text-align: center;
     font-size: 28px;
     font-weight: bold;
 }
 
-.flquestsBody {
+.flq-body {
     margin: 20px;
 }
 
-.flquestsTop {
-    overflow: hidden;
-}
-
-.flquestsModalClose {
+.flq-modal-close {
     color: black;
     float: right;
     margin-right: 10px;
@@ -74,14 +70,14 @@ const cssRaw = `
     display: block;
 }
 
-.flquestsModalClose:hover,
-.flquestsModalClose:focus {
+.flq-modal-close:hover,
+.flq-modal-close:focus {
     text-decoration: none;
     cursor: pointer;
 }
 
 @media screen and (max-width: 1000px) {
-    .flquestsModalBox {
+    .flq-modal-box {
         margin: auto;
         width: 100%;
         height: 100%;
