@@ -11,27 +11,13 @@
   "content_scripts": [
     {
       "matches": ["https://www.fallenlondon.com/*"],
-      "js": ["quality-tracker.js"],
-      "run_at": "document_start"
-    },
-    {
-      "matches": ["https://www.fallenlondon.com/*"],
-      "js": ["request-interceptor.js"],
-      "run_at": "document_start"
-    },
-    {
-      "matches": ["https://www.fallenlondon.com/*"],
-      "js": ["style-inserter.js"],
-      "run_at": "document_start"
-    },
-    {
-      "matches": ["https://www.fallenlondon.com/*"],
-      "js": ["modal.js"],
-      "run_at": "document_start"
-    },
-    {
-      "matches": ["https://www.fallenlondon.com/*"],
-      "js": ["button-inserter.js"],
+      "js": [
+        "quality-tracker.js",
+        "request-interceptor.js",
+        "style-inserter.js",
+        "modal.js",
+        "button-inserter.js"
+      ],
       "run_at": "document_start"
     }
   ]
