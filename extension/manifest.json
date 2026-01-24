@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "Fallen London Quests",
+  "version": "1.0.0",
+  "description": "Adds a quest tracker to the game Fallen London.",
+  "icons": {
+    "48": "images/icon-48.png",
+    "128": "images/icon-128.png"
+  },
+  "permissions": [],
+  "content_scripts": [
+    {
+      "matches": ["https://www.fallenlondon.com/*"],
+      "js": ["quality-tracker.js"],
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["https://www.fallenlondon.com/*"],
+      "js": ["request-interceptor.js"],
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["https://www.fallenlondon.com/*"],
+      "js": ["style-inserter.js"],
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["https://www.fallenlondon.com/*"],
+      "js": ["modal.js"],
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["https://www.fallenlondon.com/*"],
+      "js": ["button-inserter.js"],
+      "run_at": "document_start"
+    }
+  ]
+}
