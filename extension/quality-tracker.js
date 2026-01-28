@@ -1,23 +1,55 @@
-let currentQualities = {};
+class QualityManager {
+    constructor() {
+        this.qualities = {};
+        this.spoofed = false;
+    }
 
-function onMyself(response){
-    let newQualities = {};
+    get(id){
+        return this.qualities[id];
+    }
 
-    response.possessions.forEach((category) => {
-        category.possessions.forEach((quality) =>{
-            newQualities[quality.id] = quality;
+    getAll()
+    {
+        let result = [];
+        for(const id in this.qualities) {
+            result.push(this.qualities[id]);
+        }
+        return result;
+    }
+
+    spoof(fakeQualities) {
+        this.spoofed = true;
+        this.qualities = fakeQualities;
+    }
+
+    onMyself(response) {
+        if(this.spoofed){
+            return;
+        }
+
+        let newQualities = {};
+        response.possessions.forEach((category) => {
+            category.possessions.forEach((quality) =>{
+                newQualities[quality.id] = quality;
+            });
         });
-    });
 
-    currentQualities = newQualities;
-}
+        this.qualities = newQualities;
+    }
 
-function onBranch(response){
-    if (response.messages?.length > 0){
-        response.messages.forEach((message) =>{
-            if (message.possession){
-                currentQualities[message.possession.id] = message.possession;
-            }
-        });
+    onBranch(response) {
+        if(this.spoofed){
+            return;
+        }
+
+        if (response.messages?.length > 0){
+            response.messages.forEach((message) =>{
+                if (message.possession){
+                    this.qualities[message.possession.id] = message.possession;
+                }
+            });
+        }
     }
 }
+
+const Qualities = new QualityManager();

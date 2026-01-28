@@ -71,17 +71,17 @@ function makeInterceptElement(id, callback) {
 makeInterceptElement('__questsInterceptedMyself', function(){
     var elem = document.getElementById('__questsInterceptedMyself');
     let payload = JSON.parse(elem.innerText);
-    onMyself(payload);
+    Qualities.onMyself(payload);
 });
 
 makeInterceptElement('__questsInterceptedBranch', function(){
     var elem = document.getElementById('__questsInterceptedBranch');
     let payload = JSON.parse(elem.innerText);
-    onBranch(payload);
+    Qualities.onBranch(payload);
 });
 
 makeInterceptElement('__questsInterceptedAgentBranch', function(){
     var elem = document.getElementById('__questsInterceptedAgentBranch');
     let payload = JSON.parse(elem.innerText);
-    onBranch(payload);
+    Qualities.onBranch(payload);
 });

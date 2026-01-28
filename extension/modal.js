@@ -71,7 +71,7 @@ function insertModal(){
 
     let exportButton = document.getElementById("flq-export-button");
     exportButton.onclick = function(){
-        const csv = qualitiesToCSV(currentQualities);
+        const csv = qualitiesToCSV(Qualities.getAll());
         downloadFile("fl-character-qualties.csv", csv);
     };
 

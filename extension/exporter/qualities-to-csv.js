@@ -11,8 +11,7 @@ function qualitiesToCSV(qualities)
         "Nature"
     ]);
 
-    for(const id in qualities){
-        const quality = qualities[id];
+    qualities.forEach(quality => {
         builder.addRow([
             quality.category,
             quality.id,
@@ -21,7 +20,7 @@ function qualitiesToCSV(qualities)
             quality.effectiveLevel,
             quality.nature
         ]);
-    }
+    });
 
     return builder.result;
 }
