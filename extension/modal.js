@@ -1,21 +1,24 @@
-// Inject the modal into the page.
-// It's important to do this AFTER
-// the request interceptor. See
-// the interceptor file for more
-// details.
-
 const rawModal = `
 <div id="flq-modal" class="flq-modal-wrapper">
     <div class="flq-modal-box">
         <div class="flq-outline">
-            <span id="flq-close" class="flq-modal-close">✖</span>
+            <span id="flq-close" class="flq-modal-close">&#10006;</span>
             <div class="flq-title">
                 Quests Journal
             </div>
             <hr/>
             <div class="flq-body">
-                The quests will go here.
-                <button id="flq-export-button">Export My Qualities</button>
+                <div id="flq-categories">
+                </div>
+                <div id="flq-troubleshooting">
+                    <div id="flq-troubleshooting-title">Troubleshooting</div>
+                    <div id="flq-troubleshooting-content">
+                        <p>Some troubleshooting advice.</p>
+                        <div style="text-align: center;">
+                            <span id="flq-export-button" class="button button--primary button--no-margin">Export My Qualities</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -59,7 +62,107 @@ function modalCheckForDOM() {
 requestIdleCallback(modalCheckForDOM);
 
 function onShowQuestModal(){
-    let modalElem = document.getElementById("flq-modal");
+    const modalElem = document.getElementById("flq-modal");
+    const categoriesElem = document.getElementById("flq-categories");
+
+    while(categoriesElem.firstChild){
+        categoriesElem.removeChild(categoriesElem.lastChild);
+    }
+
+    const testCategory = {
+        title: "Test Category",
+        quests: [{
+            state: QuestStates.HiddenStatus,
+            title: "Hidden Status Quest",
+            details: "This is a description of the quest.",
+            subtasks: [
+                {
+                    description: "An incomplete task.",
+                    completed: false
+                },
+                {
+                    description: "A completed task.",
+                    completed: true
+                }
+            ]
+        },
+        {
+            state: QuestStates.NotStart,
+            title: "Not Started Quest",
+            details: "This is a description of the quest."
+        },
+        {
+            state: QuestStates.InProgress,
+            title: "In Progress Quest",
+            details: "This is a description of the quest.",
+            subtasks: [
+                {
+                    description: "An incomplete task.",
+                    completed: false
+                },
+                {
+                    description: "A completed task.",
+                    completed: true
+                }
+            ]
+        },
+        {
+            state: QuestStates.Blocked,
+            title: "Blocked Quest",
+            details: "This is a description of the quest.",
+            subtasks: [
+                {
+                    description: "An incomplete task.",
+                    completed: false
+                },
+                {
+                    description: "A completed task.",
+                    completed: true
+                }
+            ]
+        },
+        {
+            state: QuestStates.Completed,
+            title: "Completed Quest",
+            details: "This is a description of the quest.",
+            subtasks: []
+        }]
+    };
+
+    const testCategory2 = {
+        title: "Test Category 2",
+        quests: [
+        {
+            state: QuestStates.NotStart,
+            title: "Not Started Quest",
+            details: "This is a description of the quest."
+        },
+        {
+            state: QuestStates.InProgress,
+            title: "In Progress Quest",
+            details: "This is a description of the quest.",
+            subtasks: [
+                {
+                    description: "An incomplete task.",
+                    completed: false
+                },
+                {
+                    description: "A completed task.",
+                    completed: true
+                }
+            ]
+        },
+        {
+            state: QuestStates.Completed,
+            title: "Completed Quest",
+            details: "This is a description of the quest.",
+            subtasks: []
+        }]
+    };
+
+    categoriesElem.appendChild(makeCategoryElement(testCategory));
+    categoriesElem.appendChild(makeCategoryElement(testCategory2));
+
     if(modalElem){
         modalElem.style.display = "block";
     }

@@ -1,9 +1,3 @@
-// It's important that this excutes AFTER the
-// request interceptor is setup as it opens
-// a window for page scripts to execute.
-// See the request interceptor code for
-// more details on why this is important.
-
 // I spent a lot of time trying to setup
 // a system for grabbing these styles
 // from a file but web_accessible_resources
@@ -28,7 +22,7 @@ const cssRaw = `
 }
 
 .flq-modal-box {
-    margin: 15% auto;
+    margin: 50px auto;
     padding: 4px;
     max-width: 600px;
     background-color: #bdb29e;
@@ -55,6 +49,7 @@ const cssRaw = `
     text-align: center;
     font-size: 28px;
     font-weight: bold;
+    user-select: none;
 }
 
 .flq-body {
@@ -70,6 +65,10 @@ const cssRaw = `
     display: block;
 }
 
+.flq-cat-titlebar:hover,
+.flq-cat-titlebar:focus,
+.flq-quest-main:hover,
+.flq-quest-main:focus,
 .flq-modal-close:hover,
 .flq-modal-close:focus {
     text-decoration: none;
@@ -82,6 +81,138 @@ const cssRaw = `
         width: 100%;
         height: 100%;
     }
+}
+
+.flq-cat {
+    margin-bottom: 20px;
+}
+
+.flq-cat-titlebar {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+    user-select: none;
+    background-color: #636363;
+    color: #ffffff;
+    box-shadow: 0 1px 3px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.24);
+}
+
+.flq-cat-title {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 5px;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.flq-cat-expand {
+    width: 30px;
+    flex: 0 0 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.flq-quest-main {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+    user-select: none;
+    background-color: #e8dac3;
+    box-shadow: 0 1px 3px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.24);
+}
+
+.flq-quest-status {
+    width: 100px;
+    flex: 0 0 100px;
+    margin: auto;
+}
+
+.flq-quest-status div {
+    width: 90px;
+    margin: 5px auto;
+    padding: 5px;
+    text-align: center;
+    border: 1px solid #000000;
+}
+
+.flq-quest-toggle {
+    width: 20px;
+    flex: 0 0 20px;
+    text-align: center;
+    margin: auto 0;
+    font-weight: bold;
+}
+
+.flq-quest-title {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 5px 0;
+    margin: auto 0;
+    font-weight: bold;
+}
+
+.flq-hiddenstatus div {
+    visibility: hidden;
+}
+
+.flq-inprogress div {
+    background-color: #ddd200;
+    color: #000000;
+}
+
+.flq-blocked div {
+    background-color: #636363;
+    color: #ffffff;
+}
+
+.flq-completed div {
+    background-color: #2c9c00;
+    color: #ffffff;
+}
+
+.flq-quest-details {
+    display: none;
+    background-color: #ffffff;
+    box-shadow: 0 1px 3px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.24);
+    margin-left: 20px;
+    margin-bottom: 20px;
+}
+
+.flq-quest-detail {
+    text-align: center;
+    padding: 5px;
+}
+
+.flq-quest-detail-line {
+    border-bottom: 1px solid #808080;
+}
+
+.flq-subtask {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+}
+
+.flq-subtask-offsetrow {
+    background-color: #eeeeee;
+}
+
+.flq-subtask-description {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 5px;
+}
+
+.flq-subtask-status {
+    width: 30px;
+    flex: 0 0 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    user-select: none;
+    border-left: 1px solid #808080;
 }
 `;
 

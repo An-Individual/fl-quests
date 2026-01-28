@@ -14,8 +14,10 @@
       "js": [
         "quality-tracker.js",
         "request-interceptor.js",
+        "data/quests-datatypes.js",
         "style-inserter.js",
         "modal.js",
+        "modal-rendering.js",
         "button-inserter.js",
         "exporter/csv-builder.js",
         "exporter/qualities-to-csv.js"
