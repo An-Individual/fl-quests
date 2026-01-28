@@ -32,6 +32,7 @@ const cssRaw = `
 }
 
 .flq-outline {
+    position: relative;
     margin: 0px;
     height: 100%;
     border: 2px solid #897d67;
@@ -39,38 +40,63 @@ const cssRaw = `
     box-sizing: border-box;
 }
 
-.flq-outline hr {
+.flq-outline  hr {
     margin: 0px 20px;
     border: 1px solid #897d67;
 }
 
 .flq-title {
-    margin: 20px;
+    margin-top: 20px;
     text-align: center;
     font-size: 28px;
     font-weight: bold;
     user-select: none;
 }
 
+.flq-subtitle-links {
+    text-align: center;
+    margin-bottom: 5px;
+    font-size: 12px;
+    user-select: none;
+}
+
+.flq-tab-selected
+{
+    font-weight: bold;
+}
+
+.flq-tab-clickable
+{
+    color: #3f7277;
+}
+
+.flq-tab-clickable:hover
+{
+    color: #254245;
+}
+
 .flq-body {
     margin: 20px;
 }
 
-.flq-modal-close {
+#flq-close {
     color: black;
-    float: right;
-    margin-right: 10px;
     font-size: 28px;
     font-weight: bold;
     display: block;
+    position: absolute;
+    top: 0px;
+    right: 10px;
 }
 
+.flq-tab-clickable:hover,
+.flq-tab-clickable:focus,
 .flq-cat-titlebar:hover,
 .flq-cat-titlebar:focus,
 .flq-quest-main:hover,
 .flq-quest-main:focus,
-.flq-modal-close:hover,
-.flq-modal-close:focus {
+#flq-close:hover,
+#flq-close:focus {
     text-decoration: none;
     cursor: pointer;
 }
