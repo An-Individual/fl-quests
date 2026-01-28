@@ -15,6 +15,7 @@
         "quality-tracker.js",
         "request-interceptor.js",
         "data/quests-datatypes.js",
+        "settings.js",
         "style-inserter.js",
         "modal.js",
         "modal-rendering.js",
