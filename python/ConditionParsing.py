@@ -40,9 +40,9 @@ def parseStatement(elems, mappings, prevStatement):
             raise Exception("Not logic is not applied to a statement")
         result = parseComparisonStatement(elems[1:len(elems)], mappings)
         statement = {
-                "Type": 4,
-                "Statement": result["Statement"]
-            },
+            "Type": 4,
+            "Statement": result["Statement"]
+        }
         return parseStatement(elems[result["EndIdx"]+1:], mappings, statement)
     
     # If we've got letters then this is the start of
