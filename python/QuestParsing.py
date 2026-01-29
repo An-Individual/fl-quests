@@ -67,16 +67,18 @@ def processStateRow(row, mappings):
     }
 
 def processSubtaskRow(row, mappings):
-    visible = ConditionParsing.parseCondition(row[2])
-    if not visible:
-        raise Exception("Task row lacks logic to make it visible")
-
-    completed = ConditionParsing.parseCondition(row[3])
+    completed = ConditionParsing.parseCondition(row[2])
     if not completed:
         raise Exception("Task row lacks logic to mark it completed")
 
-    return {
+    result = {
         "Description": row[1],
-        "Visible": visible,
         "Completed": completed
     }
+
+    if len(row) >= 4:
+        visible = ConditionParsing.parseCondition(row[3])
+        if visible:
+            result["Visible"] = visible
+
+    return result
