@@ -134,7 +134,7 @@ function selectTab(tab) {
     TabData.Current = tab;
 }
 
-function onShowQuestModal(){
+async function onShowQuestModal(){
     selectTab(TabData.Tab.Home);
     const modalElem = document.getElementById("flq-modal");
     const homeElem = document.getElementById("flq-home");
@@ -143,99 +143,23 @@ function onShowQuestModal(){
         homeElem.removeChild(homeElem.lastChild);
     }
 
-    const testCategory = {
-        title: "Test Category",
-        quests: [{
-            state: QuestStates.HiddenStatus,
-            title: "Hidden Status Quest",
-            details: "This is a description of the quest.",
-            subtasks: [
-                {
-                    description: "An incomplete task.",
-                    completed: false
-                },
-                {
-                    description: "A completed task.",
-                    completed: true
-                }
-            ]
-        },
-        {
-            state: QuestStates.NotStart,
-            title: "Not Started Quest",
-            details: "This is a description of the quest."
-        },
-        {
-            state: QuestStates.InProgress,
-            title: "In Progress Quest",
-            details: "This is a description of the quest.",
-            subtasks: [
-                {
-                    description: "An incomplete task.",
-                    completed: false
-                },
-                {
-                    description: "A completed task.",
-                    completed: true
-                }
-            ]
-        },
-        {
-            state: QuestStates.Blocked,
-            title: "Blocked Quest",
-            details: "This is a description of the quest.",
-            subtasks: [
-                {
-                    description: "An incomplete task.",
-                    completed: false
-                },
-                {
-                    description: "A completed task.",
-                    completed: true
-                }
-            ]
-        },
-        {
-            state: QuestStates.Completed,
-            title: "Completed Quest",
-            details: "This is a description of the quest.",
-            subtasks: []
-        }]
-    };
-
-    const testCategory2 = {
-        title: "Test Category 2",
-        quests: [
-        {
-            state: QuestStates.NotStart,
-            title: "Not Started Quest",
-            details: "This is a description of the quest."
-        },
-        {
-            state: QuestStates.InProgress,
-            title: "In Progress Quest",
-            details: "This is a description of the quest.",
-            subtasks: [
-                {
-                    description: "An incomplete task.",
-                    completed: false
-                },
-                {
-                    description: "A completed task.",
-                    completed: true
-                }
-            ]
-        },
-        {
-            state: QuestStates.Completed,
-            title: "Completed Quest",
-            details: "This is a description of the quest.",
-            subtasks: []
-        }]
-    };
-
-    homeElem.appendChild(makeCategoryElement(testCategory));
-    homeElem.appendChild(makeCategoryElement(testCategory2));
+    try {
+        let categories = await Quests.renderQuests();
+        let categoryElems = [];
+        // We do this in stages so we don't have to clear
+        // existing category elements if an error occures.
+        categories.forEach(cat =>{
+            categoryElems.push(makeCategoryElement(cat));
+        })
+        categoryElems.forEach(elem =>{
+            homeElem.appendChild(elem);
+        });
+    } catch (error) {
+        errorElem = document.createElement("div");
+        errorElem.classList.add("flq-error");
+        errorElem.textContent = "Error Rendering Quests\n\n" + error;
+        homeElem.appendChild(errorElem);
+    }
 
     if(modalElem){
         modalElem.style.display = "block";

@@ -22,14 +22,17 @@ class SettingsManager {
         }
     }
 
-    set(name, value)
-    {
+    set(name, value) {
         this.settings[name] = value;
         this.storeSettings();
     }
 
     get(name){
         return this.settings[name];
+    }
+
+    getQuestsSource() {
+        return chrome.runtime.getURL('quests/quests.json')
     }
 }
 

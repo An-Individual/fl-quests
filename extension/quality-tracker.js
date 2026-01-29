@@ -17,6 +17,13 @@ class QualityManager {
         return result;
     }
 
+    getValue(id, property) {
+        if(!property) {
+            property = "level"
+        }
+        return this.qualities[id]?.[property] ?? 0;
+    }
+
     spoof(fakeQualities) {
         this.spoofed = true;
         this.qualities = fakeQualities;

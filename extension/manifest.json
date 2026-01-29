@@ -16,6 +16,7 @@
         "request-interceptor.js",
         "data/quests-datatypes.js",
         "settings.js",
+        "quests/quests-manager.js",
         "style-inserter.js",
         "modal.js",
         "modal-rendering.js",
@@ -25,5 +26,9 @@
       ],
       "run_at": "document_start"
     }
-  ]
+  ],
+  "web_accessible_resources": [{
+    "resources": ["quests/quests.json"],
+    "matches": ["https://www.fallenlondon.com/*"]
+  }]
 }
