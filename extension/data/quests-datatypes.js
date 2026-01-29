@@ -6,3 +6,21 @@ const QuestStates = {
     Completed: 4,
     HiddenStatus: 5
 }
+
+const LogicTypes = {
+    Undefined: 0,
+    Comparison: 1,
+    And: 2,
+    Or: 3,
+    Not: 4
+}
+
+const ComparisionTypes = {
+    Undefined: 0,
+    Equal: 1,
+    NotEqual: 2,
+    Greater: 3,
+    GreaterEqual: 4,
+    Less: 5,
+    LessEqual: 6
+}

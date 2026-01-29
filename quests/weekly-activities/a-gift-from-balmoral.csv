@@ -1,0 +1,6 @@
+100,A Gift from Balmoral,"bc=141780,agfb=141783",
+State,Description,Logic,Visible Logic
+5,Visit Balmoral castle to recieve a gift from the castellan.,bc && !agfb,
+4,"You have recieved this week's gift from the Balmoral castellan.
+
+This is an additional line for testing purposes.",bc && agfb,
