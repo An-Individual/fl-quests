@@ -1,7 +1,6 @@
 import csv
-import os
+from . import conditions
 from os.path import join
-from python import ConditionParsing
 
 def processQuestFile(file):
     quest = {
@@ -57,7 +56,7 @@ def parseIdMappings(cell):
     return result
 
 def processStateRow(row, mappings):
-    condition = ConditionParsing.parseCondition(row[2], mappings)
+    condition = conditions.parseCondition(row[2], mappings)
     if not condition:
         raise Exception("State row lacks logic")
     return {
@@ -67,7 +66,7 @@ def processStateRow(row, mappings):
     }
 
 def processSubtaskRow(row, mappings):
-    completed = ConditionParsing.parseCondition(row[2])
+    completed = conditions.parseCondition(row[2])
     if not completed:
         raise Exception("Task row lacks logic to mark it completed")
 
@@ -77,7 +76,7 @@ def processSubtaskRow(row, mappings):
     }
 
     if len(row) >= 4:
-        visible = ConditionParsing.parseCondition(row[3])
+        visible = conditions.parseCondition(row[3])
         if visible:
             result["Visible"] = visible
 

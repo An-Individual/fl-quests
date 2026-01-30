@@ -1,7 +1,7 @@
 import json
 import os
 from os.path import join
-from python import QuestParsing
+from helpers import parser
 
 def processCategoryFolder(folder, files):
     print("Compiling Quests in: " + root)
@@ -37,7 +37,7 @@ def processCategoryFolder(folder, files):
                 continue;
 
         print("    Processing " + file)
-        quest = QuestParsing.processQuestFile(join(root, file))
+        quest = parser.processQuestFile(join(root, file))
         category["Quests"].append(quest)
     
     category["Quests"].sort(reverse=True, key=lambda q: q["Order"])
@@ -48,8 +48,11 @@ def processCategoryFolder(folder, files):
     return category
 
 categories = []
-for root, dirs, files in os.walk('./quests'):
-    if root == './quests':
+
+questsdir = os.path.dirname(__file__)
+
+for root, dirs, files in os.walk(join(questsdir, './definitions')):
+    if root.endswith('./definitions'):
         continue
     categories.append(processCategoryFolder(root, files))
     
@@ -59,7 +62,7 @@ for category in categories:
 
 rawJson = json.dumps(categories);
 
-questsFile = "./extension/quests/quests.json"
+questsFile = join(questsdir, "../extension/quests/quests.json")
 os.makedirs(os.path.dirname(questsFile), exist_ok=True)
 with open(questsFile, "w") as file:
     file.write(rawJson)
