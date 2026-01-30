@@ -23,7 +23,7 @@ function makeWrapperElement(tag, className, childElements){
 function encodeText(text){
     const elem = document.createElement("textarea");
     elem.innerText = text;
-    return elem.value;
+    return elem.innerHTML;
 }
 
 function makeQuestElement(quest)

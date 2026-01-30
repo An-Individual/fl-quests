@@ -206,7 +206,6 @@ const cssRaw = `
 }
 
 .flq-quest-detail {
-    text-align: center;
     padding: 5px;
 }
 
