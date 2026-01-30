@@ -16,6 +16,7 @@
         "request-interceptor.js",
         "data/quests-datatypes.js",
         "settings.js",
+        "quests/quests-validator.js",
         "quests/quests-manager.js",
         "style-inserter.js",
         "modal.js",

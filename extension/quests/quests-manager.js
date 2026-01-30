@@ -2,6 +2,7 @@ class QuestsManager {
 
     constructor(qualityManager) {
         this.qualities = qualityManager;
+        this.validator = new QuestsValidator();
         this.getQuests()
     }
 
@@ -20,7 +21,15 @@ class QuestsManager {
             throw new Error("HTTP error: " + response.status);
         }
 
-        this.quests = await response.json();
+        let fetchedQuests = await response.json();
+
+        let validateResult = this.validator.validate(fetchedQuests);
+        if(!validateResult.valid)
+        {
+            throw new Error("Quests Validation Failed: " + validateResult.reason);
+        }
+
+        this.quests = fetchedQuests;
         return this.quests;
     }
 
