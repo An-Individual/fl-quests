@@ -12,18 +12,19 @@
     {
       "matches": ["https://www.fallenlondon.com/*"],
       "js": [
-        "quality-tracker.js",
-        "request-interceptor.js",
-        "data/quests-datatypes.js",
+        "qualities/csv/csv-builder.js",
+        "qualities/quality-tracker.js",
+        "qualities/request-interceptor.js",
         "settings.js",
+        "quests/quests-datatypes.js",
         "quests/quests-validator.js",
         "quests/quests-manager.js",
-        "style-inserter.js",
-        "modal.js",
-        "modal-rendering.js",
-        "button-inserter.js",
-        "exporter/csv-builder.js",
-        "exporter/qualities-to-csv.js"
+        "interface/style-injector.js",
+        "interface/quests-renderer.js",
+        "interface/modal-manager.js",
+        "interface/modal-injector.js",
+        "interface/button-injector.js",
+        "initialize.js"
       ],
       "run_at": "document_start"
     }

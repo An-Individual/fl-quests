@@ -1,7 +1,16 @@
-class QualityManager {
+class QualityTracker {
     constructor() {
         this.qualities = {};
         this.spoofed = false;
+    }
+
+    static singleInstance = null;
+    static instance() {
+        if(this.singleInstance) {
+            return this.singleInstance;
+        }
+        this.singleInstance = new QualityTracker();
+        return this.singleInstance;
     }
 
     get(id){
@@ -57,6 +66,32 @@ class QualityManager {
             });
         }
     }
-}
 
-const Qualities = new QualityManager();
+    exportToCSV()
+    {
+        let qualities = this.getAll();
+        const builder = new CSVBuilder();
+        
+        builder.addRow([
+            "ID",
+            "Level",
+            "Effective Level",
+            "Name",
+            "Category",
+            "Nature"
+        ]);
+
+        qualities.forEach(quality => {
+            builder.addRow([
+                quality.id,
+                quality.level,
+                quality.effectiveLevel,
+                quality.name,
+                quality.category,
+                quality.nature
+            ]);
+        });
+
+        return builder.result;
+    }
+}

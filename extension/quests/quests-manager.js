@@ -1,7 +1,8 @@
 class QuestsManager {
 
-    constructor(qualityManager) {
-        this.qualities = qualityManager;
+    constructor() {
+        this.qualities = QualityTracker.instance();
+        this.settings = SettingsManager.instance();
         this.validator = new QuestsValidator();
         this.getQuests()
     }
@@ -15,7 +16,7 @@ class QuestsManager {
             return this.quests
         }
 
-        const response = await fetch(Settings.getQuestsSource());
+        const response = await fetch(this.settings.getQuestsSource());
 
         if(!response.ok) {
             throw new Error("HTTP error: " + response.status);
@@ -167,5 +168,3 @@ class QuestsManager {
         }
     }
 }
-
-const Quests = new QuestsManager(Qualities);

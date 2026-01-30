@@ -1,4 +1,13 @@
 class SettingsManager {
+    static singleInstance;
+    static instance() {
+        if(this.singleInstance){
+            return this.singleInstance;
+        }
+        this.singleInstance = new SettingsManager();
+        return this.singleInstance;
+    }
+    
     constructor() {
         this.restoreSettings();
     }
@@ -35,5 +44,3 @@ class SettingsManager {
         return chrome.runtime.getURL('quests/quests.json')
     }
 }
-
-const Settings = new SettingsManager();
