@@ -4,13 +4,13 @@ from os.path import join
 from helpers import parser
 
 def processCategoryFolder(folder, files):
-    print("Compiling Quests in: " + root)
+    print("Compiling Quests in: " + folder)
 
-    if not os.path.exists(join(root, "category.json")):
+    if not os.path.exists(join(folder, "category.json")):
         raise Exception("No catetory.js file defined")
     
     print("    Processing category.json");
-    with open(join(root, "category.json"), "r") as catFile:
+    with open(join(folder, "category.json"), "r") as catFile:
             categoryDetails = json.load(catFile)
     
     if not categoryDetails["Order"]:
@@ -37,19 +37,28 @@ def processCategoryFolder(folder, files):
                 continue;
 
         print("    Processing " + file)
-        quest = parser.processQuestFile(join(root, file))
+        quest = parser.processQuestFile(join(folder, file))
         category["Quests"].append(quest)
     
     category["Quests"].sort(reverse=True, key=lambda q: q["Order"])
 
-    for quest in category["Quests"]:
-        del quest["Order"]
-
     return category
+
+def readVersion(scriptDir):
+    versionPath = join(scriptDir, "./definitions/version.json")
+    if not os.path.exists(versionPath):
+         raise Exception("Failed to locate version file: " + versionPath)
+    print("    Processing version.json")
+    with open(versionPath, "r") as verFile:
+        versionJson = json.load(verFile)
+        return versionJson["version"]
 
 categories = []
 
 questsdir = os.path.dirname(__file__)
+version = readVersion(questsdir);
+if not version:
+    raise Exception("Version string cannot be empty")
 
 for root, dirs, files in os.walk(join(questsdir, './definitions')):
     if root.endswith('./definitions'):
@@ -57,10 +66,13 @@ for root, dirs, files in os.walk(join(questsdir, './definitions')):
     categories.append(processCategoryFolder(root, files))
     
 categories.sort(reverse=True, key=lambda c: c["Order"])
-for category in categories:
-    del category["Order"]
 
-rawJson = json.dumps(categories);
+fullQuests = {
+     "Version": version,
+     "Categories": categories
+}
+
+rawJson = json.dumps(fullQuests)
 
 questsFile = join(questsdir, "../extension/quests/quests.json")
 os.makedirs(os.path.dirname(questsFile), exist_ok=True)

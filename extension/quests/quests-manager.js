@@ -24,10 +24,15 @@ class QuestsManager {
         return this.quests;
     }
 
+    async getCategories() {
+        let questWrapper = await this.getQuests();
+        return questWrapper.Categories;
+    }
+
     async renderQuests() {
-        let questList = await this.getQuests();
+        let categoryList = await this.getCategories();
         let result = [];
-        questList.forEach(category => {
+        categoryList.forEach(category => {
             if(!category.Quests) {
                 return;
             }
