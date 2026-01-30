@@ -1,5 +1,5 @@
 {
-    "Order": 100,
-    "Title": "Weekly Activities",
-    "ID": "WeeklyActivities"
+    "order": 100,
+    "title": "Weekly Activities",
+    "id": "WeeklyActivities"
 }

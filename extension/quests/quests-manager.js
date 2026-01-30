@@ -26,24 +26,24 @@ class QuestsManager {
 
     async getCategories() {
         let questWrapper = await this.getQuests();
-        return questWrapper.Categories;
+        return questWrapper.categories;
     }
 
     async renderQuests() {
         let categoryList = await this.getCategories();
         let result = [];
         categoryList.forEach(category => {
-            if(!category.Quests) {
+            if(!category.quests) {
                 return;
             }
 
             let outputCat = {
-                "id": category.ID,
-                "title": category.Title,
+                "id": category.id,
+                "title": category.title,
                 "quests": []
             }
 
-            category.Quests.forEach(quest =>{
+            category.quests.forEach(quest =>{
                 let outputQuest = this.renderQuest(quest);
                 if(outputQuest){
                     outputCat.quests.push(outputQuest);
@@ -60,24 +60,24 @@ class QuestsManager {
 
     renderQuest(quest)
     {
-        if(!quest.Title) {
+        if(!quest.title) {
             throw new Error("Quest does not define a title.");
         }
 
-        if(!quest.States || quest.States.length == 0) {
+        if(!quest.states || quest.states.length == 0) {
             throw new Error("Quest does not define any states.");
         }
 
         let result = {
-            "title": quest.Title,
+            "title": quest.title,
             "subtasks": []
         }
 
         let state;
-        for (let i = 0; i < quest.States.length; i++)
+        for (let i = 0; i < quest.states.length; i++)
         {
-            state = quest.States[i];
-            if(this.evaluateCondition(state.Condition))
+            state = quest.states[i];
+            if(this.evaluateCondition(state.condition))
             {
                 break;
             }
@@ -87,26 +87,26 @@ class QuestsManager {
             return null;
         }
 
-        result.state = state.State;
-        result.details = state.Description;
+        result.state = state.state;
+        result.details = state.description;
 
-        if(state.Tasks) {
-            state.Tasks.forEach(task =>{
-                if(!task.Description) {
+        if(state.tasks) {
+            state.tasks.forEach(task =>{
+                if(!task.description) {
                     throw new Error("Sub task does not include a description condition.")
                 }
 
-                if(!task.Completed) {
+                if(!task.completed) {
                     throw new Error("Sub task does not include a completed condition.")
                 }
 
-                if(task.Visible && !this.evaluateCondition(task.Visible)) {
+                if(task.visible && !this.evaluateCondition(task.visible)) {
                     return;
                 }
 
                 result.subtasks.push({
-                    "description": task.Description,
-                    "completed": this.evaluateCondition(task.Completed)
+                    "description": task.description,
+                    "completed": this.evaluateCondition(task.completed)
                 })
             });
         }
@@ -115,46 +115,46 @@ class QuestsManager {
     }
 
     evaluateCondition(condition) {
-        switch(condition.Type) {
+        switch(condition.type) {
             case LogicTypes.And:
-                return this.evaluateCondition(condition.Left) && this.evaluateCondition(condition.Right);
+                return this.evaluateCondition(condition.left) && this.evaluateCondition(condition.right);
             case LogicTypes.Or:
-                return this.evaluateCondition(condition.Left) || this.evaluateCondition(condition.Right);
+                return this.evaluateCondition(condition.left) || this.evaluateCondition(condition.right);
             case LogicTypes.Not:
-                return !this.evaluateCondition(condition.Statement);
+                return !this.evaluateCondition(condition.statement);
             case LogicTypes.Comparison:
                 return this.evaluateComparison(condition);
             default:
-                throw new Error("Unknown condition type: " + condition.Type);
+                throw new Error("Unknown condition type: " + condition.type);
         }
     }
 
     evaluateComparison(comparision) {
-        if (!comparision.Quality) {
+        if (!comparision.quality) {
             throw new Error("Quality comparision does not specify a quality.");
         }
 
-        if(!Object.hasOwn(comparision, "Value")) {
+        if(!Object.hasOwn(comparision, "value")) {
             throw new Error("Quality comparision does not specify a value.");
         }
 
-        let value = this.qualities.getValue(comparision.Quality, comparision.Property);
+        let value = this.qualities.getValue(comparision.quality, comparision.property);
 
-        switch(comparision.Comparison) {
+        switch(comparision.comparison) {
             case ComparisionTypes.Equal:
-                return value == comparision.Value;
+                return value == comparision.value;
             case ComparisionTypes.NotEqual:
-                return value != comparision.Value;
+                return value != comparision.value;
             case ComparisionTypes.Greater:
-                return value > comparision.Value;
+                return value > comparision.value;
             case ComparisionTypes.GreaterEqual:
-                return value >= comparision.Value;
+                return value >= comparision.value;
             case ComparisionTypes.Less:
-                return value < comparision.Value;
+                return value < comparision.value;
             case ComparisionTypes.LessEqual:
-                return value <= comparision.Value;
+                return value <= comparision.value;
             default:
-                throw new Error("Unknown comparison type: " + comparision.Comparison);
+                throw new Error("Unknown comparison type: " + comparision.comparison);
         }
     }
 }

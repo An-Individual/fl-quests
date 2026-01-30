@@ -4,7 +4,7 @@ from os.path import join
 
 def processQuestFile(file):
     quest = {
-        "States": []
+        "states": []
     }
     with open(file, "r") as questFile:
         csvFile = csv.reader(questFile)
@@ -17,8 +17,8 @@ def processQuestFile(file):
                 # Cell 1 is an order integer
                 # Cell 2 is the quest title
                 # Cell 3 is a comma separated list of name/number mappings
-                quest["Order"] = int(line[0])
-                quest["Title"] = line[1]
+                quest["order"] = int(line[0])
+                quest["title"] = line[1]
                 mappings = parseIdMappings(line[2])
             elif row == 2:
                 # Row 2 is just headings so no action taken.
@@ -27,10 +27,10 @@ def processQuestFile(file):
                 if not line[0]:
                     # If the first column is empty then this
                     # is a sub task
-                    quest["States"][-1]["Tasks"].append(processSubtaskRow(line, mappings))
+                    quest["states"][-1]["tasks"].append(processSubtaskRow(line, mappings))
                 else:
-                    quest["States"].append(processStateRow(line, mappings))
-    quest["States"].reverse()
+                    quest["states"].append(processStateRow(line, mappings))
+    quest["states"].reverse()
     return quest
 
 def parseIdMappings(cell):
@@ -60,9 +60,9 @@ def processStateRow(row, mappings):
     if not condition:
         raise Exception("State row lacks logic")
     return {
-        "State": int(row[0]),
-        "Description": row[1],
-        "Condition": condition
+        "state": int(row[0]),
+        "description": row[1],
+        "condition": condition
     }
 
 def processSubtaskRow(row, mappings):
@@ -71,13 +71,13 @@ def processSubtaskRow(row, mappings):
         raise Exception("Task row lacks logic to mark it completed")
 
     result = {
-        "Description": row[1],
-        "Completed": completed
+        "description": row[1],
+        "completed": completed
     }
 
     if len(row) >= 4:
         visible = conditions.parseCondition(row[3])
         if visible:
-            result["Visible"] = visible
+            result["visible"] = visible
 
     return result

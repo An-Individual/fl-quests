@@ -13,23 +13,23 @@ def processCategoryFolder(folder, files):
     with open(join(folder, "category.json"), "r") as catFile:
             categoryDetails = json.load(catFile)
     
-    if not categoryDetails["Order"]:
+    if not categoryDetails["order"]:
         raise Exception("Category does not include an order.")
 
-    if not isinstance(categoryDetails["Order"], int):
+    if not isinstance(categoryDetails["order"], int):
         raise Exception("Category order is not an integer.")
 
-    if not categoryDetails["Title"]:
+    if not categoryDetails["title"]:
         raise Exception("Category does not include a title.")
         
-    if not categoryDetails["ID"]:
+    if not categoryDetails["id"]:
         raise Exception("Category does not include an id.")
 
     category = {
-        "Order": int(categoryDetails["Order"]),
-        "Title": categoryDetails["Title"],
-        "ID": categoryDetails["ID"],
-        "Quests": []
+        "order": int(categoryDetails["order"]),
+        "title": categoryDetails["title"],
+        "id": categoryDetails["id"],
+        "quests": []
     }
 
     for file in files:
@@ -38,9 +38,9 @@ def processCategoryFolder(folder, files):
 
         print("    Processing " + file)
         quest = parser.processQuestFile(join(folder, file))
-        category["Quests"].append(quest)
+        category["quests"].append(quest)
     
-    category["Quests"].sort(reverse=True, key=lambda q: q["Order"])
+    category["quests"].sort(reverse=True, key=lambda q: q["order"])
 
     return category
 
@@ -65,11 +65,11 @@ for root, dirs, files in os.walk(join(questsdir, './definitions')):
         continue
     categories.append(processCategoryFolder(root, files))
     
-categories.sort(reverse=True, key=lambda c: c["Order"])
+categories.sort(reverse=True, key=lambda c: c["order"])
 
 fullQuests = {
-     "Version": version,
-     "Categories": categories
+     "version": version,
+     "categories": categories
 }
 
 rawJson = json.dumps(fullQuests)

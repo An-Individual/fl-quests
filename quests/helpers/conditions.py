@@ -18,9 +18,9 @@ def parseStatement(elems, mappings, prevStatement):
         if not prevStatement:
             raise Exception("Encountered unexpected logic element: " + elems[0])
         return {
-            "Type": logicType,
-            "Left": prevStatement,
-            "Right": parseStatement(elems[1:], mappings, None)
+            "type": logicType,
+            "left": prevStatement,
+            "right": parseStatement(elems[1:], mappings, None)
         }
 
     # If the next element isn't a logic element, but 
@@ -40,17 +40,17 @@ def parseStatement(elems, mappings, prevStatement):
             raise Exception("Not logic is not applied to a statement")
         result = parseComparisonStatement(elems[1:len(elems)], mappings)
         statement = {
-            "Type": 4,
-            "Statement": result["Statement"]
+            "type": 4,
+            "statement": result["statement"]
         }
-        return parseStatement(elems[result["EndIdx"]+1:], mappings, statement)
+        return parseStatement(elems[result["endIdx"]+1:], mappings, statement)
     
     # If we've got letters then this is the start of
     # a comparison statement so we throw out to
     # that method.
     if elems[0].isalpha():
         result = parseComparisonStatement(elems, mappings)
-        return parseStatement(elems[result["EndIdx"]:], mappings, result["Statement"])
+        return parseStatement(elems[result["endIdx"]:], mappings, result["statement"])
     
     # Finally, if it's an opening bracket we have to
     # find it's terminating bracket, parse the statement
@@ -87,10 +87,10 @@ def parseComparisonStatement(elems, mappings):
     # quality exists so we set that up here and modify
     # it later if the statement is more complex
     statement = {
-        "Type": 1,
-        "Quality": getMapping(elems[0], mappings),
-        "Comparison": getComparisonType(">"),
-        "Value": 0
+        "type": 1,
+        "quality": getMapping(elems[0], mappings),
+        "comparison": getComparisonType(">"),
+        "value": 0
     }
     endIdx = 1
 
@@ -98,25 +98,25 @@ def parseComparisonStatement(elems, mappings):
     if len(elems) >= 3 and elems[1] == ".":
         if not elems[2].isalpha():
             raise Exception("Invalid quality property: " + elems[2])
-        statement["Property"] = elems[2]
+        statement["property"] = elems[2]
         endIdx = 3
 
     if endIdx < len(elems):
         comparisonType = getComparisonType(elems[endIdx])
         if not comparisonType == 0:
-            statement["Comparison"] = comparisonType
+            statement["comparison"] = comparisonType
             endIdx += 1
             if endIdx >= len(elems):
                 raise Exception("Unexpected end of comparison statement")
             elif not elems[endIdx].isdigit():
                 raise Exception("Invalid comparison value: " + elems[endIdx])
             else:
-                statement["Value"] = int(elems[endIdx])
+                statement["value"] = int(elems[endIdx])
                 endIdx += 1;
 
     return {
-        "Statement": statement,
-        "EndIdx": endIdx
+        "statement": statement,
+        "endIdx": endIdx
     }
         
 def getMapping(name, mappings):
