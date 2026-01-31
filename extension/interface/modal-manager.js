@@ -29,8 +29,15 @@ class ModalManager {
             }
         }
 
+    static CategoryState = {
+        Show: 0,
+        Collapsed: 1,
+        Hide: 2
+    }
+
     constructor() {
         this.qualities = QualityTracker.instance();
+        this.settings = SettingsManager.instance();
         this.renderer = new QuestsRenderer();
         this.quests = new QuestsManager();
     }
@@ -118,7 +125,10 @@ class ModalManager {
             // We do this in stages so we don't have to clear
             // existing category elements if an error occures.
             categories.forEach(cat =>{
-                categoryElems.push(this.renderer.makeCategoryElement(cat));
+                let catState = this.settings.getCategoryState(cat.id);
+                if(catState != ModalManager.CategoryState.Hide) {
+                    categoryElems.push(this.renderer.makeCategoryElement(cat, catState == ModalManager.CategoryState.Collapsed));
+                }
             })
             categoryElems.forEach(elem =>{
                 homeElem.appendChild(elem);

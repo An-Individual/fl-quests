@@ -43,4 +43,12 @@ class SettingsManager {
     getQuestsSource() {
         return chrome.runtime.getURL('quests/quests.json')
     }
+
+    getCategoryState(id) {
+        return this.get("catstate:" + id);
+    }
+
+    setCategoryState(id, state) {
+        this.set("catstate:" + id, state);
+    }
 }

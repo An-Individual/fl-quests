@@ -5,6 +5,10 @@ class QuestsRenderer {
         Checkmark: "&#10003;",
     }
 
+    constructor() {
+        this.settings = SettingsManager.instance();
+    }
+
     makeTextElement(tag, className, textContent){
         let result = document.createElement(tag);
         result.className = className;
@@ -109,7 +113,7 @@ class QuestsRenderer {
         ]);
     }
 
-    makeCategoryElement(category){
+    makeCategoryElement(category, collapsed){
         let questElems = [];
         let completed = 0;
         category.quests.forEach((quest) =>{
@@ -124,14 +128,21 @@ class QuestsRenderer {
         let titleBarElem = this.makeWrapperElement("div", "flq-cat-titlebar", [titleElem, titleExpandElem]);
         let questsElem = this.makeWrapperElement("div", "flq-cat-quests", questElems);
 
+        if(collapsed) {
+            questsElem.style.display = "none";
+            titleExpandElem.innerHTML = QuestsRenderer.CharacterCodes.TriangleDown;
+        }
+
         titleBarElem.onclick = function(){
             if(questsElem.style.display != "none")
             {
                 questsElem.style.display = "none";
                 titleExpandElem.innerHTML = QuestsRenderer.CharacterCodes.TriangleDown;
+                SettingsManager.instance().setCategoryState(category.id, ModalManager.CategoryState.Collapsed);
             } else {
                 questsElem.style.display = "block";
                 titleExpandElem.innerHTML = QuestsRenderer.CharacterCodes.TriangleUp;
+                SettingsManager.instance().setCategoryState(category.id, ModalManager.CategoryState.Show);
             }
         };
 
