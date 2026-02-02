@@ -240,6 +240,17 @@ class StyleInjector {
             user-select: none;
             border-left: 1px solid #808080;
         }
+        
+        #flq-error-title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        #flq-error-trace {
+            font-family: "Lucida Console", "Courier New", monospace;
+            font-size: 8px;
+            margin-left: 5px;
+        }
         `;
 
     static insertStylesElement(){

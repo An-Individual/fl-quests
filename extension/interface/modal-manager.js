@@ -134,10 +134,16 @@ class ModalManager {
                 homeElem.appendChild(elem);
             });
         } catch (error) {
-            let errorElem = document.createElement("div");
-            errorElem.classList.add("flq-error");
-            errorElem.textContent = "Error Rendering Quests\n\n" + error;
-            homeElem.appendChild(errorElem);
+            homeElem.innerHTML = `
+                <div id="flq-error-title">Error Rendering Quests</div>
+                <div id="flq-error-message"></div>
+                <div id="flq-error-trace"></div>
+            `;
+            let messageElem = document.getElementById("flq-error-message");
+            let traceElem = document.getElementById("flq-error-trace");
+
+            messageElem.innerText = error.message;
+            traceElem.innerText = error.stack;
         }
 
         if(modalElem){
