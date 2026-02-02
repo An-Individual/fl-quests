@@ -20,6 +20,7 @@
         "quests/quests-validator.js",
         "quests/quests-manager.js",
         "interface/style-injector.js",
+        "interface/text-formatter.js",
         "interface/quests-renderer.js",
         "interface/modal-manager.js",
         "interface/modal-injector.js",

@@ -9,26 +9,30 @@ class QuestsRenderer {
         this.settings = SettingsManager.instance();
     }
 
-    makeTextElement(tag, className, textContent){
+    makeElement(tag, className, childElements){
         let result = document.createElement(tag);
         result.className = className;
-        result.innerHTML = textContent;
+        if(childElements) {
+            childElements.forEach((elem) =>{
+                result.appendChild(elem);
+            });
+        }
         return result;
     }
 
-    makeWrapperElement(tag, className, childElements){
+    makeElementWithInnerHtml(tag, className, innerHtml){
         let result = document.createElement(tag);
         result.className = className;
-        childElements.forEach((elem) =>{
-            result.appendChild(elem);
-        });
+        result.innerHTML = innerHtml;
         return result;
     }
 
-    encodeText(text){
-        const elem = document.createElement("textarea");
-        elem.innerText = text;
-        return elem.innerHTML;
+    makeTextElement(tag, className, text, markdownLite) {
+        return this.makeElementWithInnerHtml(
+            tag,
+            className,
+            TextFormatter.sanitizeAndFormat(text, markdownLite)
+        )
     }
 
     makeQuestElement(quest)
@@ -36,35 +40,35 @@ class QuestsRenderer {
         let statusElem;
         switch(quest.state){
             case QuestStates.NotStart:
-                statusElem = this.makeTextElement("div", "flq-quest-status flq-notstarted", "<div>Not Started</div>");
+                statusElem = this.makeElementWithInnerHtml("div", "flq-quest-status flq-notstarted", "<div>Not Started</div>");
                 break;
             case QuestStates.HiddenStatus:
-                statusElem = this.makeTextElement("div", "flq-quest-status flq-hiddenstatus", "<div>Hidden</div>");
+                statusElem = this.makeElementWithInnerHtml("div", "flq-quest-status flq-hiddenstatus", "<div>Hidden</div>");
                 break;
             case QuestStates.InProgress:
-                statusElem = this.makeTextElement("div", "flq-quest-status flq-inprogress", "<div>In Progress</div>");
+                statusElem = this.makeElementWithInnerHtml("div", "flq-quest-status flq-inprogress", "<div>In Progress</div>");
                 break;
             case QuestStates.Blocked:
-                statusElem = this.makeTextElement("div", "flq-quest-status flq-blocked", "<div>Blocked</div>");
+                statusElem = this.makeElementWithInnerHtml("div", "flq-quest-status flq-blocked", "<div>Blocked</div>");
                 break;
             case QuestStates.Completed:
-                statusElem = this.makeTextElement("div", "flq-quest-status flq-completed", "<div>Completed</div>");
+                statusElem = this.makeElementWithInnerHtml("div", "flq-quest-status flq-completed", "<div>Completed</div>");
                 break;
             default:
-                statusElem = this.makeTextElement("div", "flq-quest-status", "<div>ERROR</div>");
+                statusElem = this.makeElementWithInnerHtml("div", "flq-quest-status", "<div>ERROR</div>");
         }
 
-        let toggleElem = this.makeTextElement("div", "flq-quest-toggle", "+");
+        let toggleElem = this.makeElementWithInnerHtml("div", "flq-quest-toggle", "+");
 
-        let mainElem = this.makeWrapperElement("div", "flq-quest-main", [
+        let mainElem = this.makeElement("div", "flq-quest-main", [
             toggleElem,
-            this.makeTextElement("div", "flq-quest-title", this.encodeText(quest.title)),
+            this.makeTextElement("div", "flq-quest-title", quest.title, false),
             statusElem
         ]);
 
         let detailElems = [];
 
-        let descriptionElem = this.makeTextElement("div", "flq-quest-detail", this.encodeText(quest.details));
+        let descriptionElem = this.makeTextElement("div", "flq-quest-detail", quest.details, true);
         if(quest.subtasks?.length > 0){
             descriptionElem.classList.add("flq-quest-detail-line");
         }
@@ -75,13 +79,13 @@ class QuestsRenderer {
             quest.subtasks.forEach((task) =>{
                 let statusElem;
                 if(task.completed){
-                    statusElem = this.makeTextElement("div", "flq-subtask-status", QuestsRenderer.CharacterCodes.Checkmark);
+                    statusElem = this.makeElementWithInnerHtml("div", "flq-subtask-status", QuestsRenderer.CharacterCodes.Checkmark);
                 } else {
-                    statusElem = this.makeTextElement("div", "flq-subtask-status", "");
+                    statusElem = this.makeElementWithInnerHtml("div", "flq-subtask-status", "");
                 }
 
-                let taskElem = this.makeWrapperElement("div", "flq-subtask", [
-                    this.makeTextElement("div", "flq-subtask-description", encodeText(task.description)),
+                let taskElem = this.makeElement("div", "flq-subtask", [
+                    this.makeTextElement("div", "flq-subtask-description", task.description, true),
                     statusElem
                 ])
 
@@ -94,7 +98,7 @@ class QuestsRenderer {
             });
         }
 
-        let detailsElem = this.makeWrapperElement("div", "flq-quest-details", detailElems)
+        let detailsElem = this.makeElement("div", "flq-quest-details", detailElems)
 
         mainElem.onclick = function(){
             if(!detailsElem.style.display || detailsElem.style.display == "none")
@@ -107,7 +111,7 @@ class QuestsRenderer {
             }
         };
 
-        return this.makeWrapperElement("div", "flq-quest", [
+        return this.makeElement("div", "flq-quest", [
             mainElem,
             detailsElem
         ]);
@@ -123,10 +127,10 @@ class QuestsRenderer {
             }
         });
 
-        let titleElem = this.makeTextElement("div", "flq-cat-title", this.encodeText(category.title) + ` (${completed}/${category.quests.length})`);
-        let titleExpandElem = this.makeTextElement("div", "flq-cat-expand", QuestsRenderer.CharacterCodes.TriangleUp)
-        let titleBarElem = this.makeWrapperElement("div", "flq-cat-titlebar", [titleElem, titleExpandElem]);
-        let questsElem = this.makeWrapperElement("div", "flq-cat-quests", questElems);
+        let titleElem = this.makeTextElement("div", "flq-cat-title", `${category.title} (${completed}/${category.quests.length})`, false);
+        let titleExpandElem = this.makeElementWithInnerHtml("div", "flq-cat-expand", QuestsRenderer.CharacterCodes.TriangleUp)
+        let titleBarElem = this.makeElement("div", "flq-cat-titlebar", [titleElem, titleExpandElem]);
+        let questsElem = this.makeElement("div", "flq-cat-quests", questElems);
 
         if(collapsed) {
             questsElem.style.display = "none";
@@ -146,7 +150,7 @@ class QuestsRenderer {
             }
         };
 
-        return this.makeWrapperElement("div", "flq-cat", [
+        return this.makeElement("div", "flq-cat", [
             titleBarElem,
             questsElem
         ]);

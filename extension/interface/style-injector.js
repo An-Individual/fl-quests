@@ -251,6 +251,20 @@ class StyleInjector {
             font-size: 8px;
             margin-left: 5px;
         }
+
+        .flq-ul {
+            padding-left: 1rem;
+            list-style-type: disc;
+        }
+
+        .flq-ul .flq-ul {
+            list-style-type: circle;
+        }
+
+        .flq-ul .flq-ul .flq-ul {
+            list-style-type: square;
+        }
+        
         `;
 
     static insertStylesElement(){
