@@ -14,7 +14,8 @@
       "js": [
         "logger.js",
         "quests/quests-datatypes.js",
-        "qualities/csv/csv-builder.js",
+        "csv/csv-builder.js",
+        "csv/csv-reader.js",
         "qualities/quality-tracker.js",
         "qualities/request-interceptor.js",
         "settings.js",
