@@ -24,3 +24,10 @@ const ComparisionTypes = {
     Less: 5,
     LessEqual: 6
 }
+
+const QuestsSourceType = {
+    None: 0,
+    Local: 1,
+    GitHub: 2,
+    Custom: 3
+}

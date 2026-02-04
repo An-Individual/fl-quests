@@ -26,6 +26,14 @@ class QuestsValidator {
             }
         }
 
+        let existingIds = [];
+        for (const idx in quests.categories) {
+            if(existingIds.indexOf(quests.categories[idx].id) >= 0) {
+                return this.makeResult(false, "Category ID Not Unique: " + quests.categories[idx].id);
+            }
+            existingIds.push(quests.categories[idx].id);
+        }
+
         return this.makeResult(true);
     }
 
@@ -40,6 +48,11 @@ class QuestsValidator {
         check = this.isValidStringProperty(category.title);
         if(!check.valid) {
             return this.makeResult(false, "Category Title Error: " + check.reason);
+        }
+
+        check = this.isValidInteger(category.order);
+        if(!check.valid) {
+            return this.makeResult(false, "Category Order Error: " + check.reason);
         }
 
         check = this.isValidArray(category.quests, true);
@@ -63,6 +76,11 @@ class QuestsValidator {
         check = this.isValidStringProperty(quest.title);
         if(!check.valid) {
             return this.makeResult(false, "Quest Title Error: " + check.reason);
+        }
+
+        check = this.isValidInteger(quest.order);
+        if(!check.valid) {
+            return this.makeResult(false, "Quest Order Error: " + check.reason);
         }
 
         check = this.isValidArray(quest.states, true);

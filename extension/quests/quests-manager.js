@@ -16,7 +16,69 @@ class QuestsManager {
             return this.quests
         }
 
-        const response = await fetch(this.settings.getQuestsSource());
+        while(this.fetching) {
+            await new Promise(r => setTimeout(r, 10));
+            if(this.quests) {
+                return this.quests
+            }
+        }
+
+        try {
+            this.fetching = true;
+            Logger.log("Fetching quests from source.");
+
+            let sourceQuests = await this.fetchQuestsFromSource();
+
+            if(sourceQuests) {
+                Logger.log(`Source Quests Version: ${sourceQuests.version}`);
+                Logger.log(`Fetched ${sourceQuests.categories.length} Quest Categories From Source`);
+            } else {
+                sourceQuests = {
+                    version: "No Source Quests",
+                    categories: []
+                }
+            }
+
+            let importedQuests = this.getImportedQuests();
+
+            this.quests = this.resolveQuests(sourceQuests, importedQuests);
+            
+            return this.quests;
+        } finally {
+            this.fetching = false;
+        }
+    }
+
+    getQuestsSource() {
+        let source;
+        switch(this.settings.getQuestsSourceType()){
+            case QuestsSourceType.Local:
+                source = chrome.runtime.getURL('quests/quests.json');
+                break;
+            case QuestsSourceType.GitHub:
+                throw new Error("NOT IMPLEMENTED");
+            case QuestsSourceType.Custom:
+                source = this.settings.getCustomQuestsSource();
+                break;
+            default:
+                source = "";
+                break;
+        }
+
+        return source;
+    }
+
+    async fetchQuestsFromSource() {
+        let questsSource = this.getQuestsSource();
+
+        if(!questsSource) {
+            Logger.log(`No quests source specified`);
+            return;
+        } else {
+            Logger.log(`Quests Source: ${questsSource}`);
+        }
+
+        let response = await fetch(questsSource);
 
         if(!response.ok) {
             throw new Error("HTTP error: " + response.status);
@@ -30,8 +92,57 @@ class QuestsManager {
             throw new Error("Quests Validation Failed: " + validateResult.reason);
         }
 
-        this.quests = fetchedQuests;
-        return this.quests;
+        return fetchedQuests;
+    }
+
+    getImportedQuests() {
+        try {
+            let importedQuestsRaw = this.settings.getImportedQuests();
+            if(!importedQuestsRaw){
+                return;
+            }
+
+            Logger.log("Parsing imported quests");
+            
+            let importedQuests = JSON.parse(importedQuestsRaw);
+
+            let validateResult = this.validator.validate(importedQuests, true);
+            if(!validateResult.valid)
+            {
+                Logger.error("Imported Quests Invalid: " + validateResult.reason);
+                return;
+            }
+
+            return importedQuests;
+        } catch(error) {
+            Logger.error(error);
+        }
+    }
+
+    resolveQuests(sourceQuests, importedQuests) {
+        if(importedQuests) {
+            importedQuests.categories.forEach(cat =>{
+                let idx = sourceQuests.categories.findIndex(c => c.id == cat.id);
+                if(idx >= 0) {
+                    Logger.log(`Overwrote Category: ${cat.id} (${sourceQuests.categories[idx].title} -> ${cat.title})`);
+                    sourceQuests.categories[idx] = cat;
+                } else {
+                    Logger.log(`Imported Category: ${cat.id} (${cat.title})`);
+                    sourceQuests.categories.push(cat);
+                }
+            });
+        }
+
+        const sortOrderDescending = function(a,b) {
+            return b.order - a.order;
+        }
+
+        sourceQuests.categories.sort(sortOrderDescending);
+        sourceQuests.categories.forEach(cat => {
+            cat.quests.sort(sortOrderDescending)
+        });
+
+        return sourceQuests;
     }
 
     async getCategories() {

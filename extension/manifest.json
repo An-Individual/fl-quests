@@ -12,11 +12,12 @@
     {
       "matches": ["https://www.fallenlondon.com/*"],
       "js": [
+        "logger.js",
+        "quests/quests-datatypes.js",
         "qualities/csv/csv-builder.js",
         "qualities/quality-tracker.js",
         "qualities/request-interceptor.js",
         "settings.js",
-        "quests/quests-datatypes.js",
         "quests/quests-validator.js",
         "quests/quests-manager.js",
         "interface/style-injector.js",
