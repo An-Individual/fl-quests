@@ -19,7 +19,7 @@ class QuestsManager {
         while(this.fetching) {
             await new Promise(r => setTimeout(r, 10));
             if(this.quests) {
-                return this.quests
+                return this.quests;
             }
         }
 
@@ -97,6 +97,10 @@ class QuestsManager {
 
     getImportedQuests() {
         try {
+            if(!this.settings.getEnableImportedQuests()) {
+                return;
+            }
+
             let importedQuestsRaw = this.settings.getImportedQuests();
             if(!importedQuestsRaw){
                 return;
@@ -122,9 +126,12 @@ class QuestsManager {
     resolveQuests(sourceQuests, importedQuests) {
         if(importedQuests) {
             importedQuests.categories.forEach(cat =>{
+                cat.isImport = true;
                 let idx = sourceQuests.categories.findIndex(c => c.id == cat.id);
                 if(idx >= 0) {
                     Logger.log(`Overwrote Category: ${cat.id} (${sourceQuests.categories[idx].title} -> ${cat.title})`);
+                    cat.isOverride = true;
+                    cat.originalTitle = sourceQuests.categories[idx].title;
                     sourceQuests.categories[idx] = cat;
                 } else {
                     Logger.log(`Imported Category: ${cat.id} (${cat.title})`);

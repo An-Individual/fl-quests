@@ -56,13 +56,21 @@ class ModalManager {
             }
         };
 
+        this.attachTabEvents();
+        this.attachSettingEvents();
+        this.attachImportEvents();
+
         let exportButton = document.getElementById("flq-export-button");
         exportButton.onclick = function(){
             ModalManager.instance().exportQualities();
         };
+    }
 
+    attachTabEvents() {
         let homeButton = document.getElementById(ModalManager.TabData.ID.HomeTab);
-        homeButton.onclick = function(){
+        homeButton.onclick = async function(){
+            await ModalManager.instance().renderQuests();
+            await ModalManager.instance().renderSettings();
             ModalManager.instance().selectTab(ModalManager.TabData.Tab.Home);
         };
 
@@ -75,6 +83,99 @@ class ModalManager {
         helpButton.onclick = function(){
             ModalManager.instance().selectTab(ModalManager.TabData.Tab.Help);
         };
+    }
+
+    attachSettingEvents() {
+        this.settingsElems = {
+            hideNotStarted: document.getElementById("flq-hidenotstarted"),
+            questSourceNone: document.getElementById("flq-qsource-none"),
+            questSourceLocal: document.getElementById("flq-qsource-local"),
+            questSourceGithub: document.getElementById("flq-qsource-github"),
+            questSourceCustom: document.getElementById("flq-qsource-custom"),
+            questSourceAddress: document.getElementById("flq-qsource-address"),
+            enableImport: document.getElementById("flq-enable-quest-import"),
+            importPanel: document.getElementById("flq-quest-import-panel"),
+            importState: document.getElementById("flq-import-state"),
+            categorySettings: document.getElementById("flq-cat-settings")
+        };
+
+        this.settingsElems.hideNotStarted.addEventListener('change', (event) =>{
+            if(!this.renderingSettings) {
+                this.settings.setHideNotStarted(event.currentTarget.checked);
+            }
+        });
+
+        this.settingsElems.questSourceNone.addEventListener('change', (event) =>{
+            if(!this.renderingSettings && event.currentTarget.checked) {
+                this.settings.setQuestsSourceType(QuestsSourceType.None);
+                this.quests.clear();
+            }
+
+            this.updateSettingEnabledStates();
+        });
+
+        this.settingsElems.questSourceLocal.addEventListener('change', (event) =>{
+            if(!this.renderingSettings && event.currentTarget.checked) {
+                this.settings.setQuestsSourceType(QuestsSourceType.Local);
+                this.quests.clear();
+            }
+
+            this.updateSettingEnabledStates();
+        });
+
+        this.settingsElems.questSourceGithub.addEventListener('change', (event) =>{
+            if(!this.renderingSettings && event.currentTarget.checked) {
+                this.settings.setQuestsSourceType(QuestsSourceType.GitHub);
+                this.quests.clear();
+            }
+
+            this.updateSettingEnabledStates();
+        });
+
+        this.settingsElems.questSourceCustom.addEventListener('change', (event) =>{
+            if(!this.renderingSettings && event.currentTarget.checked) {
+                this.settings.setQuestsSourceType(QuestsSourceType.Custom);
+                this.quests.clear();
+            }
+
+            this.updateSettingEnabledStates();
+        });
+
+        this.settingsElems.questSourceAddress.addEventListener('blur', (event) =>{
+            if(!this.renderingSettings && event.currentTarget.value != this.settings.getCustomQuestsSource()) {
+                this.settings.setCustomQuestsSource(event.currentTarget.value);
+                this.quests.clear();
+            }
+        });
+
+        this.settingsElems.enableImport.addEventListener('change', (event) =>{
+            if(!this.renderingSettings) {
+                this.settings.setEnableImportedQuests(event.currentTarget.checked);
+            }
+            
+            this.updateSettingEnabledStates();
+        });
+    }
+
+    attachImportEvents() {
+        let clearButton = document.getElementById("flq-clear-imported-button");
+        clearButton.onclick = function(){
+            if(ModalManager.instance().settings.getImportedQuests()) {
+                ModalManager.instance().settings.setImportedQuests("");
+                ModalManager.instance().quests.clear();
+                ModalManager.instance().renderSettings();
+                alert("Imported quests have been cleared. The UI is refreshing.");
+            }
+        };
+
+        let importButton = document.getElementById("flq-import-quests-button");
+        importButton.onclick = function(){
+            ModalManager.instance().importQuests();
+        };
+    }
+
+    importQuests() {
+        alert("NOT IMPLEMENTED");
     }
 
     selectTab(tab) {
@@ -113,23 +214,33 @@ class ModalManager {
     async show(){
         this.selectTab(ModalManager.TabData.Tab.Home);
         const modalElem = document.getElementById("flq-modal");
-        const homeElem = document.getElementById("flq-home");
 
-        while(homeElem.firstChild){
-            homeElem.removeChild(homeElem.lastChild);
+        await this.renderQuests();
+        await this.renderSettings();
+
+        if(modalElem){
+            modalElem.style.display = "block";
         }
+    }
+
+    async renderQuests() {
+        const homeElem = document.getElementById("flq-home");
+        this.clearChildren(homeElem);
 
         try {
             let categories = await this.quests.renderQuests();
             let categoryElems = [];
+            let hideNotStarted = this.settings.getHideNotStarted();
             // We do this in stages so we don't have to clear
             // existing category elements if an error occures.
             categories.forEach(cat =>{
                 let catState = this.settings.getCategoryState(cat.id);
                 if(catState != ModalManager.CategoryState.Hide) {
-                    categoryElems.push(this.renderer.makeCategoryElement(cat, catState == ModalManager.CategoryState.Collapsed));
+                    if(!hideNotStarted || cat.quests.find(q => q.state != QuestStates.NotStart && q.state != QuestStates.HiddenStatus)) {
+                        categoryElems.push(this.renderer.makeCategoryElement(cat, catState == ModalManager.CategoryState.Collapsed));
+                    }
                 }
-            })
+            });
             categoryElems.forEach(elem =>{
                 homeElem.appendChild(elem);
             });
@@ -145,9 +256,111 @@ class ModalManager {
             messageElem.innerText = error.message;
             traceElem.innerText = error.stack;
         }
+    }
 
-        if(modalElem){
-            modalElem.style.display = "block";
+    async renderSettings() {
+        this.renderingSettings = true;
+        try {
+            this.settingsElems.hideNotStarted.checked = this.settings.getHideNotStarted();
+            this.settingsElems.enableImport.checked = this.settings.getEnableImportedQuests();
+            this.settingsElems.questSourceAddress.value = this.settings.getCustomQuestsSource() ?? "";
+
+            switch(this.settings.getQuestsSourceType()) {
+                case QuestsSourceType.None:
+                    this.settingsElems.questSourceNone.checked = true;
+                    break;
+                case QuestsSourceType.GitHub:
+                    this.settingsElems.questSourceGithub.checked = true;
+                    break;
+                case QuestsSourceType.Custom:
+                    this.settingsElems.questSourceCustom.checked = true;
+                    break;
+                default:
+                    this.settingsElems.questSourceLocal.checked = true;
+                    break;
+            }
+
+            this.updateSettingEnabledStates();
+
+            this.clearChildren(this.settingsElems.categorySettings);
+            let categories = await this.quests.getCategories();
+
+            let imported = [];
+            let overrides = [];
+            for(const i in categories) {
+                let category = categories[i];
+
+                if(category.isImport) {
+                    if(category.isOverride) {
+                        overrides.push(category);
+                    } else {
+                        imported.push(category);
+                    }
+                }
+
+                let checkboxElem = document.createElement("input");
+                checkboxElem.setAttribute("type", "checkbox");
+                checkboxElem.setAttribute("id", `hideCat${i}`);
+                checkboxElem.setAttribute("name", `hideCat${i}`);
+                checkboxElem.checked = this.settings.getCategoryState(category.id) == ModalManager.CategoryState.Hide;
+                checkboxElem.addEventListener('change', (event) =>{
+                    this.settings.setCategoryState(category.id, event.currentTarget.checked ? ModalManager.CategoryState.Hide : ModalManager.CategoryState.Show);
+                });
+
+                let labelElem = document.createElement("label");
+                labelElem.setAttribute("for", `hideCat${i}`);
+                labelElem.innerHTML = `Hide ${TextFormatter.sanitizeAndFormat(category.title)}`;
+
+                this.settingsElems.categorySettings.appendChild(checkboxElem);
+                this.settingsElems.categorySettings.appendChild(document.createTextNode(" "));
+                this.settingsElems.categorySettings.appendChild(labelElem);
+                this.settingsElems.categorySettings.appendChild(document.createElement("br"));
+            }
+
+            let importString = "";
+            
+            if(overrides.length > 0) {
+                importString += "Overridden Categories:\n";
+                importString += overrides.map(c => {
+                    if(c.title == c.originalTitle) {
+                        return `    ${TextFormatter.sanitizeAndFormat(c.title)}`;
+                    } else {
+                        return `    ${TextFormatter.sanitizeAndFormat(c.originalTitle)} -> ${TextFormatter.sanitizeAndFormat(c.title)}`;
+                    }
+                }).join("\n");
+            }
+
+            if(imported.length > 0) {
+                if(importString) {
+                    importString+= "\n\n";
+                }
+                importString += "Imported Categories:\n";
+                importString += imported.map(c => {
+                    return `    ${TextFormatter.sanitizeAndFormat(c.title)}`;
+                }).join("\n");
+            }
+
+            if(!importString) {
+                importString = "No Imports";
+            }
+
+            this.settingsElems.importState.innerText = importString;
+        } catch(error) {
+            Logger.error(error);
+            this.clearChildren(this.settingsElems.categorySettings);
+        } finally {
+            this.renderingSettings = false;
+        }
+    }
+
+    updateSettingEnabledStates() {
+        this.settingsElems.questSourceAddress.disabled = !this.settingsElems.questSourceCustom.checked;
+        this.settingsElems.importPanel.style.display = this.settingsElems.enableImport.checked ? "block" : "none";
+    }
+
+    clearChildren(element) {
+        while(element.firstChild){
+            element.removeChild(element.lastChild);
         }
     }
 

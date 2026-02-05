@@ -120,10 +120,13 @@ class QuestsRenderer {
     makeCategoryElement(category, collapsed){
         let questElems = [];
         let completed = 0;
+        let hideNotStarted = this.settings.getHideNotStarted();
         category.quests.forEach((quest) =>{
-            questElems.push(this.makeQuestElement(quest));
-            if(quest.state == QuestStates.Completed){
-                completed++;
+            if(!hideNotStarted || (quest.state != QuestStates.NotStart && quest.state != QuestStates.HiddenStatus)) {
+                questElems.push(this.makeQuestElement(quest));
+                if(quest.state == QuestStates.Completed){
+                    completed++;
+                }
             }
         });
 

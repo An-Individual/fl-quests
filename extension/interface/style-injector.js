@@ -265,6 +265,40 @@ class StyleInjector {
             list-style-type: square;
         }
         
+        .flq-settings-title {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        
+        .flq-settings-group {
+            margin-bottom: 10px;
+        }
+
+        .flq-settings-body {
+            margin-left: 20px;
+        }
+
+        #flq-quest-import-panel {
+            display: none;
+        }
+
+        #flq-quest-import-panel {
+            margin-top: 5px;
+        }
+
+        #flq-qsource-address {
+            width: 100%;
+        }
+
+        #flq-import-state {
+            font-family: "Lucida Console", "Courier New", monospace;
+            border: 1px solid #000;
+            margin-top: 5px;
+            margin-right: 40px;
+            padding: 5px;
+            font-size: 0.9em;
+            white-space: pre-wrap;
+        }
         `;
 
     static insertStylesElement(){

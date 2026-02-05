@@ -12,6 +12,7 @@ class SettingsManager {
         "HideNotStarted",
         "QuestsSourceType",
         "CustomQuestsSource",
+        "EnableImportedQuests",
         "ImportedQuests"
     ];
 
@@ -34,7 +35,7 @@ class SettingsManager {
             }
 
             this[`set${key}`] = function(value) {
-                this.set(value);
+                this.set(key, value);
             }
         })
     }

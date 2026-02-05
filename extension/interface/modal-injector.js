@@ -17,6 +17,52 @@ class ModalInjector {
                         <div id="flq-home">
                         </div>
                         <div id="flq-settings">
+                            <div class="flq-settings-group">
+                                <div class="flq-settings-title">General</div>
+                                <div class="flq-settings-body">
+                                    <input type="checkbox" id="flq-hidenotstarted" name="flq-hidenotstarted">
+                                    <label for="flq-hidenotstarted">Hide quests that have not been started</label>
+                                </div>
+                            </div>
+                            <div class="flq-settings-group">
+                                <div class="flq-settings-title">Categories</div>
+                                <div id="flq-cat-settings" class="flq-settings-body">
+                                </div>
+                            </div>
+                            <div class="flq-settings-group">
+                                <div class="flq-settings-title">Quests Source</div>
+                                <div class="flq-settings-body">
+                                    Where should the base quest list be pulled from?
+                                    <div class="flq-settings-body">
+                                        <input type="radio" id="flq-qsource-none" name="flq-qsource">
+                                        <label for="flq-qsource-none">Imported Only</label><br>
+                                        <input type="radio" id="flq-qsource-local" name="flq-qsource">
+                                        <label for="flq-qsource-local">Built In</label><br>
+                                        <input type="radio" id="flq-qsource-github" name="flq-qsource">
+                                        <label for="flq-qsource-github">GitHub</label><br>
+                                        <input type="radio" id="flq-qsource-custom" name="flq-qsource">
+                                        <label for="flq-qsource-custom">Custom:</label>
+                                        <div class="flq-settings-body" style="margin-right:40px;">
+                                            <input type="text" id="flq-qsource-address" disabled>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flq-settings-group">
+                                <div class="flq-settings-title">Imported Quests</div>
+                                <div class="flq-settings-body">
+                                    <input type="checkbox" id="flq-enable-quest-import" name="flq-enable-quest-import">
+                                    <label for="flq-enable-quest-import">Enable quest importing</label><br>
+                                    <div class="flq-settings-body" id="flq-quest-import-panel">
+                                        <div>
+                                        <span id="flq-import-quests-button" class="button button--primary button--no-margin">Import</span>
+                                        <span id="flq-clear-imported-button" class="button button--primary button--no-margin">Clear</span>
+                                        </div>
+                                        <div id="flq-import-state">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div id="flq-help">
                             <p>Some troubleshooting advice.</p>
