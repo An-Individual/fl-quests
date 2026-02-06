@@ -232,7 +232,7 @@ class ModalManager {
                 }
 
                 this.settings.setImportedQuests(JSON.stringify(current));
-                this.quests.clear();
+                this.quests.clearImported();
 
                 let details = "";
                 if(overrides.length > 0){

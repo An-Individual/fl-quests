@@ -9,6 +9,11 @@ class QuestsManager {
 
     clear() {
         this.quests = null;
+        this.questsRaw = null;
+    }
+
+    clearImported() {
+        this.quests = null;
     }
 
     async getQuests() {
@@ -69,30 +74,46 @@ class QuestsManager {
     }
 
     async fetchQuestsFromSource() {
-        let questsSource = this.getQuestsSource();
-
-        if(!questsSource) {
-            Logger.log(`No quests source specified`);
-            return;
-        } else {
-            Logger.log(`Quests Source: ${questsSource}`);
+        if(this.questsRaw){
+            return JSON.parse(this.questsRaw);
         }
 
-        let response = await fetch(questsSource);
-
-        if(!response.ok) {
-            throw new Error("HTTP error: " + response.status);
+        while(this.fetchingRaw) {
+            await new Promise(r => setTimeout(r, 10));
+            if(this.questsRaw) {
+                return JSON.parse(this.questsRaw);
+            }
         }
+        try {
+            this.fetchingRaw = true;
+            let questsSource = this.getQuestsSource();
 
-        let fetchedQuests = await response.json();
+            if(!questsSource) {
+                Logger.log(`No quests source specified`);
+                return;
+            } else {
+                Logger.log(`Quests Source: ${questsSource}`);
+            }
 
-        let validateResult = this.validator.validate(fetchedQuests);
-        if(!validateResult.valid)
-        {
-            throw new Error("Quests Validation Failed: " + validateResult.reason);
+            let response = await fetch(questsSource);
+
+            if(!response.ok) {
+                throw new Error("HTTP error: " + response.status);
+            }
+
+            let fetchedQuests = await response.json();
+
+            let validateResult = this.validator.validate(fetchedQuests);
+            if(!validateResult.valid)
+            {
+                throw new Error("Quests Validation Failed: " + validateResult.reason);
+            }
+
+            this.questsRaw = JSON.stringify(fetchedQuests);
+            return fetchedQuests;
+        } finally {
+            this.fetchingRaw = false;
         }
-
-        return fetchedQuests;
     }
 
     getImportedQuests() {
