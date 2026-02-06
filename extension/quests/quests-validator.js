@@ -40,7 +40,7 @@ class QuestsValidator {
     validateCategory(category) {
         let check;
 
-        check = this.isValidStringProperty(category.id);
+        check = this.isValidIDProperty(category.id);
         if(!check.valid) {
             return this.makeResult(false, "Category ID Error: " + check.reason);
         }
@@ -216,6 +216,17 @@ class QuestsValidator {
         }
 
         return this.makeResult(true);
+    }
+
+    isValidIDProperty(propValue) {
+        let result = this.isValidStringProperty(propValue);
+        if(!result.isValid) {
+            return result;
+        }
+
+        if(!/^\w{1,500}$/.test(propValue)) {
+            return this.makeResult(false, "IDs must contain only letters, numbers, and underscores and be fewer than 500 characters.");
+        }
     }
 
     isValidArray(propValue, requireValues){
