@@ -110,8 +110,12 @@ class QuestsManager {
             Logger.log(`Source Quests Version: ${fetchedQuests.version}`);
             Logger.log(`Fetched ${fetchedQuests.categories.length} Quest Categories From Source`);
 
+            // It's actually weirdly important that we stringify and parse
+            // the returned object here. If we don't we'll get a cross-origin object
+            // error when we try to merge the imported and source quests. Why?
+            // Damned if I know.
             this.questsRaw = JSON.stringify(fetchedQuests);
-            return fetchedQuests;
+            return JSON.parse(this.questsRaw);
         } finally {
             this.fetchingRaw = false;
         }
