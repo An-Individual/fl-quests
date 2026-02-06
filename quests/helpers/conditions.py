@@ -140,10 +140,8 @@ def getLogicType(value):
     types = {
         "&": 2,
         "&&": 2,
-        "and": 2,
         "|": 3,
-        "||": 3,
-        "or": 3
+        "||": 3
     }
     return types.get(value.lower(), 0)
 

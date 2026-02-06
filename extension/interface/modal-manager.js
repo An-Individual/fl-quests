@@ -40,6 +40,7 @@ class ModalManager {
         this.settings = SettingsManager.instance();
         this.renderer = new QuestsRenderer();
         this.quests = new QuestsManager();
+        this.questsImporter = new QuestsCSVParser();
     }
 
     attachEvents() {
@@ -159,12 +160,14 @@ class ModalManager {
 
     attachImportEvents() {
         let clearButton = document.getElementById("flq-clear-imported-button");
-        clearButton.onclick = function(){
-            if(ModalManager.instance().settings.getImportedQuests()) {
-                ModalManager.instance().settings.setImportedQuests("");
-                ModalManager.instance().quests.clear();
-                ModalManager.instance().renderSettings();
-                alert("Imported quests have been cleared. The UI is refreshing.");
+        clearButton.onclick = async function(){
+            if(confirm("Are you sure you want to clear your imported quests?")) {
+                if(ModalManager.instance().settings.getImportedQuests()) {
+                    ModalManager.instance().settings.setImportedQuests("");
+                    ModalManager.instance().quests.clear();
+                    await ModalManager.instance().renderSettings();
+                    alert("Imported quests have been cleared.");
+                }
             }
         };
 
@@ -174,8 +177,122 @@ class ModalManager {
         };
     }
 
-    importQuests() {
-        alert("NOT IMPLEMENTED");
+    async importQuests() {
+        try {
+            let fileList = await this.openFileDialog();
+            if(fileList && fileList.length > 0) {
+                let current;
+                for(const i in fileList) {
+                    let fileText = await this.readFile(fileList[i]);
+                    let imported = this.questsImporter.parse(fileText);
+                    if(imported.error) {
+                        if(imported.row) {
+                            let columnLetter = (10+imported.column).toString(36).toUpperCase();
+                            alert(`IMPORT FAILED\nFile: ${fileList[i].name}\nCell: ${columnLetter}${imported.row}\n\n${imported.error}`);
+                        } else {
+                            alert(`IMPORT FAILED\nFile :${fileList[i].name}\n\n${imported.error}`);
+                        }
+                        return;
+                    }
+
+                    let validate = this.quests.validator.validate(imported, true);
+                    if(!validate.valid) {
+                        alert(`VALIDATION FAILED\nFile :${fileList[i].name}\n\n${validate.reason}`);
+                        return;
+                    }
+
+                    if(!current) {
+                        current = imported;
+                    } else {
+                        this.mergeQuests(current, imported);
+                    }
+                }
+
+                if(!current || current.categories.length == 0)
+                {
+                    alert('IMPORT FAILED\n\nNo quests found.');
+                    return;
+                }
+
+                let oldCategories = await this.quests.getCategories();
+                let overrides = [];
+                let additions = [];
+                current.categories.forEach(cat =>{
+                    if(oldCategories.find(c => c.id == cat.id)) {
+                        overrides.push(cat.id);
+                    } else {
+                        additions.push(cat.id);
+                    }
+                });
+
+                let oldRaw = this.settings.getImportedQuests();
+                if(oldRaw) {
+                    let oldImported = JSON.parse(oldRaw);
+                    current = this.mergeQuests(oldImported, current);
+                }
+
+                this.settings.setImportedQuests(JSON.stringify(current));
+                this.quests.clear();
+
+                let details = "";
+                if(overrides.length > 0){
+                    details+= `\n\nNew Overrides\n    ${overrides.join("\n    ")}`;
+                }
+                if(additions.length > 0){
+                    details+= `\n\nNew Additions\n    ${additions.join("\n    ")}`;
+                }
+
+                await this.renderSettings();
+
+                alert(`IMPORT SUCCESSFUL\nImported ${overrides.length+additions.length} categories${details}`);
+            }
+        } catch (error) {
+            Logger.error(error);
+            alert(`IMPORT THREW AN ERROR\n\n${error}`);
+        }
+    }
+
+    openFileDialog() {
+        return new Promise((resolve) =>{
+            let inputElem = document.createElement("input");
+            inputElem.setAttribute("type", "file");
+            inputElem.setAttribute("accept", "text/csv,.csv");
+            inputElem.setAttribute("multiple", "");
+
+            inputElem.addEventListener("change", event =>{
+                resolve(event.target.files);
+            });
+
+            inputElem.addEventListener("cancel", event =>{
+                resolve();
+            });
+
+            inputElem.click();
+        });
+    }
+
+    readFile(file) {
+        return new Promise((resolve,reject) =>{
+            let reader = new FileReader();
+            reader.onload = () => {
+                resolve(reader.result);
+            };
+            reader.onerror = () => {
+                reject(new Error(`An error occurred reading file: ${file.name}`));
+            };
+            reader.readAsText(file);
+        })
+    }
+
+    mergeQuests(current, additional) {
+        additional.categories.forEach(cat =>{
+            let idx = current.categories.findIndex(c => c.id == cat.id);
+            if(idx >= 0) {
+                current.categories[idx] = cat;
+            } else {
+                current.categories.push(cat);
+            }
+        });
     }
 
     selectTab(tab) {

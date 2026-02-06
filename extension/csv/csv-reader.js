@@ -1,6 +1,7 @@
 class CSVReader {
     constructor(csvString) {
         this.remaining = csvString;
+        this.rowNumber = 0;
     }
 
     readRow() {
@@ -40,6 +41,7 @@ class CSVReader {
         }
 
         this.row = cells;
+        this.rowNumber++;
         return cells;
     }
 }
