@@ -223,7 +223,7 @@ class QuestsManager {
         }
 
         let state;
-        for (let i = 0; i < quest.states.length; i++)
+        for (let i = quest.states.length-1; i >= 0; i--)
         {
             state = quest.states[i];
             if(this.evaluateCondition(state.condition))
