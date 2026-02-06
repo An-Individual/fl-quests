@@ -21,17 +21,17 @@ class ConditionReader {
 
         if(this.isSingleton(this.value[this.index])) {
             this.index++;
-        } else if(this.isLogicChar) {
+        } else if(this.isLogicChar(this.value[this.index])) {
             this.moveNextNot(this.isLogicChar);
-        } else if(this.isComparison) {
+        } else if(this.isComparison(this.value[this.index])) {
             this.moveNextNot(this.isComparison);
-        } else if(this.isLetter) {
+        } else if(this.isLetter(this.value[this.index])) {
             this.moveNextNot(this.isLetter);
-        } else if(this.isNumber) {
+        } else if(this.isNumber(this.value[this.index])) {
             this.moveNextNot(this.isNumber);
         }
 
-        this.last = this.value.subString(this.lastIndex, this.index);
+        this.last = this.value.substring(this.lastIndex, this.index);
         return this.last;
     }
 

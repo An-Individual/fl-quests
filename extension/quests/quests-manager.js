@@ -30,14 +30,10 @@ class QuestsManager {
 
         try {
             this.fetching = true;
-            Logger.log("Fetching quests from source.");
 
             let sourceQuests = await this.fetchQuestsFromSource();
 
-            if(sourceQuests) {
-                Logger.log(`Source Quests Version: ${sourceQuests.version}`);
-                Logger.log(`Fetched ${sourceQuests.categories.length} Quest Categories From Source`);
-            } else {
+            if(!sourceQuests) {
                 sourceQuests = {
                     version: "No Source Quests",
                     categories: []
@@ -85,6 +81,8 @@ class QuestsManager {
             }
         }
         try {
+            Logger.log("Fetching quests from source.");
+
             this.fetchingRaw = true;
             let questsSource = this.getQuestsSource();
 
@@ -109,6 +107,9 @@ class QuestsManager {
                 throw new Error("Quests Validation Failed: " + validateResult.reason);
             }
 
+            Logger.log(`Source Quests Version: ${fetchedQuests.version}`);
+            Logger.log(`Fetched ${fetchedQuests.categories.length} Quest Categories From Source`);
+
             this.questsRaw = JSON.stringify(fetchedQuests);
             return fetchedQuests;
         } finally {
@@ -126,8 +127,6 @@ class QuestsManager {
             if(!importedQuestsRaw){
                 return;
             }
-
-            Logger.log("Parsing imported quests");
             
             let importedQuests = JSON.parse(importedQuestsRaw);
 

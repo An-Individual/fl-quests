@@ -2,10 +2,10 @@ class ConditionParser {
     parse(condition, mappings) {
         let elems = this.splitCondition(condition);
         let result = this.parseStatement(elems, mappings);
-        if(result.error){
+        if(result?.error){
             return result;
         }
-        return result.value;
+        return result?.value;
     }
 
     /**
@@ -30,7 +30,7 @@ class ConditionParser {
             }
 
             let rightResult = this.parseStatement(elems.slice(1), mappings);
-            if(rightResult.error) {
+            if(rightResult?.error) {
                 return rightResult;
             }
 
@@ -74,7 +74,7 @@ class ConditionParser {
                 };
             }
             let subResult = this.parseStatement(elems.slice(1), mappings);
-            if(subResult.error){
+            if(subResult?.error){
                 return subStatement;
             }
             let statement = {
@@ -95,13 +95,13 @@ class ConditionParser {
             }
 
             result = this.parseStatement(elems.slice(1,endIdx),mappings);
-            if(result.error){
+            if(result?.error){
                 return result;
             }
             result.count += 2;
         } else if(this.isLetterString(elems[0].value)) {
             result = this.parseComparision(elems, mappings);
-            if(result.error) {
+            if(result?.error) {
                 return result;
             }
         } else {
@@ -155,6 +155,7 @@ class ConditionParser {
                     }
                 }
             }
+            idx++;
         }
         return {
             error: `Condition error at position ${elems[0].position}: Bracket not closed.`
@@ -175,7 +176,7 @@ class ConditionParser {
         let statement = {
             type: LogicTypes.Comparison,
             quality: quality,
-            comparision: ComparisionTypes.Greater,
+            comparison: ComparisionTypes.Greater,
             value: 0
         }
 
@@ -199,6 +200,7 @@ class ConditionParser {
         if(idx < elems.length) {
             let comparisonType = this.getComparisonType(elems[idx].value);
             if(comparisonType) {
+                statement.comparison = comparisonType;
                 idx++;
                 if(idx >= elems.length) {
                     return {

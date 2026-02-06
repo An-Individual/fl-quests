@@ -12,6 +12,17 @@ class CSVReader {
 
         let cells = [];
         while(this.remaining) {
+            let quoteCell = this.remaining.match(/^"(([^"]|"{2})*)"/);
+            if(quoteCell) {
+                cells.push(quoteCell[1].replace(`""`,`"`));
+                this.remaining = this.remaining.slice(quoteCell[0].length);
+            } else {
+                // This will match even on an empty string
+                let plainCell = this.remaining.match(/^[^,\r\n]*/);
+                cells.push(plainCell[0]);
+                this.remaining = this.remaining.slice(plainCell[0].length);
+            }
+
             // Overly defensive, but we're just going to allow
             // any combination and number of return and new line
             // characters to end a line rather than strictly
@@ -24,15 +35,11 @@ class CSVReader {
                 break;
             }
 
-            let quoteCell = this.remaining.match(/^"(([^"]|"{2})*)",?/);
-            if(quoteCell) {
-                cells.push(quoteCell[1].replace(`""`,`"`));
-                this.remaining = this.remaining.slice(quoteCell[0].length);
-            } else {
-                // This will match even on an empty string
-                let plainCell = this.remaining.match(/^([^,\r\n]*),?/);
-                cells.push(plainCell[1]);
-                this.remaining = this.remaining.slice(plainCell[0].length);
+            if(this.remaining && this.remaining[0] == ",") {
+                this.remaining = this.remaining.slice(1);
+                if(!this.remaining) {
+                    cells.push("");
+                }
             }
         }
 

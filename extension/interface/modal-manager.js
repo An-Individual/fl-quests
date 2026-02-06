@@ -149,12 +149,13 @@ class ModalManager {
             }
         });
 
-        this.settingsElems.enableImport.addEventListener('change', (event) =>{
+        this.settingsElems.enableImport.addEventListener('change', async (event) =>{
             if(!this.renderingSettings) {
                 this.settings.setEnableImportedQuests(event.currentTarget.checked);
             }
             
-            this.updateSettingEnabledStates();
+            this.quests.clearImported();
+            await this.renderSettings();
         });
     }
 
@@ -164,9 +165,8 @@ class ModalManager {
             if(confirm("Are you sure you want to clear your imported quests?")) {
                 if(ModalManager.instance().settings.getImportedQuests()) {
                     ModalManager.instance().settings.setImportedQuests("");
-                    ModalManager.instance().quests.clear();
+                    ModalManager.instance().quests.clearImported();
                     await ModalManager.instance().renderSettings();
-                    alert("Imported quests have been cleared.");
                 }
             }
         };
@@ -182,7 +182,7 @@ class ModalManager {
             let fileList = await this.openFileDialog();
             if(fileList && fileList.length > 0) {
                 let current;
-                for(const i in fileList) {
+                for(let i = 0; i < fileList.length; i++) {
                     let fileText = await this.readFile(fileList[i]);
                     let imported = this.questsImporter.parse(fileText);
                     if(imported.error) {

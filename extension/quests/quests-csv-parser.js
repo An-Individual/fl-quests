@@ -25,6 +25,8 @@ class QuestsCSVParser {
                 }
             }
 
+            Logger.debug(`Parsing row ${reader.rowNumber}`);
+
             state.rowNumber = reader.rowNumber;
             let firstCell = row[0]?.trim()?.toLowerCase() ?? "";
 
@@ -33,28 +35,33 @@ class QuestsCSVParser {
                 continue;
             }
             else if(firstCell == "category") {
+                Logger.debug(`Parsing Category`);
                 let result = this.parseCategoryRow(row, state);
-                if(result.error){
+                if(result?.error){
                     return result;
                 }
             } else if(firstCell == "mappings") {
+                Logger.debug(`Parsing Mappings`);
                 let result = this.parseMappingsRow(row, state);
-                if(result.error) {
+                if(result?.error) {
                     return result;
                 }
             } else if(firstCell == "quest") {
+                Logger.debug(`Parsing Quest`);
                 let result = this.parseQuestRow(row, state);
-                if(result.error) {
+                if(result?.error) {
                     return result;
                 }
             } else if(this.isIntegerString(firstCell)) {
+                Logger.debug(`Parsing Quest State`);
                 let result = this.parseQuestStateRow(row, state);
-                if(result.error) {
+                if(result?.error) {
                     return result;
                 }
             } else if(!firstCell) {
+                Logger.debug(`Parsing Task`);
                 let result = this.parseTaskRow(row, state);
-                if(result.error) {
+                if(result?.error) {
                     return result;
                 }
             } else {
@@ -127,8 +134,6 @@ class QuestsCSVParser {
 
         state.categories.push(cat);
         state.currentCategory = cat;
-        state.currentQuest = null;
-        state.currentQuestState = null;
     }
 
     parseMappingsRow(row, state) {
@@ -149,11 +154,11 @@ class QuestsCSVParser {
 
     parseQuestRow(row, state) {
         let check = this.requireDeclared(state, true);
-        if(!check.error) {
+        if(check.error) {
             return check;
         }
         check = this.requireClosed(state, false, true);
-        if(!check.error) {
+        if(check.error) {
             return check;
         }
         this.undeclare(state, false, true, true);
@@ -188,7 +193,7 @@ class QuestsCSVParser {
 
     parseQuestStateRow(row, state) {
         let check = this.requireDeclared(state, true, true);
-        if(!check.error) {
+        if(check.error) {
             return check;
         }
         this.undeclare(state, false, false, true);
@@ -235,7 +240,7 @@ class QuestsCSVParser {
 
     parseTaskRow(row, state) {
         let check = this.requireDeclared(state, true, true, true);
-        if(!check.error) {
+        if(check.error) {
             return check;
         }
 
@@ -247,7 +252,7 @@ class QuestsCSVParser {
             }
         }
 
-        let completeCondition = this.conditionParser.parse(row[2]);
+        let completeCondition = this.conditionParser.parse(row[2], state.mappings);
         if(!completeCondition) {
             return {
                 row: state.rowNumber,
@@ -261,7 +266,7 @@ class QuestsCSVParser {
             completed: completeCondition
         }
 
-        let visibleCondition = this.conditionParser.parse(row[3]);
+        let visibleCondition = this.conditionParser.parse(row[3], state.mappings);
         if(visibleCondition) {
             result.visible = visibleCondition;
         }
@@ -317,6 +322,8 @@ class QuestsCSVParser {
                 error: "A quest state has not been declared."
             }
         }
+
+        return true;
     }
 
     undeclare(state, category, quest, questState) {
@@ -331,5 +338,7 @@ class QuestsCSVParser {
         if(questState) {
             state.currentQuestState = null;
         }
+
+        return true;
     }
 }
