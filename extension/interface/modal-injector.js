@@ -69,6 +69,9 @@ class ModalInjector {
                             <div style="text-align: center;">
                                 <span id="flq-export-button" class="button button--primary button--no-margin">Export My Qualities</span>
                             </div>
+                            <div style="text-align: center;">
+                                <span id="flq-spoof-button" class="button button--primary button--no-margin">Spoof My Qualities</span>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -49,22 +49,20 @@ class ModalManager {
         let closeElem = document.getElementById("flq-close");
         closeElem.onclick = function(){
             modalElem.style.display = "none";
+            ModalManager.instance().qualities.releaseSpoof();
         };
 
         window.onclick = function(event){
             if(event.target == modalElem){
                 modalElem.style.display = "none";
+                ModalManager.instance().qualities.releaseSpoof();
             }
         };
 
         this.attachTabEvents();
         this.attachSettingEvents();
         this.attachImportEvents();
-
-        let exportButton = document.getElementById("flq-export-button");
-        exportButton.onclick = function(){
-            ModalManager.instance().exportQualities();
-        };
+        this.attachHelpEvents();
     }
 
     attachTabEvents() {
@@ -177,9 +175,38 @@ class ModalManager {
         };
     }
 
+    attachHelpEvents() {
+        let exportButton = document.getElementById("flq-export-button");
+        exportButton.onclick = function(){
+            ModalManager.instance().exportQualities();
+        };
+
+        let spoofButton = document.getElementById("flq-spoof-button");
+        spoofButton.onclick = function(){
+            ModalManager.instance().importQualities();
+        };
+    }
+
+    async importQualities() {
+        try {
+            let fileList = await this.openFileDialog(false);
+            if(!fileList || fileList.length == 0){
+                return;
+            }
+
+            let fileText = await this.readFile(fileList[0]);
+            let count = this.qualities.spoofFromCSV(fileText);
+
+            alert(`Spoofed ${count} Qualities.`);
+        } catch (error) {
+            Logger.error(error);
+            alert(`IMPORT THREW AN ERROR\n\n${error}`);
+        }
+    }
+
     async importQuests() {
         try {
-            let fileList = await this.openFileDialog();
+            let fileList = await this.openFileDialog(true);
             if(fileList && fileList.length > 0) {
                 let current;
                 for(let i = 0; i < fileList.length; i++) {
@@ -252,12 +279,15 @@ class ModalManager {
         }
     }
 
-    openFileDialog() {
+    openFileDialog(allowMultiple) {
         return new Promise((resolve) =>{
             let inputElem = document.createElement("input");
             inputElem.setAttribute("type", "file");
             inputElem.setAttribute("accept", "text/csv,.csv");
-            inputElem.setAttribute("multiple", "");
+
+            if(allowMultiple) {
+                inputElem.setAttribute("multiple", "");
+            }
 
             inputElem.addEventListener("change", event =>{
                 resolve(event.target.files);

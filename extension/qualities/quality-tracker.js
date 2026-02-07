@@ -14,14 +14,22 @@ class QualityTracker {
     }
 
     get(id){
+        if(this.spoofed) {
+            return this.spoofedQualities[id];
+        }
         return this.qualities[id];
     }
 
     getAll()
     {
+        let qualityList = this.qualities;
+        if(this.spoofed) {
+            qualityList = this.spoofedQualities;
+        }
+
         let result = [];
-        for(const id in this.qualities) {
-            result.push(this.qualities[id]);
+        for(const id in qualityList) {
+            result.push(qualityList[id]);
         }
         return result;
     }
@@ -30,19 +38,22 @@ class QualityTracker {
         if(!property) {
             property = "level"
         }
+        if(this.spoofed) {
+            return this.spoofedQualities[id]?.[property] ?? 0;
+        }
         return this.qualities[id]?.[property] ?? 0;
     }
 
     spoof(fakeQualities) {
         this.spoofed = true;
-        this.qualities = fakeQualities;
+        this.spoofedQualities = fakeQualities;
+    }
+
+    releaseSpoof() {
+        this.spoofed = false;
     }
 
     onMyself(response) {
-        if(this.spoofed){
-            return;
-        }
-
         let newQualities = {};
         response.possessions.forEach((category) => {
             category.possessions.forEach((quality) =>{
@@ -54,10 +65,6 @@ class QualityTracker {
     }
 
     onBranch(response) {
-        if(this.spoofed){
-            return;
-        }
-
         if (response.messages?.length > 0){
             response.messages.forEach((message) =>{
                 if (message.possession){
@@ -73,25 +80,61 @@ class QualityTracker {
         const builder = new CSVBuilder();
         
         builder.addRow([
-            "ID",
-            "Level",
-            "Effective Level",
-            "Name",
-            "Category",
-            "Nature"
+            "id",
+            "name",
+            "level",
+            "effectiveLevel",
+            "category",
+            "nature"
         ]);
 
         qualities.forEach(quality => {
             builder.addRow([
                 quality.id,
+                quality.name,
                 quality.level,
                 quality.effectiveLevel,
-                quality.name,
                 quality.category,
                 quality.nature
             ]);
         });
 
         return builder.result;
+    }
+
+    spoofFromCSV(csvString) {
+        const reader = new CSVReader(csvString);
+        let result = {};
+        let columns = [];
+        let spoofCount = 0;
+        while(reader.readRow()) {
+            if(reader.rowNumber == 1) {
+                for(let i = 0; i < reader.row.length; i++) {
+                    columns.push(reader.row[i]?.trim());
+                }
+
+                if(!columns.includes("id")) {
+                    throw new Error(`Does not include an "id" column`);
+                }
+
+                if(!columns.includes("level")) {
+                    throw new Error(`Does not include a "level" column`);
+                }
+
+                if(!columns.includes("effectiveLevel")) {
+                    throw new Error(`Does not include a "effectiveLevel" column`);
+                }
+            } else {
+                let quality = {};
+                for(let i = 0; i < reader.row.length; i++) {
+                    quality[columns[i]] = reader.row[i];
+                }
+                result[quality.id] = quality;
+                spoofCount++;
+            }
+        }
+
+        this.spoof(result);
+        return spoofCount;
     }
 }
