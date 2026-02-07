@@ -74,6 +74,14 @@ class QualityTracker {
         }
     }
 
+    onExchange(response) {
+        if (response.possessionsChanged?.length > 0){
+            response.possessionsChanged.forEach(quality => {
+                this.qualities[quality.id] = quality;
+            });
+        }
+    }
+
     exportToCSV()
     {
         let qualities = this.getAll();

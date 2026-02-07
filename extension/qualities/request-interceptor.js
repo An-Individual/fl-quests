@@ -30,6 +30,16 @@ class RequestInterceptor
                     var messengerElem = document.getElementById('__questsInterceptedBranch');
                     messengerElem.innerText = this.response;
                 }
+
+                if(response.currentTarget.responseURL.includes("/api/exchange/sell")){
+                    var messengerElem = document.getElementById('__questsInterceptedExchange');
+                    messengerElem.innerText = this.response;
+                }
+
+                if(response.currentTarget.responseURL.includes("/api/exchange/buy")){
+                    var messengerElem = document.getElementById('__questsInterceptedExchange');
+                    messengerElem.innerText = this.response;
+                }
             }
 
             function openBypass(original_function) {
@@ -63,6 +73,12 @@ class RequestInterceptor
             var elem = document.getElementById('__questsInterceptedBranch');
             let payload = JSON.parse(elem.innerText);
             QualityTracker.instance().onBranch(payload);
+        });
+
+        this.makeInterceptElement('__questsInterceptedExchange', function(){
+            var elem = document.getElementById('__questsInterceptedExchange');
+            let payload = JSON.parse(elem.innerText);
+            QualityTracker.instance().onExchange(payload);
         });
 
         console.log("[FL Quests] Request interception installed");
