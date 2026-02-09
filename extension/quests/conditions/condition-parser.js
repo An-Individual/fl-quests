@@ -1,35 +1,52 @@
 class ConditionParser {
     parse(condition, mappings) {
-        let elems = this.splitCondition(condition);
-        let result = this.parseStatement(elems, mappings);
-        if(result?.error){
-            return result;
+        try {
+            let reader = new ConditionReader(condition);
+            reader.next();
+            return this.parseStatement(elems, mappings);
+        } catch (error) {
+            return {
+                error: error.message
+            }
         }
-        return result?.value;
     }
 
-    /**
-     * A recursive method to parse the string chunks into
-     * useful, hierarchical statements.
-     */
-    parseStatement(elems, mappings, prevResult) {
-        // No remaining elements is the terminating condition for
-        // the recursion so we just return the last statement.
-        if(elems.length == 0) {
+    parseStatement(reader, mappings, prevResult)
+    {
+        // We assume that the next thing we need
+        // to parse has already been read. This is
+        // because we often need to look at the
+        // next element in the reader and only
+        // act if it matches a certain value or
+        // pattern. If it does we handle it in
+        // place. If it doesn't we either fail
+        // entirely or throw back out to the
+        // start of this method.
+        let elem = reader.last;
+
+        // If we're at the end of the string, or
+        // the closing of a bracket, we just return
+        // the last statment. This is the terminating
+        // case for our recursion, as well as how we
+        // handle the closing of brackets.
+        if(!elem || elem == ")") {
             return prevResult;
         }
 
-        // If the next element is a logic string we need to
-        // combine the previous statement with the next one.
-        let logicType = this.getLogicType(elems[0].value);
+        // This is the reason for including the previous
+        // statement in our recursion. If we encounter
+        // an AND or OR the statement we return has
+        // to wrap the previous statement and the next.
+        let logicType = this.getLogicType(elem);
         if(logicType) {
             if(!prevResult) {
                 return {
-                    error: `Condition error at position ${elems[0].position}: No left hand side to logic statement.`
+                    error: `Condition error at position ${reader.lastIndex}: No left hand side to logic statement.`
                 };
             }
 
-            let rightResult = this.parseStatement(elems.slice(1), mappings);
+            reader.nextThrowIfEnd();
+            let rightResult = this.parseStatement(reader, mappings);
             if(rightResult?.error) {
                 return rightResult;
             }
@@ -40,133 +57,69 @@ class ConditionParser {
                 right: rightResult.value
             }
 
-            let logicResult = {
-                value: statement,
-                count: prevResult.count + rightResult.count + 1
-            }
-
-            return this.parseStatement(elems.slice(rightResult.count + 1), mappings, logicResult)
+            return this.parseStatement(reader, mappings, statement)
         }
 
-        // If we have a previous statement and we pass this
-        // point we would discard it which means the condition
-        // is malformed.
+        // If we get past the logic wrapping step and
+        // aren't at the end of string or bracket then
+        // we have a sequence of statements with no
+        // logic linking them and have to fail.
         if(prevResult) {
             return {
-                error: `Condition error at position ${elems[0].position}: No logical link between statements.`
+                error: `Condition error at position ${reader.lastIndex}: No logical link between statements.`
             };
         }
 
-        let result = {
-            count: 0,
-            value: null
-        }
-
-        if(elems[0].value == "!") {
-            // NOTs just wrap the next conditional statement
-            // The way this is written something like !a==3
-            // is equivalent to wriring !(a==3) which I've
+        let result;
+        if(elem == "!") {
+            // NOTs just wrap the next statement. The way 
+            // this is written something like !a==3 is 
+            // equivalent to wriring !(a==3) which I've
             // decided is fine for the sake of keeping the
             // code reasonably simple.
-            if(elems.length <= 1) {
+            reader.nextThrowIfEnd();
+            let subResult = this.parseStatement(reader, mappings);
+            if(!subResult) {
                 return {
-                    error: `Condition error at position ${elems[0].position}: No statement following a NOT.`
+                    error: `Condition error at position ${reader.lastIndex}: No statement following a NOT.`
                 };
             }
-            let subResult = this.parseStatement(elems.slice(1), mappings);
             if(subResult?.error){
-                return subStatement;
+                return subResult;
             }
-            let statement = {
+            result = {
                 type: LogicTypes.Not,
                 statement: subResult.value
             }
-
-            result.value = statement;
-            result.count = subResult.count + 1;
-        } else if(elems[0].value == "(") {
-            // For brackets we just have to find the closing
-            // bracket, run the statement parser on the elements
-            // between them, and expand the count of used
-            // elements to include the brackets.
-            let endIdx = this.findClosingBracket(elems);
-            if(endIdx.error){
-                return endIdx;
+        } else if(elem == "(") {
+            let openIdx = reader.lastIndex;
+            reader.nextThrowIfEnd();
+            result = this.parseStatement(reader, mappings);
+            if(reader.last != ")") {
+                return  {
+                    error: `Condition error at position ${openIdx}: bracket not closed.`
+                };
             }
-
-            result = this.parseStatement(elems.slice(1,endIdx),mappings);
-            if(result?.error){
-                return result;
-            }
-            result.count += 2;
-        } else if(this.isLetterString(elems[0].value)) {
-            result = this.parseComparision(elems, mappings);
+            reader.next();
+        } else if(this.isLetterString(elem)) {
+            result = this.parseComparision(elem, reader, mappings);
             if(result?.error) {
                 return result;
             }
         } else {
             return {
-                error: `Condition error at position ${elems[0].position}: Unexpected element ${elems[0].value}`
+                error: `Condition error at position ${reader.lastIndex}: Unexpected element ${elem}`
             };
         }
 
-        return this.parseStatement(elems.slice(result.count), mappings, result);
+        return this.parseStatement(reader, mappings, result);
     }
 
-    getLogicType(value) {
-        switch(value) {
-            case "&":
-            case "&&":
-                return LogicTypes.And;
-            case "|":
-            case "||":
-                return LogicTypes.Or;
-            default:
-                return LogicTypes.Undefined;
-        }
-    }
-
-    splitCondition(value) {
-        let reader = new ConditionReader(value);
-        let result = [];
-        while(reader.next()) {
-            result.push({
-                value: reader.last,
-                position: reader.lastIndex
-            })
-        }
-
-        return result;
-    }
-
-    findClosingBracket(elems) {
-        let bracketDepth = 0;
-        let idx = 0;
-        while(idx < elems.length) {
-            if(elems[idx].value == "(") {
-                bracketDepth++;
-            } else if (elems[idx].value == ")") {
-                bracketDepth--;
-                if(bracketDepth == 0) {
-                    return idx;
-                } else if(bracketDepth < 0) {
-                    return {
-                        error: `Condition error at position ${elems[idx].position}: Encountered unexpected closing bracket.`
-                    }
-                }
-            }
-            idx++;
-        }
-        return {
-            error: `Condition error at position ${elems[0].position}: Bracket not closed.`
-        };
-    }
-
-    parseComparision(elems, mappings) {
-        let quality = mappings[elems[0].value];
+    parseComparision(elem, reader, mappings) {
+        let quality = mappings[elem];
         if(!quality) {
             return {
-                error: `Condition error at position ${elems[0].position}: No mapping for "${elems[0].value}".`
+                error: `Condition error at position ${reader.lastIndex}: No mapping for "${elems[0].value}".`
             };
         }
 
@@ -180,47 +133,50 @@ class ConditionParser {
             value: 0
         }
 
-        let idx = 1;
-        if(idx < elems.length && elems[idx].value == ".") {
-            idx++;
-            if(idx >= elems.length) {
+        let next = reader.next();
+        if(next == ".") {
+            next = reader.nextThrowIfEnd();
+            if(!this.isLetterString(next)) {
                 return {
-                    error: `Condition error at position ${elems[idx-1].position}: Quality property incomplete.`
+                    error: `Condition error at position ${reader.lastIndex}: Invalid quality property "${next}"`
                 };
             }
-            if(!this.isLetterString(elems[idx].value)) {
+            if(!AllowedQualityProperties.includes(next)) {
                 return {
-                    error: `Condition error at position ${elems[idx].position}: Invalid quality property "${elems[idx].value}"`
+                    error: `Condition error at position ${reader.lastIndex}: Unknown quality property "${next}"`
                 };
             }
-            statement.property = elems[idx].value;
-            idx++;
+            statement.property = next;
+            next = reader.next();
         }
 
-        if(idx < elems.length) {
-            let comparisonType = this.getComparisonType(elems[idx].value);
-            if(comparisonType) {
-                statement.comparison = comparisonType;
-                idx++;
-                if(idx >= elems.length) {
-                    return {
-                        error: `Condition error at position ${elems[idx-1].position}: Comparision statement is missing value."`
-                    };
-                }
-                if(!this.isNumberString(elems[idx].value)) {
-                    return {
-                        error: `Condition error at position ${elems[idx].position}: Comparision value "${elems[idx].value}" is not number.`
-                    };
-                }
-                statement.value = parseInt(elems[idx]);
-                idx++;
+        let comparisonType = this.getComparisonType(next);
+        if(comparisonType) {
+            statement.comparison = comparisonType;
+            next = reader.nextThrowIfEnd();
+            if(!this.isNumberString(next)) {
+                return {
+                    error: `Condition error at position ${reader.lastIndex}: Comparision value "${next}" is not number.`
+                };
             }
+            statement.value = parseInt(next);
+            next = reader.next();
         }
 
-        return {
-            value: statement,
-            count: idx 
-        };
+        return statement;
+    }
+
+    getLogicType(value) {
+        switch(value) {
+            case "&":
+            case "&&":
+                return LogicTypes.And;
+            case "|":
+            case "||":
+                return LogicTypes.Or;
+            default:
+                return LogicTypes.Undefined;
+        }
     }
 
     getComparisonType(value) {

@@ -31,3 +31,8 @@ const QuestsSourceType = {
     GitHub: 2,
     Custom: 3
 }
+
+const AllowedQualityProperties = [
+    "level",
+    "effectiveLevel"
+]

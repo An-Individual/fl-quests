@@ -6,6 +6,7 @@ class ConditionReader {
 
     next() {
         if(this.index >= this.value.length) {
+            this.last = null;
             return;
         }
 
@@ -14,6 +15,7 @@ class ConditionReader {
         }
 
         if(this.index >= this.value.length) {
+            this.last = null;
             return;
         }
 
@@ -33,6 +35,14 @@ class ConditionReader {
 
         this.last = this.value.substring(this.lastIndex, this.index);
         return this.last;
+    }
+
+    nextThrowIfEnd() {
+        let result = this.next();
+        if(!result) {
+            throw new Error("Unexpected end of condition");
+        }
+        return result;
     }
 
     moveNextNot(logic) {
