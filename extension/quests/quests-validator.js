@@ -190,6 +190,16 @@ class QuestsValidator {
                     return this.makeResult(false, "Condition Quality Error: " + check.reason);
                 }
 
+                if(condition.property) {
+                    check = this.isValidStringProperty(condition.property);
+                    if(!check.valid){
+                        return this.makeResult(false, "Condition Property Error: " + check.reason);
+                    }
+                    if(!AllowedQualityProperties.includes(check.property)) {
+                        return this.makeResult(false, `Condition Property Error: Unknown quality property "${check.property}"`)
+                    }
+                }
+
                 check = this.isValidInteger(condition.value);
                 if(!check.valid){
                     return this.makeResult(false, "Condition Value Error: " + check.reason);
