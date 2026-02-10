@@ -1,0 +1,27 @@
+<html>
+    <head>
+        <script src="../extension/quests/quests-datatypes.js"></script>
+        <script src="../extension/quests/conditions/condition-reader.js"></script>
+        <script src="../testing/extension/test-framework.js"></script>
+        <script src="../testing/extension/quests/condition-reader-tests.js"></script>
+        <script>
+            function startTests() {
+                setTestOutput(document.getElementById("test-output"));
+                executeTests();
+            }
+
+            function startTestsDOM() {
+                if (document.body && document.head) {
+                    startTests();
+                } else {
+                    requestIdleCallback(startTestsDOM);
+                }
+            }
+
+            requestIdleCallback(startTestsDOM);
+        </script>
+    </head>
+    <body>
+        <div id="test-output" style="font-family: monospace; white-space: pre-wrap;"></div>
+    </body>
+</html>
