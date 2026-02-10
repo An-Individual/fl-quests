@@ -21,9 +21,7 @@ class ConditionReader {
 
         this.lastIndex = this.index;
 
-        if(this.isSingleton(this.value[this.index])) {
-            this.index++;
-        } else if(this.isLogicChar(this.value[this.index])) {
+        if(this.isLogicChar(this.value[this.index])) {
             this.moveNextNot(this.isLogicChar);
         } else if(this.isComparison(this.value[this.index])) {
             this.moveNextNot(this.isComparison);
@@ -31,6 +29,8 @@ class ConditionReader {
             this.moveNextNot(this.isLetter);
         } else if(this.isNumber(this.value[this.index])) {
             this.moveNextNot(this.isNumber);
+        } else {
+            this.index++;
         }
 
         this.last = this.value.substring(this.lastIndex, this.index);
@@ -49,10 +49,6 @@ class ConditionReader {
         while(this.index < this.value.length && logic(this.value[this.index])){
             this.index++;
         }
-    }
-
-    isSingleton(char) {
-        return /^[\.()]$/.test(char);
     }
 
     isLogicChar(char) {
