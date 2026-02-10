@@ -32,6 +32,17 @@ class AssertEqualError extends Error {
     }
 }
 
+
+class AssertThrowsError extends Error {
+    constructor(message) {
+        if(message) {
+            super(`Assert did not throw an error. ${message}`);
+        } else {
+            super("Assert did not throw an error.");
+        }
+    }
+}
+
 function assert(assertion, message) {
     if(!assertion) {
         throw new AssertError(message);
@@ -41,6 +52,14 @@ function assert(assertion, message) {
 function assertEq(actual, expected, message) {
     if(actual !== expected) {
         throw new AssertEqualError(actual, expected, message);
+    }
+}
+
+async function assertThrows(func, message) {
+    try {
+        await func();
+        throw new AssertThrowsError();
+    } catch {
     }
 }
 
@@ -112,7 +131,7 @@ async function executeTests() {
             whitespace += "    ";
         }
         if(line) { 
-            line = line.replace(`\n`, `\n${whitespace}`);
+            line = line.replace(/\n/g, `\n${whitespace}`);
         }
         frame_outputElement.innerText += whitespace + line + "\n";
     }
@@ -132,7 +151,8 @@ async function executeTests() {
             try {
                 await testCol.setupGlobal();
             } catch (error) {
-                writeLine(1, `Global setup error from ${testCol.name}: ${error}\n${error.stack}`);
+                writeLine(1, `Global setup error from ${testCol.name}: ${error}`);
+                writeLine(2, error.stack?.trim());
                 continue;
             }
         }
@@ -160,11 +180,12 @@ async function executeTests() {
         }
 
         if(failed) {
-            writeLine.apply(1, `${testCol.name} failed (${completed}/${total})`);
+            writeLine(1, `${testCol.name} failed (${completed}/${total})`);
             for(const testIdx in testCol.tests) {
                 const test = testCol.tests[testIdx];
                 if(test.error) {
-                    writeLine(2, `${test.name} failed: ${test.error}\n${test.error.stack}`);
+                    writeLine(2, `${test.name} failed: ${test.error}`);
+                    writeLine(3, test.error.stack?.trim());
                 }
             }
         } else {
@@ -175,7 +196,8 @@ async function executeTests() {
             try {
                 await testCol.teardownGlobal();
             } catch (error) {
-                writeLine(1, `Global teardown error from ${testCol.name}: ${error}\n${error.stack}`);
+                writeLine(1, `Global teardown error from ${testCol.name}`);
+                writeLine(2, error.stack?.trim());
                 continue;
             }
         }
