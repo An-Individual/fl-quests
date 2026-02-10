@@ -92,7 +92,7 @@ class ModalInjector {
         if (document.body && document.head) {
             ModalInjector.insertModalElements();
         } else {
-            requestIdleCallback(ModalInjector.insertModalElements);
+            requestIdleCallback(ModalInjector.modalCheckForDOM);
         }
     }
 

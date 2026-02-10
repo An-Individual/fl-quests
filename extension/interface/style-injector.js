@@ -311,7 +311,7 @@ class StyleInjector {
         if (document.body && document.head) {
             StyleInjector.insertStylesElement();
         } else {
-            requestIdleCallback(StyleInjector.insertStylesElement);
+            requestIdleCallback(StyleInjector.stylesCheckForDOM);
         }
     }
 
