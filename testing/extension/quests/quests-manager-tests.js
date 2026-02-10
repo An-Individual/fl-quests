@@ -1,0 +1,4 @@
+(function(){
+    declareTests("QuestsManager");
+    closeTests();
+}());
