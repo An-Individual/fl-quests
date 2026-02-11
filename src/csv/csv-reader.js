@@ -52,3 +52,23 @@ export class CSVReader {
         return cells;
     }
 }
+
+export class CSVError extends Error {
+    constructor(row, column, message) {
+        // Convert the column number to 
+        // it's text representation.
+        const letterNum = column % 26;
+        const letter = (10+letterNum).toString(36).toUpperCase()
+        const letterCount = column / 26 + 1;
+        let columnLetters = "";
+        for(let i = 0; i < letterCount; i++) {
+            columnLetters += letter;
+        }
+        let cell = columnLetters + row;
+        super(`Error at cell ${cell}: ${message}`);
+        this.column = columnLetters;
+        this.row = row;
+        this.cell = cell;
+        this.text = message;
+    }
+}

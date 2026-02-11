@@ -1,5 +1,5 @@
 import { ConditionParser } from "./conditions/condition-parser.js";
-import { CSVReader } from "../csv/csv-reader.js";
+import { CSVReader, CSVError } from "../csv/csv-reader.js";
 import { Logger } from "../logger.js";
 
 export class QuestsCSVParser {
@@ -22,11 +22,7 @@ export class QuestsCSVParser {
         while(reader.readRow()) {
             let row = reader.row;
             if(row.length < 4) {
-                return {
-                    row: reader.rowNumber,
-                    column: 0,
-                    error: "CSV includes fewer than 4 columns"
-                }
+                throw new Error("CSV includes fewer than 4 columns");
             }
 
             Logger.debug(`Parsing row ${reader.rowNumber}`);
@@ -40,47 +36,25 @@ export class QuestsCSVParser {
             }
             else if(firstCell == "category") {
                 Logger.debug(`Parsing Category`);
-                let result = this.parseCategoryRow(row, state);
-                if(result?.error){
-                    return result;
-                }
+                this.parseCategoryRow(row, state);
             } else if(firstCell == "mappings") {
                 Logger.debug(`Parsing Mappings`);
-                let result = this.parseMappingsRow(row, state);
-                if(result?.error) {
-                    return result;
-                }
+                this.parseMappingsRow(row, state);
             } else if(firstCell == "quest") {
                 Logger.debug(`Parsing Quest`);
-                let result = this.parseQuestRow(row, state);
-                if(result?.error) {
-                    return result;
-                }
+                this.parseQuestRow(row, state);
             } else if(this.isIntegerString(firstCell)) {
                 Logger.debug(`Parsing Quest State`);
-                let result = this.parseQuestStateRow(row, state);
-                if(result?.error) {
-                    return result;
-                }
+                this.parseQuestStateRow(row, state);
             } else if(!firstCell) {
                 Logger.debug(`Parsing Task`);
-                let result = this.parseTaskRow(row, state);
-                if(result?.error) {
-                    return result;
-                }
+                this.parseTaskRow(row, state);
             } else {
-                return {
-                    row: reader.rowNumber,
-                    column: 0,
-                    error: "Unexpected value"
-                }
+                throw new CSVError(reader.rowNumber, 0, "Unexpected value");
             }
         }
 
-        let check = this.requireClosed(state, true, true);
-        if(check.error) {
-            return check;
-        }
+        this.requireClosed(state, true, true);
 
         return {
             categories: state.categories
@@ -104,29 +78,29 @@ export class QuestsCSVParser {
 
         let id = row[2]?.trim() ?? "";
         if(!this.isValidIDString(id)) {
-            return {
-                row: state.rowNumber,
-                column:2,
-                error: "Category ID is not a valid ID string. ID strings include only letters, numbers, and underscores and have a maximum length of 500 characters."
-            }
+            throw new CSVError(
+                state.rowNumber, 
+                2, 
+                "Category ID is not a valid ID string. ID strings include only letters, numbers, and underscores and have a maximum length of 500 characters."
+            );
         }
 
         let orderString = row[3]?.trim() ?? "";
         if(!this.isIntegerString(orderString)) {
-            return {
-                row: state.rowNumber,
-                column: 3,
-                error: "Category order is not a valid integer."
-            }
+            throw new CSVError(
+                state.rowNumber, 
+                3, 
+                "Category order is not a valid integer."
+            );
         }
         let order = parseInt(orderString);
 
         if(!row[1]?.trim()) {
-            return {
-                row: state.rowNumber,
-                column: 1,
-                error: "Category title is empty."
-            }
+            throw new CSVError(
+                state.rowNumber, 
+                1, 
+                "Category title is empty."
+            );
         }
 
         let cat = {
@@ -141,48 +115,55 @@ export class QuestsCSVParser {
     }
 
     parseMappingsRow(row, state) {
-        let matches = row[1]?.match(/[a-zA-Z]+=\d+/g);
-        if(!matches) {
-            return {
-                row: state.rowNumber,
-                column: 1,
-                error: "No mappings found"
-            }
+        if(!row[1]) {
+            throw new CSVError(
+                state.rowNumber, 
+                1, 
+                "Mappings cell is empty"
+            );
         }
-        
-        matches.forEach(match => {
-            let pair = match.split("=");
-            state.mappings[pair[0]] = parseInt(pair[1]);
+        let pairs = row[1].split(",");
+        pairs.forEach(pair => {
+            if(!pair?.trim()) {
+                throw new CSVError(
+                    state.rowNumber, 
+                    1, 
+                    `Mappings list has empty entries`
+                );
+            }
+            let match = pair.match(/^\s*([a-zA-Z]+)\s*=\s*([0-9]+)\s*$/);
+            if(!match) {
+                throw new CSVError(
+                    state.rowNumber, 
+                    1, 
+                    `Mapping is poorly formatted: ${pair}`
+                );
+            }
+            state.mappings[match[1]] = parseInt(match[2]);
         });
     }
 
     parseQuestRow(row, state) {
-        let check = this.requireDeclared(state, true);
-        if(check.error) {
-            return check;
-        }
-        check = this.requireClosed(state, false, true);
-        if(check.error) {
-            return check;
-        }
+        this.requireDeclared(state, true);
+        this.requireClosed(state, false, true);
         this.undeclare(state, false, true, true);
 
         let orderString = row[2]?.trim() ?? "";
         if(!this.isIntegerString(orderString)) {
-            return {
-                row: state.rowNumber,
-                column: 2,
-                error: "Quest order is not a valid integer."
-            }
+            throw new CSVError(
+                state.rowNumber, 
+                2, 
+                "Quest order is not a valid integer."
+            );
         }
         let order = parseInt(orderString);
 
         if(!row[1]?.trim()) {
-            return {
-                row: state.rowNumber,
-                column: 1,
-                error: "Quest title is empty."
-            }
+            throw new CSVError(
+                state.rowNumber, 
+                1, 
+                "Quest title is empty."
+            );
         }
 
         let quest = {
@@ -204,31 +185,37 @@ export class QuestsCSVParser {
 
         let questState = parseInt(row[0]);
         if(questState < 1 || questState > 5) {
-            return {
-                row: state.rowNumber,
-                column: 0,
-                error: "Invalid quest state type: " + questState
-            }
+            throw new CSVError(
+                state.rowNumber, 
+                0, 
+                "Invalid quest state type: " + questState
+            );
         }
 
         if(!row[1]?.trim()) {
-            return {
-                row: state.rowNumber,
-                column: 1,
-                error: "Quest state description is empty."
-            }
+            throw new CSVError(
+                state.rowNumber, 
+                1, 
+                "Quest state description is empty."
+            );
         }
 
-        let condition = this.conditionParser.parse(row[2], state.mappings);
-        if(!condition) {
-            return {
-                row: state.rowNumber,
-                column: 2,
-                error: "Quest state condition is empty or malformed."
-            }
+        let condition = null;
+        try {
+            condition = this.conditionParser.parse(row[2], state.mappings);
+        } catch(error) {
+            throw new CSVError(
+                state.rowNumber, 
+                2, 
+                error.message
+            );
         }
-        if(condition.error){
-            return condition;
+        if(!condition) {
+            throw new CSVError(
+                state.rowNumber, 
+                2, 
+                "Quest state condition is empty or malformed."
+            );
         }
 
         let result = {
@@ -249,20 +236,29 @@ export class QuestsCSVParser {
         }
 
         if(!row[1]?.trim()) {
-            return {
-                row: state.rowNumber,
-                column: 1,
-                error: "Task description is empty."
-            }
+            throw new CSVError(
+                state.rowNumber, 
+                1, 
+                "Task description is empty."
+            );
         }
-
-        let completeCondition = this.conditionParser.parse(row[2], state.mappings);
+        
+        let completeCondition = null;
+        try {
+            completeCondition = this.conditionParser.parse(row[2], state.mappings);
+        } catch(error) {
+            throw new CSVError(
+                state.rowNumber, 
+                2, 
+                error.message
+            );
+        }
         if(!completeCondition) {
-            return {
-                row: state.rowNumber,
-                column: 2,
-                error: "Task completed condition is empty or malformed."
-            }
+            throw new CSVError(
+                state.rowNumber, 
+                2, 
+                "Task completed condition is empty or malformed."
+            );
         }
 
         let result = {
@@ -270,7 +266,16 @@ export class QuestsCSVParser {
             completed: completeCondition
         }
 
-        let visibleCondition = this.conditionParser.parse(row[3], state.mappings);
+        let visibleCondition = null;
+        try {
+            visibleCondition = this.conditionParser.parse(row[3], state.mappings);
+        } catch(error) {
+            throw new CSVError(
+                state.rowNumber, 
+                3, 
+                error.message
+            );
+        }
         if(visibleCondition) {
             result.visible = visibleCondition;
         }
@@ -281,21 +286,21 @@ export class QuestsCSVParser {
     requireClosed(state, category, quest) {
         if(category && state.currentCategory) {
             if(state.currentCategory.quests.length == 0){
-                return {
-                    row: state.rowNumber,
-                    column: 0,
-                    error: "Category did not declare any quests."
-                }
+                throw new CSVError(
+                    state.rowNumber, 
+                    0, 
+                    "Category did not declare any quests."
+                );
             }
         }
 
         if(quest && state.currentQuest) {
             if(state.currentQuest.states.length == 0) {
-                return {
-                    row: state.rowNumber,
-                    column: 0,
-                    error: "Quest did not declare any states."
-                }
+                throw new CSVError(
+                    state.rowNumber, 
+                    0, 
+                    "Quest did not declare any states."
+                );
             }
         }
 
@@ -304,27 +309,27 @@ export class QuestsCSVParser {
 
     requireDeclared(state, category, quest, questState) {
         if(category && !state.currentCategory) {
-            return {
-                row: state.rowNumber,
-                column: 0,
-                error: "A category has not been declared."
-            }
+            throw new CSVError(
+                state.rowNumber, 
+                0, 
+                "A category has not been declared."
+            );
         }
 
         if(quest && !state.currentQuest) {
-            return {
-                row: state.rowNumber,
-                column: 0,
-                error: "A quest has not been declared."
-            }
+            throw new CSVError(
+                state.rowNumber, 
+                0, 
+                "A quest has not been declared."
+            );
         }
 
         if(questState && !state.currentQuestState) {
-            return {
-                row: state.rowNumber,
-                column: 0,
-                error: "A quest state has not been declared."
-            }
+            throw new CSVError(
+                state.rowNumber, 
+                0, 
+                "A quest state has not been declared."
+            );
         }
 
         return true;

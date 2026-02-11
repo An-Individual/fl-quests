@@ -5,20 +5,15 @@ class ConditionError extends Error {
     constructor(position, message) {
         super(`Condition error at position ${position}: ${message}`);
         this.position = position;
+        this.text = message;
     }
 }
 
 export class ConditionParser {
     parse(condition, mappings) {
-        try {
-            let reader = new ConditionReader(condition);
-            reader.next();
-            return this.parseStatement(reader, mappings);
-        } catch (error) {
-            return {
-                error: error.message
-            }
-        }
+        let reader = new ConditionReader(condition);
+        reader.next();
+        return this.parseStatement(reader, mappings);
     }
 
     parseStatement(reader, mappings, prevResult, bracketDepth)

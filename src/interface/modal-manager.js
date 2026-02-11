@@ -220,13 +220,14 @@ export class ModalManager {
                 let current;
                 for(let i = 0; i < fileList.length; i++) {
                     let fileText = await this.readFile(fileList[i]);
-                    let imported = this.questsImporter.parse(fileText);
-                    if(imported.error) {
-                        if(imported.row) {
-                            let columnLetter = (10+imported.column).toString(36).toUpperCase();
-                            alert(`IMPORT FAILED\nFile: ${fileList[i].name}\nCell: ${columnLetter}${imported.row}\n\n${imported.error}`);
+                    let imported
+                    try {
+                        imported = this.questsImporter.parse(fileText);
+                    } catch(error) {
+                        if(error.cell) {
+                            alert(`IMPORT FAILED\nFile: ${fileList[i].name}\nCell: ${error.cell}\n\n${error.text}`);
                         } else {
-                            alert(`IMPORT FAILED\nFile :${fileList[i].name}\n\n${imported.error}`);
+                            alert(`IMPORT FAILED\nFile :${fileList[i].name}\n\n${error.message}`);
                         }
                         return;
                     }
