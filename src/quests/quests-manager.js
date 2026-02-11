@@ -1,8 +1,8 @@
-import { QualityTracker } from "../qualities/quality-tracker";
-import { SettingsManager } from "../settings";
-import { QuestsValidator } from "./quests-validator";
-import { Logger } from "../logger";
-import { QuestsSourceType, LogicTypes, ComparisonTypes } from "./quests-datatypes";
+import { QualityTracker } from "../qualities/quality-tracker.js";
+import { SettingsManager } from "../settings.js";
+import { QuestsValidator } from "./quests-validator.js";
+import { Logger } from "../logger.js";
+import { QuestsSourceType, LogicTypes, ComparisonTypes } from "./quests-datatypes.js";
 
 export class QuestsManager {
 
@@ -60,7 +60,7 @@ export class QuestsManager {
         let source;
         switch(this.settings.getQuestsSourceType()){
             case QuestsSourceType.Local:
-                source = chrome.runtime.getURL('quests/quests.json');
+                source = chrome.runtime.getURL('quests.json');
                 break;
             case QuestsSourceType.GitHub:
                 throw new Error("NOT IMPLEMENTED");

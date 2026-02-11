@@ -1,4 +1,4 @@
-import { QualityTracker } from "./quality-tracker";
+import { QualityTracker } from "./quality-tracker.js";
 
 export class RequestInterceptor
 {

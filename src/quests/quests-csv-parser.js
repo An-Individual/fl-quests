@@ -1,6 +1,6 @@
-import { ConditionParser } from "./conditions/condition-parser";
-import { CSVReader } from "../csv/csv-reader";
-import { Logger } from "../logger";
+import { ConditionParser } from "./conditions/condition-parser.js";
+import { CSVReader } from "../csv/csv-reader.js";
+import { Logger } from "../logger.js";
 
 export class QuestsCSVParser {
     constructor() {

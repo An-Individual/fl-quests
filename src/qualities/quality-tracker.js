@@ -1,5 +1,5 @@
-import { CSVBuilder } from "../csv/csv-builder";
-import { CSVReader } from "../csv/csv-reader";
+import { CSVBuilder } from "../csv/csv-builder.js";
+import { CSVReader } from "../csv/csv-reader.js";
 
 export class QualityTracker {
     constructor() {

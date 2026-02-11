@@ -1,6 +1,6 @@
-import { QuestStates } from "../quests/quests-datatypes";
-import { SettingsManager } from "../settings";
-import { TextFormatter } from "./text-formatter";
+import { QuestStates } from "../quests/quests-datatypes.js";
+import { SettingsManager } from "../settings.js";
+import { TextFormatter } from "./text-formatter.js";
 
 export class QuestsRenderer {
     static CharacterCodes = {

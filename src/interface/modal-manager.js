@@ -1,11 +1,11 @@
-import { QualityTracker } from "../qualities/quality-tracker";
-import { SettingsManager } from "../settings";
-import { Logger } from "../logger";
-import { QuestsRenderer } from "./quests-renderer";
-import { QuestsManager } from "../quests/quests-manager";
-import { QuestsCSVParser } from "../quests/quests-csv-parser";
-import { TextFormatter } from "./text-formatter";
-import { QuestsSourceType } from "../quests/quests-datatypes";
+import { QualityTracker } from "../qualities/quality-tracker.js";
+import { SettingsManager } from "../settings.js";
+import { Logger } from "../logger.js";
+import { QuestsRenderer } from "./quests-renderer.js";
+import { QuestsManager } from "../quests/quests-manager.js";
+import { QuestsCSVParser } from "../quests/quests-csv-parser.js";
+import { TextFormatter } from "./text-formatter.js";
+import { QuestsSourceType } from "../quests/quests-datatypes.js";
 
 export class ModalManager {
     static singleInstance = null;

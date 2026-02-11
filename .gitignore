@@ -1,4 +1,4 @@
 **/__pycache__
-extension/quests/quests.json
-node_modules
+extension/quests.json
 extension/quests.js
+node_modules

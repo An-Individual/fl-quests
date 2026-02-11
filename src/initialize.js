@@ -1,7 +1,7 @@
-import { RequestInterceptor } from "./qualities/request-interceptor";
-import { StyleInjector } from "./interface/style-injector";
-import { ModalInjector } from "./interface/modal-injector";
-import { ButtonInjector } from "./interface/button-injector";
+import { RequestInterceptor } from "./qualities/request-interceptor.js";
+import { StyleInjector } from "./interface/style-injector.js";
+import { ModalInjector } from "./interface/modal-injector.js";
+import { ButtonInjector } from "./interface/button-injector.js";
 
 RequestInterceptor.injectInterceptors();
 StyleInjector.injectStyles();

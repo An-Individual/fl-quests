@@ -1,4 +1,4 @@
-import { ModalManager } from "./modal-manager";
+import { ModalManager } from "./modal-manager.js";
 
 export class ButtonInjector {
     static addQuestsButton(buttonsNode){

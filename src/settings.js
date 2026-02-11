@@ -1,5 +1,5 @@
-import { Logger } from "./logger";
-import { QuestsSourceType } from "./quests/quests-datatypes";
+import { Logger } from "./logger.js";
+import { QuestsSourceType } from "./quests/quests-datatypes.js";
 
 export class SettingsManager {
     static singleInstance;
