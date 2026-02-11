@@ -3,14 +3,18 @@ import { LogicTypes, ComparisonTypes } from "../../src/quests/quests-datatypes.j
 import assert from "node:assert";
 
 describe("ConditionParser", function(){
+    let parser;
+
+    beforeEach(function() {
+        parser = new ConditionParser();
+    });
+
     describe("parse()", function(){
         it(`Empty String - False Result`, async function(){
-            const parser = new ConditionParser();
             assert(!parser.parse(""));
         });
 
         it(`"a" - Basic Existence Check`, async function(){
-            const parser = new ConditionParser();
             const condition = parser.parse("a", {
                 a: 1
             });
@@ -22,7 +26,6 @@ describe("ConditionParser", function(){
         });
 
         it(`"a=2" - Comparison Parsed`, async function(){
-            const parser = new ConditionParser();
             const condition = parser.parse("a=2", {
                 a: 1
             });
@@ -34,7 +37,6 @@ describe("ConditionParser", function(){
         });
 
         it(`"a!=2" - Comparison Parsed`, async function(){
-            const parser = new ConditionParser();
             const condition = parser.parse("a!=2", {
                 a: 1
             });
@@ -46,7 +48,6 @@ describe("ConditionParser", function(){
         });
 
         it(`"a>2" - Comparison Parsed`, async function(){
-            const parser = new ConditionParser();
             const condition = parser.parse("a>2", {
                 a: 1
             });
@@ -58,7 +59,6 @@ describe("ConditionParser", function(){
         });
 
         it(`"a>=2" - Comparison Parsed`, async function(){
-            const parser = new ConditionParser();
             const condition = parser.parse("a>=2", {
                 a: 1
             });
@@ -70,7 +70,6 @@ describe("ConditionParser", function(){
         });
 
         it(`"a<2" - Comparison Parsed`, async function(){
-            const parser = new ConditionParser();
             const condition = parser.parse("a<2", {
                 a: 1
             });
@@ -82,7 +81,6 @@ describe("ConditionParser", function(){
         });
 
         it(`"a<=2" - Comparison Parsed`, async function(){
-            const parser = new ConditionParser();
             const condition = parser.parse("a<=2", {
                 a: 1
             });
@@ -94,7 +92,6 @@ describe("ConditionParser", function(){
         });
 
         it(`"a?2" - Error`, async function(){
-            const parser = new ConditionParser();
             const condition = parser.parse("a?2", {
                 a: 1
             });
@@ -102,7 +99,6 @@ describe("ConditionParser", function(){
         });
 
         it(`"a?2" - Error`, async function(){
-            const parser = new ConditionParser();
             const condition = parser.parse("a?2", {
                 a: 1
             });
@@ -110,7 +106,6 @@ describe("ConditionParser", function(){
         });
 
         it(`"a=b" - Error`, async function(){
-            const parser = new ConditionParser();
             const condition = parser.parse("a=b", {
                 a: 1
             });
@@ -118,7 +113,6 @@ describe("ConditionParser", function(){
         });
 
         it(`"(a)" - Same as Unbracketed`, async function(){
-            const parser = new ConditionParser();
             const condition = parser.parse("(a)", {
                 a: 1
             });
@@ -130,7 +124,6 @@ describe("ConditionParser", function(){
         });
 
         it(`"(((a)))" - Same as Unbracketed`, async function(){
-            const parser = new ConditionParser();
             const condition = parser.parse("(((a)))", {
                 a: 1
             });
@@ -142,7 +135,6 @@ describe("ConditionParser", function(){
         });
 
         it(`"(((a))" - Error`, async function(){
-            const parser = new ConditionParser();
             const condition = parser.parse("(((a))", {
                 a: 1
             });
@@ -150,7 +142,6 @@ describe("ConditionParser", function(){
         });
 
         it(`"((a)))" - Error`, async function(){
-            const parser = new ConditionParser();
             const condition = parser.parse("((a)))", {
                 a: 1
             });
@@ -158,7 +149,6 @@ describe("ConditionParser", function(){
         });
 
         it(`"a&b" - Basic And`, async function(){
-            const parser = new ConditionParser();
             const condition = parser.parse("a&b", {
                 a: 1,
                 b: 2
@@ -175,7 +165,6 @@ describe("ConditionParser", function(){
         });
 
         it(`"a&&b" - Basic And`, async function(){
-            const parser = new ConditionParser();
             const condition = parser.parse("a&&b", {
                 a: 1,
                 b: 2
@@ -192,7 +181,6 @@ describe("ConditionParser", function(){
         });
 
         it(`"a&&&b" - error`, async function(){
-            const parser = new ConditionParser();
             const condition = parser.parse("a&&&b", {
                 a: 1,
                 b: 2
@@ -201,7 +189,6 @@ describe("ConditionParser", function(){
         });
 
         it(`"a|b" - Basic And`, async function(){
-            const parser = new ConditionParser();
             const condition = parser.parse("a|b", {
                 a: 1,
                 b: 2
@@ -218,7 +205,6 @@ describe("ConditionParser", function(){
         });
 
         it(`"a||b" - Basic And`, async function(){
-            const parser = new ConditionParser();
             const condition = parser.parse("a||b", {
                 a: 1,
                 b: 2
@@ -235,7 +221,6 @@ describe("ConditionParser", function(){
         });
 
         it(`"a|||b" - Error`, async function(){
-            const parser = new ConditionParser();
             const condition = parser.parse("a|||b", {
                 a: 1,
                 b: 2
@@ -244,7 +229,6 @@ describe("ConditionParser", function(){
         });
 
         it(`"a.level" - Condition With Property`, async function(){
-            const parser = new ConditionParser();
             const condition = parser.parse("a.level", {
                 a: 1
             });
@@ -256,7 +240,6 @@ describe("ConditionParser", function(){
         });
 
         it(`"a.effectiveLevel" - Condition With Property`, async function(){
-            const parser = new ConditionParser();
             const condition = parser.parse("a.effectiveLevel", {
                 a: 1
             });
@@ -268,7 +251,6 @@ describe("ConditionParser", function(){
         });
 
         it(`"a.Level" - Error`, async function(){
-            const parser = new ConditionParser();
             const condition = parser.parse("a.Level", {
                 a: 1
             });
@@ -276,7 +258,6 @@ describe("ConditionParser", function(){
         });
 
         it(`"a.2" - Condition With Property`, async function(){
-            const parser = new ConditionParser();
             const condition = parser.parse("a.2", {
                 a: 1
             });
@@ -284,7 +265,6 @@ describe("ConditionParser", function(){
         });
 
         it(`"a.level == 2" - Condition With Property`, async function(){
-            const parser = new ConditionParser();
             const condition = parser.parse("a.level == 2", {
                 a: 1
             });
@@ -296,7 +276,6 @@ describe("ConditionParser", function(){
         });
 
         it(`"!a" - Not`, async function(){
-            const parser = new ConditionParser();
             const condition = parser.parse("!a", {
                 a: 1
             });
@@ -310,7 +289,6 @@ describe("ConditionParser", function(){
         });
 
         it(`"!a=2" - Not`, async function(){
-            const parser = new ConditionParser();
             const condition = parser.parse("!a=2", {
                 a: 1
             });
@@ -324,7 +302,6 @@ describe("ConditionParser", function(){
         });
 
         it(`"!(a=2)" - Not`, async function(){
-            const parser = new ConditionParser();
             const condition = parser.parse("!(a=2)", {
                 a: 1
             });
@@ -338,7 +315,6 @@ describe("ConditionParser", function(){
         });
 
         it(`"!" - Error`, async function(){
-            const parser = new ConditionParser();
             const condition = parser.parse("!", {
                 a: 1
             });
@@ -346,7 +322,6 @@ describe("ConditionParser", function(){
         });
 
         it(`"(!)" - Error`, async function(){
-            const parser = new ConditionParser();
             const condition = parser.parse("(!)", {
                 a: 1
             });
