@@ -3,13 +3,12 @@ import { LogicTypes, ComparisonTypes } from "../../src/quests/quests-datatypes.j
 import assert from "node:assert";
 
 describe("ConditionParser", function(){
-    let parser;
-
-    beforeEach(function() {
-        parser = new ConditionParser();
-    });
-
     describe("parse()", function(){
+        let parser;
+        beforeEach(function() {
+            parser = new ConditionParser();
+        });
+        
         it(`Empty String - False Result`, function(){
             assert(!parser.parse(""));
         });
