@@ -1,10 +1,12 @@
 {
   "devDependencies": {
+    "mocha": "^11.3.0",
     "webpack": "^5.105.1",
     "webpack-cli": "^6.0.1"
   },
   "type": "module",
   "scripts": {
-    "build": "npx webpack --config webpack.config.js && node ./quests/compile-quests.js"
+    "build": "npx webpack --config webpack.config.js && node ./quests/compile-quests.js",
+    "test": "mocha --recursive"
   }
 }

@@ -12,3 +12,7 @@ To install webpack by running run:
 Next run the following to package the extension code and compile the quests JSON.
 
 > npm run build
+
+To run the tests install Mocha and run:
+
+> npm run test

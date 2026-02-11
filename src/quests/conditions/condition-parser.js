@@ -1,5 +1,5 @@
 import { ConditionReader } from "./condition-reader.js";
-import { LogicTypes, ComparisonTypes } from "../quests-datatypes.js";
+import { LogicTypes, ComparisonTypes, AllowedQualityProperties } from "../quests-datatypes.js";
 
 class ConditionError extends Error {
     constructor(position, message) {

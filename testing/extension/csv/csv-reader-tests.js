@@ -1,4 +1,0 @@
-(function(){
-    declareTests("CSVReader");
-    closeTests();
-}());

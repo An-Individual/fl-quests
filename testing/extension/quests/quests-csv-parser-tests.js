@@ -1,4 +1,0 @@
-(function(){
-    declareTests("QuestsCSVParser");
-    closeTests();
-}());

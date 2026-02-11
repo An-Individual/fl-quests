@@ -1,4 +1,4 @@
-import { LogicTypes } from "./quests-datatypes.js";
+import { LogicTypes, AllowedQualityProperties } from "./quests-datatypes.js";
 
 export class QuestsValidator {
     validate(quests, ignoreVersion) {

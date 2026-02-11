@@ -1,4 +1,0 @@
-(function(){
-    declareTests("QuestsParser");
-    closeTests();
-}());
