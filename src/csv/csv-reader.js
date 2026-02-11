@@ -14,7 +14,7 @@ export class CSVReader {
         while(this.remaining) {
             let quoteCell = this.remaining.match(/^"(([^"]|"{2})*)"/);
             if(quoteCell) {
-                cells.push(quoteCell[1].replace(`""`,`"`));
+                cells.push(quoteCell[1].replace(/""/g,`"`));
                 this.remaining = this.remaining.slice(quoteCell[0].length);
             } else {
                 // This will match even on an empty string
