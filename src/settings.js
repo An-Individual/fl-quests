@@ -1,4 +1,7 @@
-class SettingsManager {
+import { Logger } from "./logger";
+import { QuestsSourceType } from "./quests/quests-datatypes";
+
+export class SettingsManager {
     static singleInstance;
     static instance() {
         if(this.singleInstance){

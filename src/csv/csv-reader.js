@@ -1,4 +1,4 @@
-class CSVReader {
+export class CSVReader {
     constructor(csvString) {
         this.remaining = csvString;
         this.rowNumber = 0;

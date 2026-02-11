@@ -1,4 +1,7 @@
-class QualityTracker {
+import { CSVBuilder } from "../csv/csv-builder";
+import { CSVReader } from "../csv/csv-reader";
+
+export class QualityTracker {
     constructor() {
         this.qualities = {};
         this.spoofed = false;

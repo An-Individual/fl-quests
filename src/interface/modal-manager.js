@@ -1,4 +1,13 @@
-class ModalManager {
+import { QualityTracker } from "../qualities/quality-tracker";
+import { SettingsManager } from "../settings";
+import { Logger } from "../logger";
+import { QuestsRenderer } from "./quests-renderer";
+import { QuestsManager } from "../quests/quests-manager";
+import { QuestsCSVParser } from "../quests/quests-csv-parser";
+import { TextFormatter } from "./text-formatter";
+import { QuestsSourceType } from "../quests/quests-datatypes";
+
+export class ModalManager {
     static singleInstance = null;
     static instance() {
         if(this.singleInstance) {

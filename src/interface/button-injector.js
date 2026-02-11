@@ -1,4 +1,6 @@
-class ButtonInjector {
+import { ModalManager } from "./modal-manager";
+
+export class ButtonInjector {
     static addQuestsButton(buttonsNode){
         let whitespace = document.createTextNode(' ');
         buttonsNode.prepend(whitespace);

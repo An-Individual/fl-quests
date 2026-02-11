@@ -1,4 +1,4 @@
-class StyleInjector {
+export class StyleInjector {
     // I spent a lot of time trying to setup
     // a system for grabbing these styles
     // from a file but web_accessible_resources

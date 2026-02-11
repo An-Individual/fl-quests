@@ -1,4 +1,6 @@
-class ModalInjector {
+import { ModalManager } from "./modal-manager";
+
+export class ModalInjector {
     static rawModal = `
         <div id="flq-modal" class="flq-modal-wrapper">
             <div class="flq-modal-box">

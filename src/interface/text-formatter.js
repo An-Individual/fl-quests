@@ -1,4 +1,4 @@
-class TextFormatter {
+export class TextFormatter {
     static Expressions = {
         Header: /^\s*(#{1,6}) /,
         ListPoint: /^(\s*)([-+]|\* )/

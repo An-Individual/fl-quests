@@ -1,3 +1,6 @@
+import { ConditionReader } from "./condition-reader";
+import { LogicTypes, ComparisonTypes } from "../quests-datatypes";
+
 class ConditionError extends Error {
     constructor(position, message) {
         super(`Condition error at position ${position}: ${message}`);
@@ -5,7 +8,7 @@ class ConditionError extends Error {
     }
 }
 
-class ConditionParser {
+export class ConditionParser {
     parse(condition, mappings) {
         try {
             let reader = new ConditionReader(condition);

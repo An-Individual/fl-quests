@@ -1,4 +1,10 @@
-class QuestsManager {
+import { QualityTracker } from "../qualities/quality-tracker";
+import { SettingsManager } from "../settings";
+import { QuestsValidator } from "./quests-validator";
+import { Logger } from "../logger";
+import { QuestsSourceType, LogicTypes, ComparisonTypes } from "./quests-datatypes";
+
+export class QuestsManager {
 
     constructor() {
         this.qualities = QualityTracker.instance();

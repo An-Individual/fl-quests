@@ -1,4 +1,4 @@
-const QuestStates = {
+export const QuestStates = {
     Undefined: 0,
     NotStart: 1,
     InProgress: 2,
@@ -7,7 +7,7 @@ const QuestStates = {
     HiddenStatus: 5
 }
 
-const LogicTypes = {
+export const LogicTypes = {
     Undefined: 0,
     Comparison: 1,
     And: 2,
@@ -15,7 +15,7 @@ const LogicTypes = {
     Not: 4
 }
 
-const ComparisonTypes = {
+export const ComparisonTypes = {
     Undefined: 0,
     Equal: 1,
     NotEqual: 2,
@@ -25,14 +25,14 @@ const ComparisonTypes = {
     LessEqual: 6
 }
 
-const QuestsSourceType = {
+export const QuestsSourceType = {
     None: 0,
     Local: 1,
     GitHub: 2,
     Custom: 3
 }
 
-const AllowedQualityProperties = [
+export const AllowedQualityProperties = [
     "level",
     "effectiveLevel"
 ]

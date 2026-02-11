@@ -1,4 +1,8 @@
-class QuestsRenderer {
+import { QuestStates } from "../quests/quests-datatypes";
+import { SettingsManager } from "../settings";
+import { TextFormatter } from "./text-formatter";
+
+export class QuestsRenderer {
     static CharacterCodes = {
         TriangleUp: "&#9650;",
         TriangleDown: "&#9660;",

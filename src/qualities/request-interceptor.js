@@ -1,4 +1,6 @@
-class RequestInterceptor
+import { QualityTracker } from "./quality-tracker";
+
+export class RequestInterceptor
 {
     // It's important that we use inline script text like this
     // instead of grabbing the script text from an external

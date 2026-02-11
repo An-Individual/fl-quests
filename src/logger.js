@@ -1,4 +1,4 @@
-class Logger {
+export class Logger {
     static log(value) {
         console.log(`[FL Quests] ${value}`);
     }

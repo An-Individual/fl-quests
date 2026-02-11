@@ -1,4 +1,4 @@
-class CSVBuilder {
+export class CSVBuilder {
     constructor() {
         this.result = "";
     }

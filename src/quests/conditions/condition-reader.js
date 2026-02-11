@@ -1,4 +1,4 @@
-class ConditionReader {
+export class ConditionReader {
     constructor(conditionString) {
         this.value = conditionString;
         this.index = 0;

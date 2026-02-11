@@ -1,4 +1,8 @@
-class QuestsCSVParser {
+import { ConditionParser } from "./conditions/condition-parser";
+import { CSVReader } from "../csv/csv-reader";
+import { Logger } from "../logger";
+
+export class QuestsCSVParser {
     constructor() {
         this.conditionParser = new ConditionParser();
     }

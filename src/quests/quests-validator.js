@@ -1,4 +1,6 @@
-class QuestsValidator {
+import { LogicTypes } from "./quests-datatypes";
+
+export class QuestsValidator {
     validate(quests, ignoreVersion) {
         if(!quests) {
             return this.makeResult(false, "Input was undefined");
