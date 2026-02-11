@@ -1,9 +1,16 @@
+class ConditionError extends Error {
+    constructor(position, message) {
+        super(`Condition error at position ${position}: ${message}`);
+        this.position = position;
+    }
+}
+
 class ConditionParser {
     parse(condition, mappings) {
         try {
             let reader = new ConditionReader(condition);
             reader.next();
-            return this.parseStatement(elems, mappings);
+            return this.parseStatement(reader, mappings);
         } catch (error) {
             return {
                 error: error.message
@@ -11,7 +18,7 @@ class ConditionParser {
         }
     }
 
-    parseStatement(reader, mappings, prevResult)
+    parseStatement(reader, mappings, prevResult, bracketDepth)
     {
         // We assume that the next thing we need
         // to parse has already been read. This is
@@ -24,12 +31,20 @@ class ConditionParser {
         // start of this method.
         let elem = reader.last;
 
-        // If we're at the end of the string, or
-        // the closing of a bracket, we just return
-        // the last statment. This is the terminating
-        // case for our recursion, as well as how we
-        // handle the closing of brackets.
-        if(!elem || elem == ")") {
+        // If we're at the end of the string we
+        // just return. This is the terminating
+        // case for our recursion.
+        if(!elem) {
+            return prevResult;
+        }
+
+        // Similar to the above, if we know we're
+        // inside brackets a closing bracket is
+        // treated the same as a string end. If
+        // we aren't inside brackets we let execution
+        // continue to hit the unexpected character
+        // handling.
+        if(elem == ")" && bracketDepth) {
             return prevResult;
         }
 
@@ -40,24 +55,19 @@ class ConditionParser {
         let logicType = this.getLogicType(elem);
         if(logicType) {
             if(!prevResult) {
-                return {
-                    error: `Condition error at position ${reader.lastIndex}: No left hand side to logic statement.`
-                };
+                throw new ConditionError(reader.lastIndex, "No left hand side to logic statement.");
             }
 
             reader.nextThrowIfEnd();
-            let rightResult = this.parseStatement(reader, mappings);
-            if(rightResult?.error) {
-                return rightResult;
-            }
+            let rightResult = this.parseStatement(reader, mappings, null, bracketDepth);
 
             let statement = {
                 type: logicType,
-                left: prevResult.value,
-                right: rightResult.value
-            }
+                left: prevResult,
+                right: rightResult
+            };
 
-            return this.parseStatement(reader, mappings, statement)
+            return this.parseStatement(reader, mappings, statement, bracketDepth);
         }
 
         // If we get past the logic wrapping step and
@@ -65,9 +75,7 @@ class ConditionParser {
         // we have a sequence of statements with no
         // logic linking them and have to fail.
         if(prevResult) {
-            return {
-                error: `Condition error at position ${reader.lastIndex}: No logical link between statements.`
-            };
+            throw new ConditionError(reader.lastIndex, `Unexpected element '${elem}'`);
         }
 
         let result;
@@ -78,49 +86,35 @@ class ConditionParser {
             // decided is fine for the sake of keeping the
             // code reasonably simple.
             reader.nextThrowIfEnd();
-            let subResult = this.parseStatement(reader, mappings);
+            let subResult = this.parseStatement(reader, mappings, null, bracketDepth);
             if(!subResult) {
-                return {
-                    error: `Condition error at position ${reader.lastIndex}: No statement following a NOT.`
-                };
-            }
-            if(subResult?.error){
-                return subResult;
+                throw new ConditionError(reader.lastIndex, "No statement following a NOT.");
             }
             result = {
                 type: LogicTypes.Not,
-                statement: subResult.value
+                statement: subResult
             }
         } else if(elem == "(") {
             let openIdx = reader.lastIndex;
             reader.nextThrowIfEnd();
-            result = this.parseStatement(reader, mappings);
+            result = this.parseStatement(reader, mappings, null, (bracketDepth ?? 0) + 1);
             if(reader.last != ")") {
-                return  {
-                    error: `Condition error at position ${openIdx}: bracket not closed.`
-                };
+                throw new ConditionError(openIdx, "Bracket not closed.");
             }
             reader.next();
         } else if(this.isLetterString(elem)) {
             result = this.parseComparision(elem, reader, mappings);
-            if(result?.error) {
-                return result;
-            }
         } else {
-            return {
-                error: `Condition error at position ${reader.lastIndex}: Unexpected element ${elem}`
-            };
+            throw new ConditionError(reader.lastIndex, `Unknown element '${elem}'`);
         }
 
-        return this.parseStatement(reader, mappings, result);
+        return this.parseStatement(reader, mappings, result, bracketDepth);
     }
 
     parseComparision(elem, reader, mappings) {
         let quality = mappings[elem];
         if(!quality) {
-            return {
-                error: `Condition error at position ${reader.lastIndex}: No mapping for "${elems[0].value}".`
-            };
+            throw new ConditionError(reader.lastIndex, `No mapping for '${elem}'`);
         }
 
         // A quality without a comparision statement
@@ -129,7 +123,7 @@ class ConditionParser {
         let statement = {
             type: LogicTypes.Comparison,
             quality: quality,
-            comparison: ComparisionTypes.Greater,
+            comparison: ComparisonTypes.Greater,
             value: 0
         }
 
@@ -137,14 +131,10 @@ class ConditionParser {
         if(next == ".") {
             next = reader.nextThrowIfEnd();
             if(!this.isLetterString(next)) {
-                return {
-                    error: `Condition error at position ${reader.lastIndex}: Invalid quality property "${next}"`
-                };
+                throw new ConditionError(reader.lastIndex, `Invalid quality property '${next}'`);
             }
             if(!AllowedQualityProperties.includes(next)) {
-                return {
-                    error: `Condition error at position ${reader.lastIndex}: Unknown quality property "${next}"`
-                };
+                throw new ConditionError(reader.lastIndex, `Unknown quality property '${next}'`);
             }
             statement.property = next;
             next = reader.next();
@@ -155,9 +145,7 @@ class ConditionParser {
             statement.comparison = comparisonType;
             next = reader.nextThrowIfEnd();
             if(!this.isNumberString(next)) {
-                return {
-                    error: `Condition error at position ${reader.lastIndex}: Comparision value "${next}" is not number.`
-                };
+                throw new ConditionError(reader.lastIndex, `Comparision value '${next}' is not number.`);
             }
             statement.value = parseInt(next);
             next = reader.next();
@@ -183,19 +171,19 @@ class ConditionParser {
         switch(value) {
             case "=":
             case "==":
-                return ComparisionTypes.Equal;
+                return ComparisonTypes.Equal;
             case "!=":
-                return ComparisionTypes.NotEqual;
+                return ComparisonTypes.NotEqual;
             case ">":
-                return ComparisionTypes.Greater;
+                return ComparisonTypes.Greater;
             case ">=":
-                return ComparisionTypes.GreaterEqual;
+                return ComparisonTypes.GreaterEqual;
             case "<":
-                return ComparisionTypes.Less;
+                return ComparisonTypes.Less;
             case "<=":
-                return ComparisionTypes.LessEqual;
+                return ComparisonTypes.LessEqual;
             default:
-                return ComparisionTypes.Undefined;
+                return ComparisonTypes.Undefined;
         }
     }
 

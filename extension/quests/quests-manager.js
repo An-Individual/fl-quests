@@ -293,17 +293,17 @@ class QuestsManager {
         let value = this.qualities.getValue(comparision.quality, comparision.property);
 
         switch(comparision.comparison) {
-            case ComparisionTypes.Equal:
+            case ComparisonTypes.Equal:
                 return value == comparision.value;
-            case ComparisionTypes.NotEqual:
+            case ComparisonTypes.NotEqual:
                 return value != comparision.value;
-            case ComparisionTypes.Greater:
+            case ComparisonTypes.Greater:
                 return value > comparision.value;
-            case ComparisionTypes.GreaterEqual:
+            case ComparisonTypes.GreaterEqual:
                 return value >= comparision.value;
-            case ComparisionTypes.Less:
+            case ComparisonTypes.Less:
                 return value < comparision.value;
-            case ComparisionTypes.LessEqual:
+            case ComparisonTypes.LessEqual:
                 return value <= comparision.value;
             default:
                 throw new Error("Unknown comparison type: " + comparision.comparison);

@@ -15,7 +15,7 @@ const LogicTypes = {
     Not: 4
 }
 
-const ComparisionTypes = {
+const ComparisonTypes = {
     Undefined: 0,
     Equal: 1,
     NotEqual: 2,
