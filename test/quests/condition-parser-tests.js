@@ -95,7 +95,7 @@ describe("ConditionParser", function(){
                 const condition = parser.parse("a?2", {
                     a: 1
                 });
-            }, Error, "Condition error at position 1: Unexpected element '?'");
+            }, e => e.message == "Condition error at position 1: Unexpected element '?'");
         });
 
         it(`"a?2" - Error`, function(){
@@ -103,7 +103,7 @@ describe("ConditionParser", function(){
                 const condition = parser.parse("a?2", {
                     a: 1
                 });
-            }, Error, "Condition error at position 1: Unexpected element '?'");
+            }, e => e.message == "Condition error at position 1: Unexpected element '?'");
         });
 
         it(`"a=b" - Error`, function(){
@@ -111,7 +111,7 @@ describe("ConditionParser", function(){
                 const condition = parser.parse("a=b", {
                     a: 1
                 });
-            }, Error, "Condition error at position 2: Comparision value 'b' is not number.");
+            }, e => e.message == "Condition error at position 2: Comparision value 'b' is not number.");
         });
 
         it(`"(a)" - Same as Unbracketed`, function(){
@@ -141,7 +141,7 @@ describe("ConditionParser", function(){
                 const condition = parser.parse("(((a))", {
                     a: 1
                 });
-            }, Error, "Condition error at position 0: Bracket not closed.");
+            }, e => e.message == "Condition error at position 0: Bracket not closed.");
         });
 
         it(`"((a)))" - Error`, function(){
@@ -149,7 +149,7 @@ describe("ConditionParser", function(){
                 const condition = parser.parse("((a)))", {
                     a: 1
                 });
-            }, Error, "Condition error at position 5: Unexpected element ')'");
+            }, e => e.message == "Condition error at position 5: Unexpected element ')'");
         });
 
         it(`"a&b" - Basic And`, function(){
@@ -190,7 +190,7 @@ describe("ConditionParser", function(){
                     a: 1,
                     b: 2
                 });
-            }, Error, "Condition error at position 1: Unexpected element '&&&'");
+            }, e => e.message == "Condition error at position 1: Unexpected element '&&&'");
         });
 
         it(`"a|b" - Basic And`, function(){
@@ -231,7 +231,7 @@ describe("ConditionParser", function(){
                     a: 1,
                     b: 2
                 });
-            }, Error, "Condition error at position 1: Unexpected element '|||'");
+            }, e => e.message == "Condition error at position 1: Unexpected element '|||'");
         });
 
         it(`"a.level" - Condition With Property`, function(){
@@ -261,7 +261,7 @@ describe("ConditionParser", function(){
                 const condition = parser.parse("a.Level", {
                     a: 1
                 });
-            }, Error, "Condition error at position 2: Unknown quality property 'Level'");
+            }, e => e.message == "Condition error at position 2: Unknown quality property 'Level'");
         });
 
         it(`"a.2" - Condition With Property`, function(){
@@ -269,7 +269,7 @@ describe("ConditionParser", function(){
                 const condition = parser.parse("a.2", {
                     a: 1
                 });
-            }, Error, "Condition error at position 2: Invalid quality property '2'");
+            }, e => e.message == "Condition error at position 2: Invalid quality property '2'");
         });
 
         it(`"a.level == 2" - Condition With Property`, function(){
@@ -327,7 +327,7 @@ describe("ConditionParser", function(){
                 const condition = parser.parse("!", {
                     a: 1
                 });
-            }, Error, "Unexpected end of condition");
+            }, e => e.message == "Unexpected end of condition");
         });
 
         it(`"(!)" - Error`, function(){
@@ -335,7 +335,15 @@ describe("ConditionParser", function(){
                 const condition = parser.parse("(!)", {
                     a: 1
                 });
-            }, Error, "Condition error at position 2: No statement following a NOT.");
+            }, e => e.message == "Condition error at position 2: No statement following a NOT.");
+        });
+
+        it(`Unmapped Quality - Error`, function(){
+            assert.throws(function(){
+                const condition = parser.parse("a", {
+                    b: 1
+                });
+            }, e => e.message == "Condition error at position 0: No mapping for 'a'");
         });
     });
 });
