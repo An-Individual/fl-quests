@@ -59,7 +59,7 @@ export class CSVError extends Error {
         // it's text representation.
         const letterNum = column % 26;
         const letter = (10+letterNum).toString(36).toUpperCase()
-        const letterCount = column / 26 + 1;
+        const letterCount = Math.floor(column / 26) + 1;
         let columnLetters = "";
         for(let i = 0; i < letterCount; i++) {
             columnLetters += letter;
