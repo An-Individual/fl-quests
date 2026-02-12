@@ -107,11 +107,7 @@ export class QuestsManager {
 
             let fetchedQuests = await response.json();
 
-            let validateResult = this.validator.validate(fetchedQuests);
-            if(!validateResult.valid)
-            {
-                throw new Error("Quests Validation Failed: " + validateResult.reason);
-            }
+            this.validator.validate(fetchedQuests);
 
             Logger.log(`Source Quests Version: ${fetchedQuests.version}`);
             Logger.log(`Fetched ${fetchedQuests.categories.length} Quest Categories From Source`);
@@ -140,12 +136,7 @@ export class QuestsManager {
             
             let importedQuests = JSON.parse(importedQuestsRaw);
 
-            let validateResult = this.validator.validate(importedQuests, true);
-            if(!validateResult.valid)
-            {
-                Logger.error("Imported Quests Invalid: " + validateResult.reason);
-                return;
-            }
+            this.validator.validate(importedQuests, true);
 
             return importedQuests;
         } catch(error) {

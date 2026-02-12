@@ -232,9 +232,10 @@ export class ModalManager {
                         return;
                     }
 
-                    let validate = this.quests.validator.validate(imported, true);
-                    if(!validate.valid) {
-                        alert(`VALIDATION FAILED\nFile :${fileList[i].name}\n\n${validate.reason}`);
+                    try {
+                        this.quests.validator.validate(imported, true);
+                    } catch (error) {
+                        alert(`VALIDATION FAILED\nFile :${fileList[i].name}\n\n${error.message}`);
                         return;
                     }
 

@@ -42,9 +42,6 @@ for(let i = 0; i < files.length; i++) {
 }
 
 console.log("Validating Quest JSON");
-const vResult = validator.validate(quests);
-if(!vResult.valid) {
-    throw new Error(`Validation Failure: ${vResult.reason}`);
-}
+validator.validate(quests);
 
 fs.writeFileSync(outputFile, JSON.stringify(quests))

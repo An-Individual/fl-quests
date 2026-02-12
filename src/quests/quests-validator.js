@@ -1,265 +1,179 @@
 import { LogicTypes, AllowedQualityProperties } from "./quests-datatypes.js";
 
+export class QuestsValidationError extends Error{
+    constructor(property, message) {
+        super(`${property}: ${message}`);
+    }
+
+    addElemStack(name) {
+        this.message = `${name} -> ${this.message}`;
+    }
+}
+
 export class QuestsValidator {
     validate(quests, ignoreVersion) {
         if(!quests) {
-            return this.makeResult(false, "Input was undefined");
+            throw new Error("Quests JSON was undefined");
         }
-
-        let check;
 
         if(!ignoreVersion){
-            check = this.isValidStringProperty(quests.version);
-            if(!check.valid){
-                return this.makeResult(false, "Version Property Error: " + check.reason);
-            }
+            this.isValidStringProperty(quests.version, "Version Property Error");
         }
 
-        check = this.isValidArray(quests.categories, true);
-        if(!check.valid){
-            return this.makeResult(false, "Category List Error: " + check.reason);
-        }
+        this.isValidArray(quests.categories, "Category List Error", true);
 
         for (const idx in quests.categories) {
-            let catResult = this.validateCategory(quests.categories[idx]);
-            if(!catResult.valid)
-            {
-                return catResult;
+            try {
+                this.validateCategory(quests.categories[idx]);
+            }catch(error) {
+                
+                error.addElemStack?.(`Category ${idx + 1}`);
+                throw error;
             }
         }
 
         let existingIds = [];
         for (const idx in quests.categories) {
             if(existingIds.indexOf(quests.categories[idx].id) >= 0) {
-                return this.makeResult(false, "Category ID Not Unique: " + quests.categories[idx].id);
+                throw new Error("Category ID Not Unique: " + quests.categories[idx].id);
             }
             existingIds.push(quests.categories[idx].id);
         }
-
-        return this.makeResult(true);
     }
 
     validateCategory(category) {
-        let check;
-
-        check = this.isValidIDProperty(category.id);
-        if(!check.valid) {
-            return this.makeResult(false, "Category ID Error: " + check.reason);
-        }
-
-        check = this.isValidStringProperty(category.title);
-        if(!check.valid) {
-            return this.makeResult(false, "Category Title Error: " + check.reason);
-        }
-
-        check = this.isValidInteger(category.order);
-        if(!check.valid) {
-            return this.makeResult(false, "Category Order Error: " + check.reason);
-        }
-
-        check = this.isValidArray(category.quests, true);
-        if(!check.valid){
-            return this.makeResult(false, "Category Quest List Error: " + check.reason);
-        }
+        this.isValidIDProperty(category.id, "ID Error");
+        this.isValidStringProperty(category.title, "Title Error");
+        this.isValidInteger(category.order, "Order Error");
+        this.isValidArray(category.quests, "Quest List Error", true);
 
         for(const idx in category.quests) {
-            check = this.validateQuest(category.quests[idx]);
-            if(!check.valid){
-                return check;
+            try {
+                this.validateQuest(category.quests[idx]);
+            }catch(error) {
+                error.addElemStack?.(`Quest ${idx + 1}`);
+                throw error;
             }
         }
-
-        return this.makeResult(true);
     }
 
     validateQuest(quest) {
-        let check;
-
-        check = this.isValidStringProperty(quest.title);
-        if(!check.valid) {
-            return this.makeResult(false, "Quest Title Error: " + check.reason);
-        }
-
-        check = this.isValidInteger(quest.order);
-        if(!check.valid) {
-            return this.makeResult(false, "Quest Order Error: " + check.reason);
-        }
-
-        check = this.isValidArray(quest.states, true);
-        if(!check.valid){
-            return this.makeResult(false, "Quest States Error: " + check.reason);
-        }
+        this.isValidStringProperty(quest.title, "Title Error");
+        this.isValidInteger(quest.order, "Order Error");
+        this.isValidArray(quest.states, "States Error", true);
         
         for(const idx in quest.states) {
-            check = this.validateState(quest.states[idx]);
-            if(!check.valid){
-                return check;
+            try {
+                this.validateState(quest.states[idx]);
+            } catch (error) {
+                error.addElemStack?.(`State ${idx + 1}`);
+                throw error;
             }
         }
-
-        return this.makeResult(true);
     }
 
     validateState(state) {
-        let check;
-
-        check = this.isValidInteger(state.state, 1, 5);
-        if(!check.valid) {
-            return this.makeResult(false, "Quest State Type Error: " + check.reason);
-        }
-
-        check = this.isValidStringProperty(state.description);
-        if(!check.valid) {
-            return this.makeResult(false, "Quest State Description Error: " + check.reason);
-        }
-
-        check = this.validateCondition(state.condition);
-        if(!check.valid) {
-            return this.makeResult(false, "Quest State Condition Error: " + check.reason);
-        }
+        this.isValidInteger(state.state, "Type Error", 1, 5);
+        this.isValidStringProperty(state.description, "Description Error");
+        this.validateCondition(state.condition);
 
         if(state.tasks) {
-            check = this.isValidArray(state.tasks);
-            if(!check.valid) {
-                return this.makeResult(false, "Quest State Tasks Error: " + check.reason);
-            }
+            this.isValidArray(state.tasks, "Tasks Error");
 
             for(const idx in state.tasks) {
-                check = this.validateTask(state.tasks[idx]);
-                if(!check.valid){
-                    return check;
-                }
+                this.validateTask(state.tasks[idx], idx);
             }
         }
-
-        return this.makeResult(true);
     }
 
-    validateTask(task) {
-        let check;
+    validateTask(task, taskIndex) {
+        this.isValidStringProperty(task.description, `Task ${taskIndex + 1} Description Error`);
 
-        check = this.isValidStringProperty(task.description);
-        if(!check.valid) {
-            return this.makeResult(false, "Task Description Error: " + check.reason);
-        }
-
-        check = this.validateCondition(task.completed);
-        if(!check.valid) {
-            return this.makeResult(false, "Task Completed Error: " + check.reason);
+        try {
+            this.validateCondition(task.completed);
+        } catch (error) {
+            error.addElemStack?.(`Task ${taskIndex + 1} Completed`);
+            throw error;
         }
 
         if(task.visible) {
-            check = this.validateCondition(task.visible);
-            if(!check.valid) {
-                return this.makeResult(false, "Task Visible Error: " + check.reason);
+            try {
+                this.validateCondition(task.visible);
+            } catch (error) {
+                error.addElemStack?.(`Task ${taskIndex + 1} Visible`);
+                throw error;
             }
         }
-
-        return this.makeResult(true);
     }
 
     validateCondition(condition) {
-        let check;
-
         if(!condition){
-            return this.makeResult(false, "Condition undefined");
+            throw new QuestsValidationError("Condition Error", "Undefined");
         }
 
-        check = this.isValidInteger(condition.type, 1, 4);
-        if(!check.valid) {
-            return this.makeResult(false, "Condition Type Error: " + check.reason);
-        }
+        this.isValidInteger(condition.type, "Condition Type Error", 1, 4);
 
         switch(condition.type) {
             case LogicTypes.And:
             case LogicTypes.Or:
-                check = this.validateCondition(condition.left);
-                if(!check.valid) {
-                    return check;
-                }
-
-                check = this.validateCondition(condition.right);
-                if(!check.valid) {
-                    return check;
-                }
-
-                return this.makeResult(true);
+                this.validateCondition(condition.left);
+                this.validateCondition(condition.right);
+                break;
             case LogicTypes.Not:
-                return this.validateCondition(condition.statement);
+                this.validateCondition(condition.statement);
+                break;
             case LogicTypes.Comparison:
-                check = this.isValidInteger(condition.quality);
-                if(!check.valid){
-                    return this.makeResult(false, "Condition Quality Error: " + check.reason);
-                }
-
+                this.isValidInteger(condition.quality, "Condition Quality Error");
                 if(condition.property) {
-                    check = this.isValidStringProperty(condition.property);
-                    if(!check.valid){
-                        return this.makeResult(false, "Condition Property Error: " + check.reason);
-                    }
+                    check = this.isValidStringProperty(condition.property, "Condition Property Error");
                     if(!AllowedQualityProperties.includes(check.property)) {
-                        return this.makeResult(false, `Condition Property Error: Unknown quality property "${check.property}"`)
+                        throw new QuestsValidationError("Condition Property Error", `Unknown quality property "${check.property}"`);
                     }
                 }
 
-                check = this.isValidInteger(condition.value);
-                if(!check.valid){
-                    return this.makeResult(false, "Condition Value Error: " + check.reason);
-                }
-
-                check = this.isValidInteger(condition.comparison, 1, 6);
-                if(!check.valid){
-                    return this.makeResult(false, "Condition Comparison Error: " + check.reason);
-                }
-
-                return this.makeResult(true);
+                this.isValidInteger(condition.value, "Condition Value Error");
+                this.isValidInteger(condition.comparison, "Condition Comparison Error", 1, 6);
+                break;
             default:
-                return this.makeResult(false, "No handling defined for condition type");
+                throw new QuestsValidationError("Condition Error", `Unknown condition type "${condition.type}"`);
         }
     }
 
-    isValidStringProperty(propValue) {
+    isValidStringProperty(propValue, message) {
         if(!propValue) {
-            return this.makeResult(false, "Undefined");
+            throw new QuestsValidationError(message, "Undefined");
         }
 
         if(!this.isString(propValue)) {
-            return this.makeResult(false, "Not a string");
+            throw new QuestsValidationError(message, `Not a string`);
         }
-
-        return this.makeResult(true);
     }
 
-    isValidIDProperty(propValue) {
-        let result = this.isValidStringProperty(propValue);
-        if(!result.isValid) {
-            return result;
-        }
+    isValidIDProperty(propValue, message) {
+        this.isValidStringProperty(propValue, message);
 
         if(!/^\w{1,500}$/.test(propValue)) {
-            return this.makeResult(false, "IDs must contain only letters, numbers, and underscores and be fewer than 500 characters.");
+            throw new QuestsValidationError(message, `IDs must contain only letters, numbers, and underscores and be fewer than 500 characters.`);
         }
     }
 
-    isValidArray(propValue, requireValues){
+    isValidArray(propValue, message, requireValues){
         if(!propValue) {
-            return this.makeResult(false, "Undefined");
+            throw new QuestsValidationError(message, `Undefined`);
         }
 
         if(!Array.isArray(propValue)) {
-            return this.makeResult(false, "Not an Array");
+            throw new QuestsValidationError(message, `Not an Array`);
         }
 
         if(requireValues && propValue.length == 0) {
-            return this.makeResult(false, "Is Empty");
+            throw new QuestsValidationError(message, `Is Empty`);
         }
-
-        return this.makeResult(true)
     }
 
-    isValidInteger(propValue, minValue, maxValue){
+    isValidInteger(propValue, message, minValue, maxValue){
         if(!Number.isInteger(propValue)){
-            return this.makeResult(false, "Is not an Integer");
+            throw new QuestsValidationError(message, `Is not an Integer`);
         }
 
         // This will break if either value is 0
@@ -269,24 +183,12 @@ export class QuestsValidator {
         if(minValue && maxValue)
         {
             if(propValue < minValue || propValue > maxValue) {
-                return this.makeResult(false, "Invalid value");
+                throw new QuestsValidationError(message, `Invalid value`);
             }
         }
-
-        return this.makeResult(true);
     }
 
     isString(obj) {
         return typeof obj === "string" || obj instanceof String;
-    }
-
-    makeResult(isValid, reason){
-        let result = {
-            "valid": isValid
-        }
-        if(reason) {
-            result.reason = reason;
-        }
-        return result;
     }
 }
