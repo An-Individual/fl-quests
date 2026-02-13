@@ -1,7 +1,6 @@
 import { QuestsValidator } from "../../src/quests/quests-validator.js";
 import { QuestStates, LogicTypes, ComparisonTypes } from "../../src/quests/quests-datatypes.js";
 import assert from "node:assert";
-import { version } from "node:os";
 
 describe("QuestsValidator", function(){
     function getValidCondition() {
