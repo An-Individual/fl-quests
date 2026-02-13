@@ -1,16 +1,13 @@
 import { ConditionParser } from "./conditions/condition-parser.js";
 import { CSVReader, CSVError } from "../csv/csv-reader.js";
-import { Logger } from "../logger.js";
 
 export class QuestsCSVParser {
     constructor() {
         this.conditionParser = new ConditionParser();
     }
 
-    parse(csvString) {
-        let reader = new CSVReader(csvString);
-
-        let state = {
+    getDefaultState() {
+        return {
             rowNumber: 0,
             categories: [],
             currentCategory: null,
@@ -18,14 +15,18 @@ export class QuestsCSVParser {
             currentQuestState: null,
             mappings: {}
         };
+    }
+
+    parse(csvString) {
+        let reader = new CSVReader(csvString);
+
+        let state = this.getDefaultState();
 
         while(reader.readRow()) {
             let row = reader.row;
             if(row.length < 4) {
                 throw new Error("CSV includes fewer than 4 columns");
             }
-
-            Logger.debug(`Parsing row ${reader.rowNumber}`);
 
             state.rowNumber = reader.rowNumber;
             let firstCell = row[0]?.trim()?.toLowerCase() ?? "";
@@ -35,19 +36,14 @@ export class QuestsCSVParser {
                 continue;
             }
             else if(firstCell == "category") {
-                Logger.debug(`Parsing Category`);
                 this.parseCategoryRow(row, state);
             } else if(firstCell == "mappings") {
-                Logger.debug(`Parsing Mappings`);
                 this.parseMappingsRow(row, state);
             } else if(firstCell == "quest") {
-                Logger.debug(`Parsing Quest`);
                 this.parseQuestRow(row, state);
             } else if(this.isIntegerString(firstCell)) {
-                Logger.debug(`Parsing Quest State`);
                 this.parseQuestStateRow(row, state);
             } else if(!firstCell) {
-                Logger.debug(`Parsing Task`);
                 this.parseTaskRow(row, state);
             } else {
                 throw new CSVError(reader.rowNumber, 0, "Unexpected value");
@@ -55,6 +51,15 @@ export class QuestsCSVParser {
         }
 
         this.requireClosed(state, true, true);
+
+        // Apply ordering to unordered quests.
+        state.categories.forEach(cat =>{
+            for(let i = 0; i < cat.quests.length; i++) {
+                if(!Object.hasOwn(cat.quests[i], "order")) {
+                    cat.quests[i].order = cat.quests.length - i;
+                }
+            }
+        })
 
         return {
             categories: state.categories
@@ -148,16 +153,6 @@ export class QuestsCSVParser {
         this.requireClosed(state, false, true);
         this.undeclare(state, false, true, true);
 
-        let orderString = row[2]?.trim() ?? "";
-        if(!this.isIntegerString(orderString)) {
-            throw new CSVError(
-                state.rowNumber, 
-                2, 
-                "Quest order is not a valid integer."
-            );
-        }
-        let order = parseInt(orderString);
-
         if(!row[1]?.trim()) {
             throw new CSVError(
                 state.rowNumber, 
@@ -168,9 +163,20 @@ export class QuestsCSVParser {
 
         let quest = {
             title: row[1],
-            order: order,
             states: []
         };
+
+        let orderString = row[2]?.trim() ?? "";
+        if(orderString) {
+            if(!this.isIntegerString(orderString)) {
+                throw new CSVError(
+                    state.rowNumber, 
+                    2, 
+                    "Quest order is not a valid integer."
+                );
+            }
+            quest.order = parseInt(orderString);
+        }
 
         state.currentCategory.quests.push(quest);
         state.currentQuest = quest;
