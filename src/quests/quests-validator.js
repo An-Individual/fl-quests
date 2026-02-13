@@ -22,22 +22,21 @@ export class QuestsValidator {
 
         this.isValidArray(quests.categories, "Category List Error", true);
 
-        for (const idx in quests.categories) {
+        for (let i = 0; i < quests.categories.length; i++) {
             try {
-                this.validateCategory(quests.categories[idx]);
+                this.validateCategory(quests.categories[i]);
             }catch(error) {
-                
-                error.addElemStack?.(`Category ${idx + 1}`);
+                error.addElemStack?.(`Category ${i + 1}`);
                 throw error;
             }
         }
 
         let existingIds = [];
-        for (const idx in quests.categories) {
-            if(existingIds.indexOf(quests.categories[idx].id) >= 0) {
-                throw new Error("Category ID Not Unique: " + quests.categories[idx].id);
+        for (let i = 0; i < quests.categories.length; i++) {
+            if(existingIds.indexOf(quests.categories[i].id) >= 0) {
+                throw new Error("Category ID Not Unique: " + quests.categories[i].id);
             }
-            existingIds.push(quests.categories[idx].id);
+            existingIds.push(quests.categories[i].id);
         }
     }
 
@@ -47,11 +46,11 @@ export class QuestsValidator {
         this.isValidInteger(category.order, "Order Error");
         this.isValidArray(category.quests, "Quest List Error", true);
 
-        for(const idx in category.quests) {
+        for(let i = 0; i < category.quests.length; i++) {
             try {
-                this.validateQuest(category.quests[idx]);
+                this.validateQuest(category.quests[i]);
             }catch(error) {
-                error.addElemStack?.(`Quest ${idx + 1}`);
+                error.addElemStack?.(`Quest ${i + 1}`);
                 throw error;
             }
         }
@@ -62,37 +61,46 @@ export class QuestsValidator {
         this.isValidInteger(quest.order, "Order Error");
         this.isValidArray(quest.states, "States Error", true);
         
-        for(const idx in quest.states) {
+        for(let i = 0; i < quest.states.length; i++) {
             try {
-                this.validateState(quest.states[idx]);
+                this.validateState(quest.states[i]);
             } catch (error) {
-                error.addElemStack?.(`State ${idx + 1}`);
+                error.addElemStack?.(`Quest State ${i + 1}`);
                 throw error;
             }
         }
     }
 
     validateState(state) {
-        this.isValidInteger(state.state, "Type Error", 1, 5);
+        this.isValidInteger(state.state, "State Error", 1, 5);
         this.isValidStringProperty(state.description, "Description Error");
-        this.validateCondition(state.condition);
 
+        try {
+            this.validateCondition(state.condition);
+        } catch (error) {
+            error.addElemStack?.(`Condition`);
+            throw error;
+        }
         if(state.tasks) {
             this.isValidArray(state.tasks, "Tasks Error");
-
-            for(const idx in state.tasks) {
-                this.validateTask(state.tasks[idx], idx);
+            for(let i = 0; i < state.tasks.length; i++) {
+                try {
+                    this.validateTask(state.tasks[i]);
+                } catch (error) {
+                    error.addElemStack?.(`Task ${i + 1}`);
+                    throw error;
+                }
             }
         }
     }
 
-    validateTask(task, taskIndex) {
-        this.isValidStringProperty(task.description, `Task ${taskIndex + 1} Description Error`);
+    validateTask(task) {
+        this.isValidStringProperty(task.description, `Description Error`);
 
         try {
             this.validateCondition(task.completed);
         } catch (error) {
-            error.addElemStack?.(`Task ${taskIndex + 1} Completed`);
+            error.addElemStack?.(`Completed`);
             throw error;
         }
 
@@ -100,7 +108,7 @@ export class QuestsValidator {
             try {
                 this.validateCondition(task.visible);
             } catch (error) {
-                error.addElemStack?.(`Task ${taskIndex + 1} Visible`);
+                error.addElemStack?.(`Visible`);
                 throw error;
             }
         }
@@ -108,26 +116,35 @@ export class QuestsValidator {
 
     validateCondition(condition) {
         if(!condition){
-            throw new QuestsValidationError("Condition Error", "Undefined");
+            throw new QuestsValidationError("Condition Error", "No condition defined");
         }
 
-        this.isValidInteger(condition.type, "Condition Type Error", 1, 4);
+        this.isValidInteger(condition.type, "Condition Type Error");
 
         switch(condition.type) {
             case LogicTypes.And:
             case LogicTypes.Or:
+                if(!condition.left) {
+                    throw new QuestsValidationError("Condition Error", "Left logic statement undefined.")
+                }
+                if(!condition.right) {
+                    throw new QuestsValidationError("Condition Error", "Right logic statement undefined.")
+                }
                 this.validateCondition(condition.left);
                 this.validateCondition(condition.right);
                 break;
             case LogicTypes.Not:
+                if(!condition.statement) {
+                    throw new QuestsValidationError("Condition Error", "NOT target undefined.")
+                }
                 this.validateCondition(condition.statement);
                 break;
             case LogicTypes.Comparison:
                 this.isValidInteger(condition.quality, "Condition Quality Error");
                 if(condition.property) {
-                    check = this.isValidStringProperty(condition.property, "Condition Property Error");
-                    if(!AllowedQualityProperties.includes(check.property)) {
-                        throw new QuestsValidationError("Condition Property Error", `Unknown quality property "${check.property}"`);
+                    this.isValidStringProperty(condition.property, "Condition Property Error");
+                    if(!AllowedQualityProperties.includes(condition.property)) {
+                        throw new QuestsValidationError("Condition Property Error", `Unknown quality property "${condition.property}"`);
                     }
                 }
 
@@ -146,6 +163,10 @@ export class QuestsValidator {
 
         if(!this.isString(propValue)) {
             throw new QuestsValidationError(message, `Not a string`);
+        }
+
+        if(!propValue.trim()) {
+            throw new QuestsValidationError(message, "Is Empty");
         }
     }
 
