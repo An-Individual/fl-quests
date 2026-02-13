@@ -10,5 +10,8 @@ export default {
     filename: "quests.js",
     path: path.resolve(__dirname, "extension"),
   },
-  mode: "production"
+  mode: "production",
+  devtool: [
+    { type: "javascript", use: "source-map" }
+  ]
 };

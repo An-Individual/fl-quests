@@ -7,7 +7,6 @@
   "type": "module",
   "scripts": {
     "build": "npx webpack --config webpack.config.js && node ./quests/compile-quests.js",
-    "build-dev": "npx webpack --config webpack-dev.config.js && node ./quests/compile-quests.js",
     "test": "mocha --recursive"
   }
 }
