@@ -822,4 +822,95 @@ describe("QuestsManager", function(){
             assert.equal(result.subtasks.length, 0);
         });
     });
+
+    describe("#renderQuests()", function(){
+        let manager;
+        this.beforeEach(function(){
+            manager = makeSpoofedManager();
+        });
+
+        it("No Categories - Empty Result", async function(){
+            const result = await manager.renderQuests();
+            assert.equal(result.length, 0);
+        });
+
+        it("Category with No Quests Property - Empty Result", async function(){
+            manager.categories.push({
+                id: "cat1",
+                title: "Category 1"
+            });
+            const result = await manager.renderQuests();
+            assert.equal(result.length, 0);
+        });
+
+        it("Category with Empty Quests - Empty Result", async function(){
+            manager.categories.push({
+                id: "cat1",
+                title: "Category 1",
+                quests: []
+            });
+            const result = await manager.renderQuests();
+            assert.equal(result.length, 0);
+        });
+
+        it("Category with Quest without Matching State - Empty Result", async function(){
+            manager.qualities[1] = 10;
+            manager.categories.push({
+                id: "cat1",
+                title: "Category 1",
+                quests: [
+                    {
+                        title: "Quest 1",
+                        states: [
+                            {
+                                state: QuestStates.InProgress,
+                                description: "State 1",
+                                condition: {
+                                    type: LogicTypes.Comparison,
+                                    quality: 1,
+                                    comparison: ComparisonTypes.Equal,
+                                    value: 1
+                                }
+                            }
+                        ]
+                    }
+                ]
+            });
+            const result = await manager.renderQuests();
+            assert.equal(result.length, 0);
+        });
+
+        it("Category with Quest with Matching State - Category Rendered", async function(){
+            manager.qualities[1] = 10;
+            manager.categories.push({
+                id: "cat1",
+                title: "Category 1",
+                quests: [
+                    {
+                        title: "Quest 1",
+                        states: [
+                            {
+                                state: QuestStates.InProgress,
+                                description: "State 1",
+                                condition: {
+                                    type: LogicTypes.Comparison,
+                                    quality: 1,
+                                    comparison: ComparisonTypes.Equal,
+                                    value: 10
+                                }
+                            }
+                        ]
+                    }
+                ]
+            });
+            const result = await manager.renderQuests();
+            assert.equal(result.length, 1);
+            assert.equal(result[0].id, "cat1");
+            assert.equal(result[0].title, "Category 1");
+            assert.equal(result[0].quests.length, 1);
+            assert.equal(result[0].quests[0].title, "Quest 1");
+            assert.equal(result[0].quests[0].state, QuestStates.InProgress);
+            assert.equal(result[0].quests[0].details, "State 1");
+        });
+    });
 });

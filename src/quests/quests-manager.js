@@ -181,9 +181,10 @@ export class QuestsManager {
     async renderQuests() {
         let categoryList = await this.getCategories();
         let result = [];
-        categoryList.forEach(category => {
+        for(let i = 0; i < categoryList.length; i++) {
+            let category = categoryList[i];
             if(!category.quests) {
-                return;
+                continue;
             }
 
             let outputCat = {
@@ -202,7 +203,7 @@ export class QuestsManager {
             if(outputCat.quests.length > 0) {
                 result.push(outputCat);
             }
-        });
+        }
 
         return result;
     }
