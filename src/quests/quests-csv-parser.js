@@ -141,7 +141,7 @@ export class QuestsCSVParser {
                 throw new CSVError(
                     state.rowNumber, 
                     1, 
-                    `Mapping is poorly formatted: ${pair}`
+                    `Mapping "${pair}" is poorly formatted`
                 );
             }
             state.mappings[match[1]] = parseInt(match[2]);
@@ -220,7 +220,7 @@ export class QuestsCSVParser {
             throw new CSVError(
                 state.rowNumber, 
                 2, 
-                "Quest state condition is empty or malformed."
+                "Quest state condition is empty."
             );
         }
 
@@ -263,7 +263,7 @@ export class QuestsCSVParser {
             throw new CSVError(
                 state.rowNumber, 
                 2, 
-                "Task completed condition is empty or malformed."
+                "Task completed condition is empty."
             );
         }
 
