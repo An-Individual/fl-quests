@@ -264,12 +264,30 @@ export class QuestsManager {
     }
 
     evaluateCondition(condition) {
+        if(!condition) {
+            throw new Error("Condition Undefined")
+        }
         switch(condition.type) {
             case LogicTypes.And:
+                if(!condition.left) {
+                    throw new Error("AND left condition undefined.")
+                }
+                if(!condition.right) {
+                    throw new Error("AND right condition undefined.")
+                }
                 return this.evaluateCondition(condition.left) && this.evaluateCondition(condition.right);
             case LogicTypes.Or:
+                if(!condition.left) {
+                    throw new Error("OR left condition undefined.")
+                }
+                if(!condition.right) {
+                    throw new Error("OR right condition undefined.")
+                }
                 return this.evaluateCondition(condition.left) || this.evaluateCondition(condition.right);
             case LogicTypes.Not:
+                if(!condition.statement) {
+                    throw new Error("NOT statement undefined.");
+                }
                 return !this.evaluateCondition(condition.statement);
             case LogicTypes.Comparison:
                 return this.evaluateComparison(condition);
@@ -279,6 +297,10 @@ export class QuestsManager {
     }
 
     evaluateComparison(comparision) {
+        if(!comparision) {
+            throw new Error("Comparison Undefined");
+        }
+
         if (!comparision.quality) {
             throw new Error("Quality comparision does not specify a quality.");
         }

@@ -50,6 +50,14 @@ export class SettingsManager {
     }
 
     restoreSettings() {
+        // Here for running test cases. Lets us get past
+        // constructors that reference the settings so
+        // we can create spoofs.
+        if(typeof window == "undefined") {
+            this.settings = this.getDefaultSettings();
+            return;
+        }
+
         let storedSettings = localStorage.getItem("flq-settings");
         let result;
         if(storedSettings){
