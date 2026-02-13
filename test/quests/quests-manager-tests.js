@@ -510,4 +510,316 @@ describe("QuestsManager", function(){
             }, e => e.message == `Condition Undefined`)
         });
     });
+
+    describe("#renderQuest()", function(){
+        let manager;
+        this.beforeEach(function(){
+            manager = makeSpoofedManager();
+        });
+
+        it("No Parameters - Falsy Response", function(){
+            assert(!manager.renderQuest());
+        });
+
+        it("No States Property - Falsy Response", function(){
+            const quest = {
+                title: "Quest Title"
+            };
+            assert(!manager.renderQuest(quest));
+        });
+
+        it("Empty States Array - Falsy Response", function(){
+            const quest = {
+                title: "Quest Title",
+                states: []
+            };
+            assert(!manager.renderQuest(quest));
+        });
+
+        it("Matching State - Simple Result", function(){
+            manager.qualities[1] = 10;
+            const quest = {
+                title: "Quest Title",
+                states: [
+                    {
+                        state: QuestStates.Completed,
+                        description: "State Description",
+                        condition: {
+                            type: LogicTypes.Comparison,
+                            quality: 1,
+                            comparison: ComparisonTypes.Equal,
+                            value: 10
+                        }
+                    }
+                ]
+            };
+            const result = manager.renderQuest(quest);
+            assert.equal(result.title, "Quest Title");
+            assert.equal(result.state, QuestStates.Completed);
+            assert.equal(result.details, "State Description");
+            assert.equal(result.subtasks.length, 0);
+        });
+
+        it("No Title - Undefined Title", function(){
+            manager.qualities[1] = 10;
+            const quest = {
+                states: [
+                    {
+                        state: QuestStates.Completed,
+                        description: "State Description",
+                        condition: {
+                            type: LogicTypes.Comparison,
+                            quality: 1,
+                            comparison: ComparisonTypes.Equal,
+                            value: 10
+                        }
+                    }
+                ]
+            };
+            const result = manager.renderQuest(quest);
+            assert.equal(result.title, undefined);
+            assert.equal(result.state, QuestStates.Completed);
+            assert.equal(result.details, "State Description");
+            assert.equal(result.subtasks.length, 0);
+        });
+
+        it("No Matching State - Falsy Result", function(){
+            manager.qualities[1] = 10;
+            const quest = {
+                title: "Quest Title",
+                states: [
+                    {
+                        state: QuestStates.Completed,
+                        description: "State Description",
+                        condition: {
+                            type: LogicTypes.Comparison,
+                            quality: 1,
+                            comparison: ComparisonTypes.Equal,
+                            value: 1
+                        }
+                    }
+                ]
+            };
+            assert(!manager.renderQuest(quest));
+        });
+
+        it("Multiple Matching States - Last One Selected", function(){
+            manager.qualities[1] = 10;
+            const quest = {
+                title: "Quest Title",
+                states: [
+                    {
+                        state: QuestStates.InProgress,
+                        description: "State 1",
+                        condition: {
+                            type: LogicTypes.Comparison,
+                            quality: 1,
+                            comparison: ComparisonTypes.Equal,
+                            value: 10
+                        }
+                    },
+                    {
+                        state: QuestStates.Completed,
+                        description: "State 2",
+                        condition: {
+                            type: LogicTypes.Comparison,
+                            quality: 1,
+                            comparison: ComparisonTypes.Equal,
+                            value: 10
+                        }
+                    }
+                ]
+            };
+            const result = manager.renderQuest(quest);
+            assert.equal(result.title, "Quest Title");
+            assert.equal(result.state, QuestStates.Completed);
+            assert.equal(result.details, "State 2");
+            assert.equal(result.subtasks.length, 0);
+        });
+
+        it("Task Without Completed - Error", function(){
+            manager.qualities[1] = 10;
+            const quest = {
+                title: "Quest Title",
+                states: [
+                    {
+                        state: QuestStates.InProgress,
+                        description: "State 1",
+                        condition: {
+                            type: LogicTypes.Comparison,
+                            quality: 1,
+                            comparison: ComparisonTypes.Equal,
+                            value: 10
+                        },
+                        tasks: [
+                            {
+                                description: "Task 1"
+                            }
+                        ]
+                    }
+                ]
+            };
+            assert.throws(function(){
+                manager.renderQuest(quest);
+            }, e => e.message == "Task does not include a completed condition.");
+        });
+
+        it("Incomplete Task - Error", function(){
+            manager.qualities[1] = 10;
+            const quest = {
+                title: "Quest Title",
+                states: [
+                    {
+                        state: QuestStates.InProgress,
+                        description: "State 1",
+                        condition: {
+                            type: LogicTypes.Comparison,
+                            quality: 1,
+                            comparison: ComparisonTypes.Equal,
+                            value: 10
+                        },
+                        tasks: [
+                            {
+                                description: "Task 1",
+                                completed: {
+                                    type: LogicTypes.Comparison,
+                                    quality: 1,
+                                    comparison: ComparisonTypes.Equal,
+                                    value: 1
+                                }
+                            }
+                        ]
+                    }
+                ]
+            };
+            const result = manager.renderQuest(quest);
+            assert.equal(result.title, "Quest Title");
+            assert.equal(result.state, QuestStates.InProgress);
+            assert.equal(result.details, "State 1");
+            assert.equal(result.subtasks.length, 1);
+            assert.equal(result.subtasks[0].description, "Task 1")
+            assert.equal(result.subtasks[0].completed, false);
+        });
+
+        it("Completed Task - Error", function(){
+            manager.qualities[1] = 10;
+            const quest = {
+                title: "Quest Title",
+                states: [
+                    {
+                        state: QuestStates.InProgress,
+                        description: "State 1",
+                        condition: {
+                            type: LogicTypes.Comparison,
+                            quality: 1,
+                            comparison: ComparisonTypes.Equal,
+                            value: 10
+                        },
+                        tasks: [
+                            {
+                                description: "Task 1",
+                                completed: {
+                                    type: LogicTypes.Comparison,
+                                    quality: 1,
+                                    comparison: ComparisonTypes.Equal,
+                                    value: 10
+                                }
+                            }
+                        ]
+                    }
+                ]
+            };
+            const result = manager.renderQuest(quest);
+            assert.equal(result.title, "Quest Title");
+            assert.equal(result.state, QuestStates.InProgress);
+            assert.equal(result.details, "State 1");
+            assert.equal(result.subtasks.length, 1);
+            assert.equal(result.subtasks[0].description, "Task 1")
+            assert.equal(result.subtasks[0].completed, true);
+        });
+
+        it("Visible Task - Error", function(){
+            manager.qualities[1] = 10;
+            const quest = {
+                title: "Quest Title",
+                states: [
+                    {
+                        state: QuestStates.InProgress,
+                        description: "State 1",
+                        condition: {
+                            type: LogicTypes.Comparison,
+                            quality: 1,
+                            comparison: ComparisonTypes.Equal,
+                            value: 10
+                        },
+                        tasks: [
+                            {
+                                description: "Task 1",
+                                completed: {
+                                    type: LogicTypes.Comparison,
+                                    quality: 1,
+                                    comparison: ComparisonTypes.Equal,
+                                    value: 10
+                                },
+                                visible: {
+                                    type: LogicTypes.Comparison,
+                                    quality: 1,
+                                    comparison: ComparisonTypes.Equal,
+                                    value: 10
+                                }
+                            }
+                        ]
+                    }
+                ]
+            };
+            const result = manager.renderQuest(quest);
+            assert.equal(result.title, "Quest Title");
+            assert.equal(result.state, QuestStates.InProgress);
+            assert.equal(result.details, "State 1");
+            assert.equal(result.subtasks.length, 1);
+            assert.equal(result.subtasks[0].description, "Task 1")
+            assert.equal(result.subtasks[0].completed, true);
+        });
+
+        it("Invisible Task - Error", function(){
+            manager.qualities[1] = 10;
+            const quest = {
+                title: "Quest Title",
+                states: [
+                    {
+                        state: QuestStates.InProgress,
+                        description: "State 1",
+                        condition: {
+                            type: LogicTypes.Comparison,
+                            quality: 1,
+                            comparison: ComparisonTypes.Equal,
+                            value: 10
+                        },
+                        tasks: [
+                            {
+                                description: "Task 1",
+                                completed: {
+                                    type: LogicTypes.Comparison,
+                                    quality: 1,
+                                    comparison: ComparisonTypes.Equal,
+                                    value: 10
+                                },
+                                visible: {
+                                    type: LogicTypes.Comparison,
+                                    quality: 1,
+                                    comparison: ComparisonTypes.NotEqual,
+                                    value: 10
+                                }
+                            }
+                        ]
+                    }
+                ]
+            };
+            const result = manager.renderQuest(quest);
+            assert.equal(result.title, "Quest Title");
+            assert.equal(result.state, QuestStates.InProgress);
+            assert.equal(result.details, "State 1");
+            assert.equal(result.subtasks.length, 0);
+        });
+    });
 });

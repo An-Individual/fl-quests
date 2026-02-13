@@ -209,12 +209,8 @@ export class QuestsManager {
 
     renderQuest(quest)
     {
-        if(!quest.title) {
-            throw new Error("Quest does not define a title.");
-        }
-
-        if(!quest.states || quest.states.length == 0) {
-            throw new Error("Quest does not define any states.");
+        if(!quest || !quest.states) {
+            return null;
         }
 
         let result = {
@@ -225,9 +221,9 @@ export class QuestsManager {
         let state;
         for (let i = quest.states.length-1; i >= 0; i--)
         {
-            state = quest.states[i];
-            if(this.evaluateCondition(state.condition))
+            if(this.evaluateCondition(quest.states[i].condition))
             {
+                state = quest.states[i];
                 break;
             }
         }
@@ -241,12 +237,8 @@ export class QuestsManager {
 
         if(state.tasks) {
             state.tasks.forEach(task =>{
-                if(!task.description) {
-                    throw new Error("Sub task does not include a description condition.")
-                }
-
                 if(!task.completed) {
-                    throw new Error("Sub task does not include a completed condition.")
+                    throw new Error("Task does not include a completed condition.")
                 }
 
                 if(task.visible && !this.evaluateCondition(task.visible)) {
