@@ -7,10 +7,11 @@ import { QuestsSourceType, LogicTypes, ComparisonTypes } from "./quests-datatype
 export class QuestsManager {
 
     constructor() {
+        this.refetchGracePeriod = Temporal.Duration.from({ hours: 12}).total("milliseconds");
         this.qualities = QualityTracker.instance();
         this.settings = SettingsManager.instance();
         this.validator = new QuestsValidator();
-        this.getQuests()
+        this.getQuests();
     }
 
     clear() {
@@ -99,6 +100,21 @@ export class QuestsManager {
                 Logger.log(`Quests Source: ${questsSource}`);
             }
 
+            const isRemoteSource = this.settings.getQuestsSourceType() != QuestsSourceType.Local;
+            if(isRemoteSource) {
+                const previousFetchRaw = this.settings.getSourceQuests();
+                if(previousFetchRaw) {
+                    const prevFetch = JSON.parse(previousFetchRaw);
+                    if(prevFetch.source == questsSource && prevFetch.date) {
+                        if(Date.now() - prevFetch.date < this.refetchGracePeriod) {
+                            Logger.log("Using previously fetch")
+                            this.questsRaw = previousFetchRaw;
+                            return prevFetch;
+                        }
+                    }
+                }
+            }
+
             let response = await fetch(questsSource);
 
             if(!response.ok) {
@@ -112,11 +128,19 @@ export class QuestsManager {
             Logger.log(`Source Quests Version: ${fetchedQuests.version}`);
             Logger.log(`Fetched ${fetchedQuests.categories.length} Quest Categories From Source`);
 
+            if(isRemoteSource) {
+                fetchedQuests.source = questsSource;
+                fetchedQuests.date = Date.now();
+            }
+
             // It's actually weirdly important that we stringify and parse
             // the returned object here. If we don't we'll get a cross-origin object
             // error when we try to merge the imported and source quests. Why?
             // Damned if I know.
             this.questsRaw = JSON.stringify(fetchedQuests);
+            if(isRemoteSource) {
+                this.settings.setSourceQuests(this.questsRaw);
+            }
             return JSON.parse(this.questsRaw);
         } finally {
             this.fetchingRaw = false;

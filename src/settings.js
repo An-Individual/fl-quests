@@ -16,7 +16,8 @@ export class SettingsManager {
         "QuestsSourceType",
         "CustomQuestsSource",
         "EnableImportedQuests",
-        "ImportedQuests"
+        "ImportedQuests",
+        "SourceQuests"
     ];
 
     getDefaultSettings() {
