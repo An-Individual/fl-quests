@@ -6,6 +6,7 @@ export class ModalInjector {
             <div class="flq-modal-box">
                 <div class="flq-outline">
                     <span id="flq-close">&#10006;</span>
+                    <img id="flq-marquee" />
                     <div class="flq-title">
                         Quests Journal
                     </div>
@@ -91,6 +92,9 @@ export class ModalInjector {
         tempElem.innerHTML = ModalInjector.rawModal.trim();
 
         document.body.appendChild(tempElem.firstChild);
+
+        const refreshElem = document.getElementById("flq-marquee");
+        refreshElem.setAttribute("src", chrome.runtime.getURL('images/refresh.svg'));
 
         ModalManager.instance().attachEvents();
     }

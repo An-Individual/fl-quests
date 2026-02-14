@@ -17,8 +17,14 @@
       "run_at": "document_start"
     }
   ],
-  "web_accessible_resources": [{
-    "resources": ["quests.json"],
-    "matches": ["https://www.fallenlondon.com/*"]
-  }]
+  "web_accessible_resources": [
+    {
+      "resources": ["quests.json"],
+      "matches": ["https://www.fallenlondon.com/*"]
+    },
+    {
+      "resources": ["images/refresh.svg"],
+      "matches": ["https://www.fallenlondon.com/*"]
+    }
+  ]
 }

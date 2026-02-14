@@ -321,6 +321,21 @@ export class StyleInjector {
         #flq-version {
             white-space: pre-wrap;
         }
+
+        #flq-marquee {
+            width: 24px;
+            height: 24px;
+            display: block;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
         `;
 
     static insertStylesElement(){
