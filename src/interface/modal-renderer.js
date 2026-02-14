@@ -2,7 +2,7 @@ import { QuestStates } from "../quests/quests-datatypes.js";
 import { SettingsManager } from "../settings.js";
 import { TextFormatter } from "./text-formatter.js";
 
-export class QuestsRenderer {
+export class ModalRenderer {
     static CharacterCodes = {
         TriangleUp: "&#9650;",
         TriangleDown: "&#9660;",
@@ -83,7 +83,7 @@ export class QuestsRenderer {
             quest.subtasks.forEach((task) =>{
                 let statusElem;
                 if(task.completed){
-                    statusElem = this.makeElementWithInnerHtml("div", "flq-subtask-status", QuestsRenderer.CharacterCodes.Checkmark);
+                    statusElem = this.makeElementWithInnerHtml("div", "flq-subtask-status", ModalRenderer.CharacterCodes.Checkmark);
                 } else {
                     statusElem = this.makeElementWithInnerHtml("div", "flq-subtask-status", "");
                 }
@@ -135,24 +135,24 @@ export class QuestsRenderer {
         });
 
         let titleElem = this.makeTextElement("div", "flq-cat-title", `${category.title} (${completed}/${category.quests.length})`, false);
-        let titleExpandElem = this.makeElementWithInnerHtml("div", "flq-cat-expand", QuestsRenderer.CharacterCodes.TriangleUp)
+        let titleExpandElem = this.makeElementWithInnerHtml("div", "flq-cat-expand", ModalRenderer.CharacterCodes.TriangleUp)
         let titleBarElem = this.makeElement("div", "flq-cat-titlebar", [titleElem, titleExpandElem]);
         let questsElem = this.makeElement("div", "flq-cat-quests", questElems);
 
         if(collapsed) {
             questsElem.style.display = "none";
-            titleExpandElem.innerHTML = QuestsRenderer.CharacterCodes.TriangleDown;
+            titleExpandElem.innerHTML = ModalRenderer.CharacterCodes.TriangleDown;
         }
 
         titleBarElem.onclick = function(){
             if(questsElem.style.display != "none")
             {
                 questsElem.style.display = "none";
-                titleExpandElem.innerHTML = QuestsRenderer.CharacterCodes.TriangleDown;
+                titleExpandElem.innerHTML = ModalRenderer.CharacterCodes.TriangleDown;
                 SettingsManager.instance().setCategoryState(category.id, ModalManager.CategoryState.Collapsed);
             } else {
                 questsElem.style.display = "block";
-                titleExpandElem.innerHTML = QuestsRenderer.CharacterCodes.TriangleUp;
+                titleExpandElem.innerHTML = ModalRenderer.CharacterCodes.TriangleUp;
                 SettingsManager.instance().setCategoryState(category.id, ModalManager.CategoryState.Show);
             }
         };

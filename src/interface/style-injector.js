@@ -325,7 +325,7 @@ export class StyleInjector {
         #flq-marquee {
             width: 24px;
             height: 24px;
-            display: block;
+            display: none;
             position: absolute;
             top: 10px;
             left: 10px;

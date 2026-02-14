@@ -1,21 +1,16 @@
-import { QuestsManager } from "../../src/quests/quests-manager.js";
+import { QuestsRenderer } from "../../src/quests/quests-renderer.js";
 import { QuestStates, LogicTypes, ComparisonTypes } from "../../src/quests/quests-datatypes.js";
 import assert from "node:assert";
 
-describe("QuestsManager", function(){
-    function makeSpoofedManager() {
-        const manager = new QuestsManager();
-        manager.qualities = {
+describe("QuestsRenderer", function(){
+    function makeSpoofedRenderer() {
+        const renderer = new QuestsRenderer();
+        renderer.qualities = {
             getValue: function(key) {
-                return manager.qualities[key];
+                return renderer.qualities[key];
             }
         }
-        manager.categories = [];
-        manager.getCategories = function() {
-            return manager.categories;
-        }
-
-        return manager;
+        return renderer;
     }
 
     function getValidComparison() {
@@ -36,200 +31,200 @@ describe("QuestsManager", function(){
     }
 
     describe("#evaluateComparison()", function(){
-        let manager;
+        let renderer;
         this.beforeEach(function(){
-            manager = makeSpoofedManager();
+            renderer = makeSpoofedRenderer();
         });
 
         it("Equal True - Returns True", function() {
-            manager.qualities[1] = 123;
+            renderer.qualities[1] = 123;
             const condition = {
                 comparison: ComparisonTypes.Equal,
                 quality: 1,
                 value: 123
             };
-            assert.equal(manager.evaluateComparison(condition), true);
+            assert.equal(renderer.evaluateComparison(condition), true);
         });
 
         it("Equal False - Returns False", function() {
-            manager.qualities[1] = 123;
+            renderer.qualities[1] = 123;
             const condition = {
                 comparison: ComparisonTypes.Equal,
                 quality: 1,
                 value: 321
             };
-            assert.equal(manager.evaluateComparison(condition), false);
+            assert.equal(renderer.evaluateComparison(condition), false);
         });
 
         it("NotEqual True - Returns True", function() {
-            manager.qualities[1] = 123;
+            renderer.qualities[1] = 123;
             const condition = {
                 comparison: ComparisonTypes.NotEqual,
                 quality: 1,
                 value: 321
             };
-            assert.equal(manager.evaluateComparison(condition), true);
+            assert.equal(renderer.evaluateComparison(condition), true);
         });
 
         it("NotEqual False - Returns False", function() {
-            manager.qualities[1] = 123;
+            renderer.qualities[1] = 123;
             const condition = {
                 comparison: ComparisonTypes.NotEqual,
                 quality: 1,
                 value: 123
             };
-            assert.equal(manager.evaluateComparison(condition), false);
+            assert.equal(renderer.evaluateComparison(condition), false);
         });
 
         it("Greater True - Returns True", function() {
-            manager.qualities[1] = 10;
+            renderer.qualities[1] = 10;
             const condition = {
                 comparison: ComparisonTypes.Greater,
                 quality: 1,
                 value: 7
             };
-            assert.equal(manager.evaluateComparison(condition), true);
+            assert.equal(renderer.evaluateComparison(condition), true);
         });
 
         it("Greater False - Returns False", function() {
-            manager.qualities[1] = 10;
+            renderer.qualities[1] = 10;
             const condition = {
                 comparison: ComparisonTypes.Greater,
                 quality: 1,
                 value: 10
             };
-            assert.equal(manager.evaluateComparison(condition), false);
+            assert.equal(renderer.evaluateComparison(condition), false);
         });
 
         it("GreaterEqual True - Returns True", function() {
-            manager.qualities[1] = 10;
+            renderer.qualities[1] = 10;
             const condition = {
                 comparison: ComparisonTypes.GreaterEqual,
                 quality: 1,
                 value: 10
             };
-            assert.equal(manager.evaluateComparison(condition), true);
+            assert.equal(renderer.evaluateComparison(condition), true);
         });
 
         it("GreaterEqual False - Returns False", function() {
-            manager.qualities[1] = 10;
+            renderer.qualities[1] = 10;
             const condition = {
                 comparison: ComparisonTypes.GreaterEqual,
                 quality: 1,
                 value: 11
             };
-            assert.equal(manager.evaluateComparison(condition), false);
+            assert.equal(renderer.evaluateComparison(condition), false);
         });
         
         it("Less True - Returns True", function() {
-            manager.qualities[1] = 10;
+            renderer.qualities[1] = 10;
             const condition = {
                 comparison: ComparisonTypes.Less,
                 quality: 1,
                 value: 77
             };
-            assert.equal(manager.evaluateComparison(condition), true);
+            assert.equal(renderer.evaluateComparison(condition), true);
         });
 
         it("Less False - Returns False", function() {
-            manager.qualities[1] = 10;
+            renderer.qualities[1] = 10;
             const condition = {
                 comparison: ComparisonTypes.Less,
                 quality: 1,
                 value: 10
             };
-            assert.equal(manager.evaluateComparison(condition), false);
+            assert.equal(renderer.evaluateComparison(condition), false);
         });
 
         it("Less True - Returns True", function() {
-            manager.qualities[1] = 10;
+            renderer.qualities[1] = 10;
             const condition = {
                 comparison: ComparisonTypes.Less,
                 quality: 1,
                 value: 77
             };
-            assert.equal(manager.evaluateComparison(condition), true);
+            assert.equal(renderer.evaluateComparison(condition), true);
         });
 
         it("Less False - Returns False", function() {
-            manager.qualities[1] = 10;
+            renderer.qualities[1] = 10;
             const condition = {
                 comparison: ComparisonTypes.Less,
                 quality: 1,
                 value: 10
             };
-            assert.equal(manager.evaluateComparison(condition), false);
+            assert.equal(renderer.evaluateComparison(condition), false);
         });
 
         it("LessEqual True - Returns True", function() {
-            manager.qualities[1] = 10;
+            renderer.qualities[1] = 10;
             const condition = {
                 comparison: ComparisonTypes.LessEqual,
                 quality: 1,
                 value: 10
             };
-            assert.equal(manager.evaluateComparison(condition), true);
+            assert.equal(renderer.evaluateComparison(condition), true);
         });
 
         it("LessEqual False - Returns False", function() {
-            manager.qualities[1] = 10;
+            renderer.qualities[1] = 10;
             const condition = {
                 comparison: ComparisonTypes.LessEqual,
                 quality: 1,
                 value: 0
             };
-            assert.equal(manager.evaluateComparison(condition), false);
+            assert.equal(renderer.evaluateComparison(condition), false);
         });
 
         it("No Quality - Error", function() {
-            manager.qualities[1] = 10;
+            renderer.qualities[1] = 10;
             const condition = {
                 comparison: ComparisonTypes.LessEqual,
                 value: 1
             };
             assert.throws(function(){
-                manager.evaluateComparison(condition);
+                renderer.evaluateComparison(condition);
             }, e => e.message == `Quality comparision does not specify a quality.`);
         });
 
         it("No Value - Error", function() {
-            manager.qualities[1] = 10;
+            renderer.qualities[1] = 10;
             const condition = {
                 comparison: ComparisonTypes.LessEqual,
                 quality: 1
             };
             assert.throws(function(){
-                manager.evaluateComparison(condition);
+                renderer.evaluateComparison(condition);
             }, e => e.message == `Quality comparision does not specify a value.`);
         });
 
         it("Invalid Comparison - Error", function() {
-            manager.qualities[1] = 10;
+            renderer.qualities[1] = 10;
             const condition = {
                 comparison: 7,
                 quality: 1,
                 value: 1
             };
             assert.throws(function(){
-                manager.evaluateComparison(condition);
+                renderer.evaluateComparison(condition);
             }, e => e.message == `Unknown comparison type: 7`);
         });
 
         it("Undefined Comparison - Error", function() {
             assert.throws(function(){
-                manager.evaluateComparison();
+                renderer.evaluateComparison();
             }, e => e.message == `Comparison Undefined`);
         });
     });
 
     describe("#evaluateCondition()", function(){
-        let manager;
+        let renderer;
         this.beforeEach(function(){
-            manager = makeSpoofedManager();
+            renderer = makeSpoofedRenderer();
         });
 
         it("AND both True - True", function() {
-            manager.qualities[1] = 10;
+            renderer.qualities[1] = 10;
             let condition = {
                 type: LogicTypes.And,
                 left: {
@@ -245,11 +240,11 @@ describe("QuestsManager", function(){
                     value: 10
                 }
             }
-            assert.equal(manager.evaluateCondition(condition), true);
+            assert.equal(renderer.evaluateCondition(condition), true);
         });
 
         it("AND left False - False", function() {
-            manager.qualities[1] = 10;
+            renderer.qualities[1] = 10;
             let condition = {
                 type: LogicTypes.And,
                 left: {
@@ -265,11 +260,11 @@ describe("QuestsManager", function(){
                     value: 10
                 }
             }
-            assert.equal(manager.evaluateCondition(condition), false);
+            assert.equal(renderer.evaluateCondition(condition), false);
         });
 
         it("AND right False - False", function() {
-            manager.qualities[1] = 10;
+            renderer.qualities[1] = 10;
             let condition = {
                 type: LogicTypes.And,
                 left: {
@@ -285,11 +280,11 @@ describe("QuestsManager", function(){
                     value: 1
                 }
             }
-            assert.equal(manager.evaluateCondition(condition), false);
+            assert.equal(renderer.evaluateCondition(condition), false);
         });
 
         it("AND both False - False", function() {
-            manager.qualities[1] = 10;
+            renderer.qualities[1] = 10;
             let condition = {
                 type: LogicTypes.And,
                 left: {
@@ -305,11 +300,11 @@ describe("QuestsManager", function(){
                     value: 1
                 }
             }
-            assert.equal(manager.evaluateCondition(condition), false);
+            assert.equal(renderer.evaluateCondition(condition), false);
         });
 
         it("OR both True - True", function() {
-            manager.qualities[1] = 10;
+            renderer.qualities[1] = 10;
             let condition = {
                 type: LogicTypes.Or,
                 left: {
@@ -325,11 +320,11 @@ describe("QuestsManager", function(){
                     value: 10
                 }
             }
-            assert.equal(manager.evaluateCondition(condition), true);
+            assert.equal(renderer.evaluateCondition(condition), true);
         });
 
         it("OR left False - True", function() {
-            manager.qualities[1] = 10;
+            renderer.qualities[1] = 10;
             let condition = {
                 type: LogicTypes.Or,
                 left: {
@@ -345,11 +340,11 @@ describe("QuestsManager", function(){
                     value: 10
                 }
             }
-            assert.equal(manager.evaluateCondition(condition), true);
+            assert.equal(renderer.evaluateCondition(condition), true);
         });
 
         it("OR right False - True", function() {
-            manager.qualities[1] = 10;
+            renderer.qualities[1] = 10;
             let condition = {
                 type: LogicTypes.Or,
                 left: {
@@ -365,11 +360,11 @@ describe("QuestsManager", function(){
                     value: 1
                 }
             }
-            assert.equal(manager.evaluateCondition(condition), true);
+            assert.equal(renderer.evaluateCondition(condition), true);
         });
 
         it("OR both False - False", function() {
-            manager.qualities[1] = 10;
+            renderer.qualities[1] = 10;
             let condition = {
                 type: LogicTypes.Or,
                 left: {
@@ -385,11 +380,11 @@ describe("QuestsManager", function(){
                     value: 1
                 }
             }
-            assert.equal(manager.evaluateCondition(condition), false);
+            assert.equal(renderer.evaluateCondition(condition), false);
         });
 
         it("NOT on True - False", function(){
-            manager.qualities[1] = 10;
+            renderer.qualities[1] = 10;
             let condition = {
                 type: LogicTypes.Not,
                 statement: {
@@ -399,11 +394,11 @@ describe("QuestsManager", function(){
                     value: 10
                 }
             }
-            assert.equal(manager.evaluateCondition(condition), false);
+            assert.equal(renderer.evaluateCondition(condition), false);
         });
 
         it("NOT on False - True", function(){
-            manager.qualities[1] = 10;
+            renderer.qualities[1] = 10;
             let condition = {
                 type: LogicTypes.Not,
                 statement: {
@@ -413,29 +408,29 @@ describe("QuestsManager", function(){
                     value: 1
                 }
             }
-            assert.equal(manager.evaluateCondition(condition), true);
+            assert.equal(renderer.evaluateCondition(condition), true);
         });
 
         it("True Condition - True", function(){
-            manager.qualities[1] = 10;
+            renderer.qualities[1] = 10;
             let condition = {
                 type: LogicTypes.Comparison,
                 quality: 1,
                 comparison: ComparisonTypes.Equal,
                 value: 10
             }
-            assert.equal(manager.evaluateCondition(condition), true);
+            assert.equal(renderer.evaluateCondition(condition), true);
         });
 
         it("False Condition - False", function(){
-            manager.qualities[1] = 10;
+            renderer.qualities[1] = 10;
             let condition = {
                 type: LogicTypes.Comparison,
                 quality: 1,
                 comparison: ComparisonTypes.Equal,
                 value: 1
             }
-            assert.equal(manager.evaluateCondition(condition), false);
+            assert.equal(renderer.evaluateCondition(condition), false);
         });
 
         it("AND no Left - Error", function(){
@@ -444,7 +439,7 @@ describe("QuestsManager", function(){
                 right: getValidComparison()
             }
             assert.throws(function(){
-                manager.evaluateCondition(condition);
+                renderer.evaluateCondition(condition);
             }, e => e.message == `AND left condition undefined.`)
         });
 
@@ -454,7 +449,7 @@ describe("QuestsManager", function(){
                 left: getValidComparison()
             }
             assert.throws(function(){
-                manager.evaluateCondition(condition);
+                renderer.evaluateCondition(condition);
             }, e => e.message == `AND right condition undefined.`)
         });
 
@@ -464,7 +459,7 @@ describe("QuestsManager", function(){
                 right: getValidComparison()
             }
             assert.throws(function(){
-                manager.evaluateCondition(condition);
+                renderer.evaluateCondition(condition);
             }, e => e.message == `OR left condition undefined.`)
         });
 
@@ -474,7 +469,7 @@ describe("QuestsManager", function(){
                 left: getValidComparison()
             }
             assert.throws(function(){
-                manager.evaluateCondition(condition);
+                renderer.evaluateCondition(condition);
             }, e => e.message == `OR right condition undefined.`)
         });
 
@@ -483,7 +478,7 @@ describe("QuestsManager", function(){
                 type: LogicTypes.Not
             }
             assert.throws(function(){
-                manager.evaluateCondition(condition);
+                renderer.evaluateCondition(condition);
             }, e => e.message == `NOT statement undefined.`)
         });
 
@@ -491,7 +486,7 @@ describe("QuestsManager", function(){
             let condition = {
             }
             assert.throws(function(){
-                manager.evaluateCondition(condition);
+                renderer.evaluateCondition(condition);
             }, e => e.message == `Unknown condition type: undefined`)
         });
 
@@ -500,32 +495,32 @@ describe("QuestsManager", function(){
                 type: 5
             }
             assert.throws(function(){
-                manager.evaluateCondition(condition);
+                renderer.evaluateCondition(condition);
             }, e => e.message == `Unknown condition type: 5`)
         });
 
         it("No Parameters - Error", function(){
             assert.throws(function(){
-                manager.evaluateCondition();
+                renderer.evaluateCondition();
             }, e => e.message == `Condition Undefined`)
         });
     });
 
     describe("#renderQuest()", function(){
-        let manager;
+        let renderer;
         this.beforeEach(function(){
-            manager = makeSpoofedManager();
+            renderer = makeSpoofedRenderer();
         });
 
         it("No Parameters - Falsy Response", function(){
-            assert(!manager.renderQuest());
+            assert(!renderer.renderQuest());
         });
 
         it("No States Property - Falsy Response", function(){
             const quest = {
                 title: "Quest Title"
             };
-            assert(!manager.renderQuest(quest));
+            assert(!renderer.renderQuest(quest));
         });
 
         it("Empty States Array - Falsy Response", function(){
@@ -533,11 +528,11 @@ describe("QuestsManager", function(){
                 title: "Quest Title",
                 states: []
             };
-            assert(!manager.renderQuest(quest));
+            assert(!renderer.renderQuest(quest));
         });
 
         it("Matching State - Simple Result", function(){
-            manager.qualities[1] = 10;
+            renderer.qualities[1] = 10;
             const quest = {
                 title: "Quest Title",
                 states: [
@@ -553,7 +548,7 @@ describe("QuestsManager", function(){
                     }
                 ]
             };
-            const result = manager.renderQuest(quest);
+            const result = renderer.renderQuest(quest);
             assert.equal(result.title, "Quest Title");
             assert.equal(result.state, QuestStates.Completed);
             assert.equal(result.details, "State Description");
@@ -561,7 +556,7 @@ describe("QuestsManager", function(){
         });
 
         it("No Title - Undefined Title", function(){
-            manager.qualities[1] = 10;
+            renderer.qualities[1] = 10;
             const quest = {
                 states: [
                     {
@@ -576,7 +571,7 @@ describe("QuestsManager", function(){
                     }
                 ]
             };
-            const result = manager.renderQuest(quest);
+            const result = renderer.renderQuest(quest);
             assert.equal(result.title, undefined);
             assert.equal(result.state, QuestStates.Completed);
             assert.equal(result.details, "State Description");
@@ -584,7 +579,7 @@ describe("QuestsManager", function(){
         });
 
         it("No Matching State - Falsy Result", function(){
-            manager.qualities[1] = 10;
+            renderer.qualities[1] = 10;
             const quest = {
                 title: "Quest Title",
                 states: [
@@ -600,11 +595,11 @@ describe("QuestsManager", function(){
                     }
                 ]
             };
-            assert(!manager.renderQuest(quest));
+            assert(!renderer.renderQuest(quest));
         });
 
         it("Multiple Matching States - Last One Selected", function(){
-            manager.qualities[1] = 10;
+            renderer.qualities[1] = 10;
             const quest = {
                 title: "Quest Title",
                 states: [
@@ -630,7 +625,7 @@ describe("QuestsManager", function(){
                     }
                 ]
             };
-            const result = manager.renderQuest(quest);
+            const result = renderer.renderQuest(quest);
             assert.equal(result.title, "Quest Title");
             assert.equal(result.state, QuestStates.Completed);
             assert.equal(result.details, "State 2");
@@ -638,7 +633,7 @@ describe("QuestsManager", function(){
         });
 
         it("Task Without Completed - Error", function(){
-            manager.qualities[1] = 10;
+            renderer.qualities[1] = 10;
             const quest = {
                 title: "Quest Title",
                 states: [
@@ -660,12 +655,12 @@ describe("QuestsManager", function(){
                 ]
             };
             assert.throws(function(){
-                manager.renderQuest(quest);
+                renderer.renderQuest(quest);
             }, e => e.message == "Task does not include a completed condition.");
         });
 
         it("Incomplete Task - Error", function(){
-            manager.qualities[1] = 10;
+            renderer.qualities[1] = 10;
             const quest = {
                 title: "Quest Title",
                 states: [
@@ -692,7 +687,7 @@ describe("QuestsManager", function(){
                     }
                 ]
             };
-            const result = manager.renderQuest(quest);
+            const result = renderer.renderQuest(quest);
             assert.equal(result.title, "Quest Title");
             assert.equal(result.state, QuestStates.InProgress);
             assert.equal(result.details, "State 1");
@@ -702,7 +697,7 @@ describe("QuestsManager", function(){
         });
 
         it("Completed Task - Error", function(){
-            manager.qualities[1] = 10;
+            renderer.qualities[1] = 10;
             const quest = {
                 title: "Quest Title",
                 states: [
@@ -729,7 +724,7 @@ describe("QuestsManager", function(){
                     }
                 ]
             };
-            const result = manager.renderQuest(quest);
+            const result = renderer.renderQuest(quest);
             assert.equal(result.title, "Quest Title");
             assert.equal(result.state, QuestStates.InProgress);
             assert.equal(result.details, "State 1");
@@ -739,7 +734,7 @@ describe("QuestsManager", function(){
         });
 
         it("Visible Task - Error", function(){
-            manager.qualities[1] = 10;
+            renderer.qualities[1] = 10;
             const quest = {
                 title: "Quest Title",
                 states: [
@@ -772,7 +767,7 @@ describe("QuestsManager", function(){
                     }
                 ]
             };
-            const result = manager.renderQuest(quest);
+            const result = renderer.renderQuest(quest);
             assert.equal(result.title, "Quest Title");
             assert.equal(result.state, QuestStates.InProgress);
             assert.equal(result.details, "State 1");
@@ -782,7 +777,7 @@ describe("QuestsManager", function(){
         });
 
         it("Invisible Task - Error", function(){
-            manager.qualities[1] = 10;
+            renderer.qualities[1] = 10;
             const quest = {
                 title: "Quest Title",
                 states: [
@@ -815,7 +810,7 @@ describe("QuestsManager", function(){
                     }
                 ]
             };
-            const result = manager.renderQuest(quest);
+            const result = renderer.renderQuest(quest);
             assert.equal(result.title, "Quest Title");
             assert.equal(result.state, QuestStates.InProgress);
             assert.equal(result.details, "State 1");
@@ -824,86 +819,115 @@ describe("QuestsManager", function(){
     });
 
     describe("#renderQuests()", function(){
-        let manager;
+        let renderer;
         this.beforeEach(function(){
-            manager = makeSpoofedManager();
+            renderer = makeSpoofedRenderer();
         });
 
-        it("No Categories - Empty Result", async function(){
-            const result = await manager.renderQuests();
+        it("No Parameters - Empty Result", function(){
+            const result = renderer.renderQuests();
             assert.equal(result.length, 0);
         });
 
-        it("Category with No Quests Property - Empty Result", async function(){
-            manager.categories.push({
-                id: "cat1",
-                title: "Category 1"
+        it("No Categories Parameter - Empty Result", function(){
+            const result = renderer.renderQuests({
             });
-            const result = await manager.renderQuests();
             assert.equal(result.length, 0);
         });
 
-        it("Category with Empty Quests - Empty Result", async function(){
-            manager.categories.push({
-                id: "cat1",
-                title: "Category 1",
-                quests: []
+        it("Empty Categories Not Array - Empty Result", function(){
+            const result = renderer.renderQuests({
+                categories: "Test"
             });
-            const result = await manager.renderQuests();
             assert.equal(result.length, 0);
         });
 
-        it("Category with Quest without Matching State - Empty Result", async function(){
-            manager.qualities[1] = 10;
-            manager.categories.push({
-                id: "cat1",
-                title: "Category 1",
-                quests: [
+        it("Category with No Quests Property - Empty Result", function(){
+            const quests = {
+                categories: [
                     {
-                        title: "Quest 1",
-                        states: [
+                        id: "cat1",
+                        title: "Category 1"
+                    }
+                ]
+            };
+            const result = renderer.renderQuests(quests);
+            assert.equal(result.length, 0);
+        });
+
+        it("Category with Empty Quests - Empty Result", function(){
+            const quests = {
+                categories: [
+                    {
+                        id: "cat1",
+                        title: "Category 1",
+                        quests: []
+                    }
+                ]
+            };
+            const result = renderer.renderQuests(quests);
+            assert.equal(result.length, 0);
+        });
+
+        it("Category with Quest without Matching State - Empty Result", function(){
+            renderer.qualities[1] = 10;
+            const quests = {
+                categories: [
+                    {
+                        id: "cat1",
+                        title: "Category 1",
+                        quests: [
                             {
-                                state: QuestStates.InProgress,
-                                description: "State 1",
-                                condition: {
-                                    type: LogicTypes.Comparison,
-                                    quality: 1,
-                                    comparison: ComparisonTypes.Equal,
-                                    value: 1
-                                }
+                                title: "Quest 1",
+                                states: [
+                                    {
+                                        state: QuestStates.InProgress,
+                                        description: "State 1",
+                                        condition: {
+                                            type: LogicTypes.Comparison,
+                                            quality: 1,
+                                            comparison: ComparisonTypes.Equal,
+                                            value: 1
+                                        }
+                                    }
+                                ]
                             }
                         ]
                     }
                 ]
-            });
-            const result = await manager.renderQuests();
+            };
+            const result = renderer.renderQuests(quests);
             assert.equal(result.length, 0);
         });
 
-        it("Category with Quest with Matching State - Category Rendered", async function(){
-            manager.qualities[1] = 10;
-            manager.categories.push({
-                id: "cat1",
-                title: "Category 1",
-                quests: [
+        it("Category with Quest with Matching State - Category Rendered", function(){
+            renderer.qualities[1] = 10;
+            const quests = {
+                categories: [
                     {
-                        title: "Quest 1",
-                        states: [
+                        id: "cat1",
+                        title: "Category 1",
+                        quests: [
                             {
-                                state: QuestStates.InProgress,
-                                description: "State 1",
-                                condition: {
-                                    type: LogicTypes.Comparison,
-                                    quality: 1,
-                                    comparison: ComparisonTypes.Equal,
-                                    value: 10
-                                }
+                                title: "Quest 1",
+                                states: [
+                                    {
+                                        state: QuestStates.InProgress,
+                                        description: "State 1",
+                                        condition: {
+                                            type: LogicTypes.Comparison,
+                                            quality: 1,
+                                            comparison: ComparisonTypes.Equal,
+                                            value: 10
+                                        }
+                                    }
+                                ]
                             }
                         ]
                     }
                 ]
-            });
-            const result = await manager.renderQuests();
+            };
+            const result = renderer.renderQuests(quests);
             assert.equal(result.length, 1);
             assert.equal(result[0].id, "cat1");
             assert.equal(result[0].title, "Category 1");
