@@ -1,0 +1,9 @@
+{
+    "files.exclude": {
+        "extension/quests.json": true,
+        "extension/quests.js": true,
+        "extension/quests.js.map": true,
+        "node_modules": true,
+        "docs": true
+    }
+}
