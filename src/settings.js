@@ -23,7 +23,7 @@ export class SettingsManager {
     getDefaultSettings() {
         return {
             HideNotStarted: false,
-            QuestsSourceType: QuestsSourceType.Local
+            QuestsSourceType: QuestsSourceType.GitHub
         };
     }
 
