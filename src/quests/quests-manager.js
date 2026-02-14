@@ -58,22 +58,16 @@ export class QuestsManager {
     }
 
     getQuestsSource() {
-        let source;
         switch(this.settings.getQuestsSourceType()){
             case QuestsSourceType.Local:
-                source = chrome.runtime.getURL('quests.json');
-                break;
+                return chrome.runtime.getURL('quests.json');
             case QuestsSourceType.GitHub:
-                throw new Error("NOT IMPLEMENTED");
+                return "https://an-individual.github.io/fl-quests/published/quests.json";
             case QuestsSourceType.Custom:
-                source = this.settings.getCustomQuestsSource();
-                break;
+                return this.settings.getCustomQuestsSource();
             default:
-                source = "";
-                break;
+                return "";
         }
-
-        return source;
     }
 
     async fetchQuestsFromSource() {

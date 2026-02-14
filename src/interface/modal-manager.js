@@ -548,7 +548,7 @@ export class ModalManager {
                 questsInfo += `\n    Version: ${quests.version}`;
             }
             if(quests.date) {
-                questsInfo += `\n    Last Fetched: ${new Date(quests.date)}`;
+                questsInfo += `\n    Last Fetched: ${new Date(quests.date).toISOString()}`;
             }
             
             let overrides = 0;

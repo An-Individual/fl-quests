@@ -314,6 +314,7 @@ export class StyleInjector {
             padding: 5px;
             box-sizing: border-box;
             font-family: "Lucida Console", "Courier New", monospace;
+            font-size: 0.8em;
             color: #bdb29eff;
         }
 
