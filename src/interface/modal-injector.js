@@ -67,7 +67,12 @@ export class ModalInjector {
                             </div>
                         </div>
                         <div id="flq-help">
-                            <p>Some troubleshooting advice.</p>
+                            <div class="flq-version-outer">
+                                <div class="flq-version-border">
+                                    <div style="text-align: center;">Fallen London Quests</div>
+                                    <div id="flq-version"></div>
+                                </div>
+                            </div>
                             <div style="text-align: center;">
                                 <span id="flq-export-button" class="button button--primary button--no-margin">Export My Qualities</span>
                             </div>

@@ -299,6 +299,27 @@ export class StyleInjector {
             font-size: 0.9em;
             white-space: pre-wrap;
         }
+
+        .flq-version-outer {
+            max-width: 378px;
+            margin: 0 auto;
+            padding: 5px;
+            background-color: #433e38ff;
+        }
+
+        .flq-version-border {
+            position: relative;
+            height: 100%;
+            border: 2px solid #bdb29eff;
+            padding: 5px;
+            box-sizing: border-box;
+            font-family: "Lucida Console", "Courier New", monospace;
+            color: #bdb29eff;
+        }
+
+        #flq-version {
+            white-space: pre-wrap;
+        }
         `;
 
     static insertStylesElement(){

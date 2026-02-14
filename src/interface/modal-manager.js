@@ -79,6 +79,7 @@ export class ModalManager {
         homeButton.onclick = async function(){
             await ModalManager.instance().renderQuests();
             await ModalManager.instance().renderSettings();
+            await ModalManager.instance().renderVersionBox();
             ModalManager.instance().selectTab(ModalManager.TabData.Tab.Home);
         };
 
@@ -88,7 +89,8 @@ export class ModalManager {
         };
 
         let helpButton = document.getElementById(ModalManager.TabData.ID.HelpTab);
-        helpButton.onclick = function(){
+        helpButton.onclick = async function(){
+            await ModalManager.instance().renderVersionBox();
             ModalManager.instance().selectTab(ModalManager.TabData.Tab.Help);
         };
     }
@@ -375,6 +377,7 @@ export class ModalManager {
 
         await this.renderQuests();
         await this.renderSettings();
+        await this.renderVersionBox();
 
         if(modalElem){
             modalElem.style.display = "block";
@@ -509,6 +512,67 @@ export class ModalManager {
         } finally {
             this.renderingSettings = false;
         }
+    }
+
+    async renderVersionBox() {
+        const versionElem = document.getElementById("flq-version");
+        
+        let extensionInfo = `Extension Info`;
+        extensionInfo += `\n    Version: ${chrome.runtime.getManifest().version}`;
+
+        let questsInfo = `Quests Info`;
+        switch(this.settings.getQuestsSourceType()) {
+            case QuestsSourceType.None:
+                questsInfo += `\n    Source: None`;
+                break;
+            case QuestsSourceType.Local:
+                questsInfo += `\n    Source: Built In`;
+                break;
+            case QuestsSourceType.GitHub:
+                questsInfo += `\n    Source: GitHub`;
+                break;
+            default:
+                questsInfo += `\n    Source: Custom`;
+                break;
+        }
+        
+        let quests;
+        try {
+            quests = await this.quests.getQuests();
+        } catch {
+            questsInfo += `\n    Error: Quest Read Failed`;
+        }
+
+        if(quests){
+            if(quests.version) {
+                questsInfo += `\n    Version: ${quests.version}`;
+            }
+            if(quests.date) {
+                questsInfo += `\n    Last Fetched: ${new Date(quests.date)}`;
+            }
+            
+            let overrides = 0;
+            let additions = 0;
+            quests.categories.forEach(cat => {
+                if(cat.isOverride) {
+                    overrides++;
+                } else if(cat.isImport) {
+                    additions++;
+                }
+            });
+
+            if(overrides || additions) {
+                questsInfo += `\n    Imports:`;
+                if(overrides) {
+                    questsInfo += `\n        ${overrides} Overrides`;
+                }
+                if(additions) {
+                    questsInfo += `\n        ${additions} Additions`;
+                }
+            }
+        }
+
+        versionElem.innerText = extensionInfo + "\n" + questsInfo;
     }
 
     updateSettingEnabledStates() {
