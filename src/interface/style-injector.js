@@ -69,12 +69,12 @@ export class StyleInjector {
         .flq-tab-clickable
         {
             font-weight: bold;
-            color: #42686b;
+            color: #3f7277;
         }
 
         .flq-tab-clickable:hover
         {
-            color: #528084;
+            color: #254245;
         }
 
         .flq-body {
@@ -361,12 +361,12 @@ export class StyleInjector {
 
         .flq-body a {
             font-weight: bold;
-            color: #42686b;;
+            color: #3f7277;;
         }
 
         .flq-body a:hover {
             font-weight: bold;
-            color: #528084;
+            color: #254245;
         }
         `;
 
