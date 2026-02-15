@@ -77,6 +77,25 @@ export class ModalInjector {
                             <p>REMINDER: Fallen London Quests is an unsupported 3rd party extension. If you are experiencing
                             issues with the wider game uninstall it, refresh the page, and check if the issue has been resolved
                             before contacting support.</p>
+                            <h1>What are the Quest Sources?</h1>
+                            <p>This is what the extension will use to build its base quest list. There are 4 options.</p>
+                            <ul class="flq-ul">
+                                <li><b>Imported Only:</b> Keeps the base list empty so you can assemble your
+                                quests entirely using the import feature.</li>
+                                <li><b>Built In:</b> The quest list that the extension is distributed with. It won't be updated
+                                as often, but doesn't rely on externally hosted files.</li>
+                                <li><b>GitHub:</b> The most up-to-date version of the extension's quest list pulled from the
+                                <a target="_blank" href="https://github.com/An-Individual/fl-quests">GitHub repository</a>.
+                                <li><b>Custom:</b> Allows you to use a custom quest list published by another party. You'll need
+                                to populate the provided text field with the URL of the JSON file you want to pull quests from.</li>
+                                <ul class="flq-ul">
+                                    <li>Note: It is recommended you only pull quests from a trusted source. The extension is written
+                                    defensively, but there is always the risk of security issues slipping the net.</li>
+                                </ul>
+                            </ul>
+                            <h1>Can I create my own quests?</h1>
+                            <p>Yes! Quests can be created with any spreadsheet program and require a minimum of technical knowledge.
+                            See [TODO: CREATE QUEST CREATION PAGE] for details.</p>
                             <h1>Troubleshooting</h1>
                             <p>The extension only refetches from its Quests Source once every 12 hours. If you're just waiting
                             for an update to roll out I recommend patience. If you absolutely cannot wait, you can force the issue 
@@ -99,13 +118,14 @@ export class ModalInjector {
                                     re-importing them.</li>
                                 </ul>
                             </ul>
+                            <p>If you're still having issues after trying the above, consider reporting an issue (see below).</p>
                             <h1>Reporting an Issue</h1>
                             <p>This is a difficult extension to test because there is no fast way to take a character through the game
                             and ensure that its advice is accurate. Here are the kinds of issues you should report.</p>
                             <ul class="flq-ul">
                                 <li>A quest providing incorrect or inaccurate advice.</li>
                                 <li>A quest being in the wrong state.</li>
-                                <li>The Main tab showing an error message.</li>
+                                <li>The Home tab showing an error message.</li>
                                 <ul class="flq-ul">
                                     <li>Unless you are using a Custom Quests Source. Network issues reading these sources as well
                                     as formatting issues with their JSON will appear as errors here.</li>
@@ -118,7 +138,6 @@ export class ModalInjector {
                                     Messages tab might require a refresh to pick up.</li>
                                 </ul>
                             </ul>
-                            <p>If you're still having issues after trying the above, consider reporting an issue (see below).</p>
                             <p>Things you should NOT report.</p>
                             <ul class="flq-ul">
                                 <li>Issues with Imported Quests or Custom Quest Sources. These should be directed to their creators.</li>
@@ -133,9 +152,9 @@ export class ModalInjector {
                                 </ul>
                             </ul>
                             <p>The best way to report a problem is to create an issue on the 
-                            <a target="_blank" href="https://github.com/An-Individual/fl-quests">GitHub page</a>. When you create an issue you should
-                            include the extension information at the top of this tab and any relevant qualities information you're
-                            comfortable sharing (see the Debugging Tools section below for a quick way to access these).</p>
+                            <a target="_blank" href="https://github.com/An-Individual/fl-quests">GitHub repository</a>. When you create 
+                            an issue you should include the extension information at the top of this tab and any relevant qualities 
+                            information you're comfortable sharing (see the Debugging Tools section below for a quick way to access these).</p>
                             <h1>Debugging Tools</h1>
                             <p>This button packages the character qualities that the extension has detected into a CSV file which
                             can be opened in most spreadsheet programs. It includes your character's game state (the content of your 
