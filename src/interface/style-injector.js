@@ -330,11 +330,13 @@ export class StyleInjector {
         #flq-marquee {
             width: 24px;
             height: 24px;
-            display: none;
+            display: block;
+            opacity: 0;
             position: absolute;
             top: 10px;
             left: 10px;
             animation: spin 1s linear infinite;
+            transition: opacity 0.5s;
         }
 
         @keyframes spin {

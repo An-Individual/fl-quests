@@ -606,12 +606,12 @@ export class ModalManager {
 
     showMarquee() {
         const refreshElem = document.getElementById("flq-marquee");
-        refreshElem.style.display = "block";
+        refreshElem.style.opacity = 1;
     }
 
     hideMarquee() {
         const refreshElem = document.getElementById("flq-marquee");
-        refreshElem.style.display = "none";
+        refreshElem.style.opacity = 0;
     }
 
     clearChildren(element) {
