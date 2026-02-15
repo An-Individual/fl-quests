@@ -255,14 +255,17 @@ export class StyleInjector {
         .flq-ul {
             padding-left: 1rem;
             list-style-type: disc;
+            margin-bottom: 10px;
         }
 
         .flq-ul .flq-ul {
             list-style-type: circle;
+            margin-bottom: 0;
         }
 
         .flq-ul .flq-ul .flq-ul {
             list-style-type: square;
+            margin-bottom: 0;
         }
         
         .flq-settings-title {
@@ -302,9 +305,10 @@ export class StyleInjector {
 
         .flq-version-outer {
             max-width: 378px;
-            margin: 0 auto;
+            margin: 0 auto 20px;
             padding: 5px;
             background-color: #433e38ff;
+
         }
 
         .flq-version-border {
@@ -335,6 +339,31 @@ export class StyleInjector {
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+
+        .flq-body h1 {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .flq-body p {
+            margin-bottom: 10px;
+        }
+
+        .flq-body code {
+            font-family: "Lucida Console", "Courier New", monospace;
+            background-color: #9c9483;
+            color: #000;
+        }
+
+        .flq-body a {
+            font-weight: bold;
+            color: #824c9a;
+        }
+
+        .flq-body a:hover {
+            font-weight: bold;
+            color: #b060d3;
         }
         `;
 

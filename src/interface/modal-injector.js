@@ -74,9 +74,82 @@ export class ModalInjector {
                                     <div id="flq-version"></div>
                                 </div>
                             </div>
-                            <div style="text-align: center;">
+                            <p>REMINDER: Fallen London Quests is an unsupported 3rd party extension. If you are experiencing
+                            issues with the wider game uninstall it, refresh the page, and check if the issue has been resolved
+                            before contacting support.</p>
+                            <h1>Troubleshooting</h1>
+                            <p>The extension only refetches from its Quests Source once every 12 hours. If you're just waiting
+                            for an update to roll out I recommend patience. If you absolutely cannot wait, you can force the issue 
+                            by clearing your browser's local data.</p>
+                            <p>If you're having issues with the extension, here are some common steps to narrow down the issue.</p>
+                            <ul class="flq-ul">
+                                <li>Refresh the page.</li>
+                                <ul class="flq-ul">
+                                    <li>This forces the extension to grab your latest qualities list.</li>
+                                </ul>
+                                <li>If you're using a Custom quests source, switch to GitHub or Built In.</li>
+                                <li>If you're still having trouble with the GitHub source, consider trying Built In.</li>
+                                <ul class="flq-ul">
+                                    <li>This eliminates network issues from the equation.</li>
+                                </ul>
+                                <li>Disable quest importing.</li>
+                                <ul class="flq-ul">
+                                    <li>Your imported quests will still be there when you turn it back on.</li>
+                                    <li>If disabling quest importing fixes the issue, try clearing your imported quests and
+                                    re-importing them.</li>
+                                </ul>
+                            </ul>
+                            <h1>Reporting an Issue</h1>
+                            <p>This is a difficult extension to test because there is no fast way to take a character through the game
+                            and ensure that its advice is accurate. Here are the kinds of issues you should report.</p>
+                            <ul class="flq-ul">
+                                <li>A quest providing incorrect or inaccurate advice.</li>
+                                <li>A quest being in the wrong state.</li>
+                                <li>The Main tab showing an error message.</li>
+                                <ul class="flq-ul">
+                                    <li>Unless you are using a Custom Quests Source. Network issues reading these sources as well
+                                    as formatting issues with their JSON will appear as errors here.</li>
+                                </ul>
+                                <li>Issues with settings not being applied or preserved.</li>
+                                <li>Persistent issues with quest states getting out of sync with your character, especially if they
+                                are fixed by refreshing the page.</li>
+                                <ul class="flq-ul">
+                                    <li>Note: It is expected that changes caused by Living Stories and interactions with the
+                                    Messages tab might require a refresh to pick up.</li>
+                                </ul>
+                            </ul>
+                            <p>If you're still having issues after trying the above, consider reporting an issue (see below).</p>
+                            <p>Things you should NOT report.</p>
+                            <ul class="flq-ul">
+                                <li>Issues with Imported Quests or Custom Quest Sources. These should be directed to their creators.</li>
+                                <li>Feature requests.</li>
+                                <li>Requests for additional quests.</li>
+                                <li>Requests for existing quests to provide additional details unless they are too vague to locate
+                                the thing the quest is trying to point you to.</li>
+                                <ul class="flq-ul">
+                                    <li>The base quests are intended to be more vague than a wiki guide. They help you keep track
+                                    of what stories were in progress and where you should go next. But they try to preserve the
+                                    classic experience of these stories so they tend to be light on details.</li>
+                                </ul>
+                            </ul>
+                            <p>The best way to report a problem is to create an issue on the 
+                            <a target="_blank" href="https://github.com/An-Individual/fl-quests">GitHub page</a>. When you create an issue you should
+                            include the extension information at the top of this tab and any relevant qualities information you're
+                            comfortable sharing (see the Debugging Tools section below for a quick way to access these).</p>
+                            <h1>Debugging Tools</h1>
+                            <p>This button packages the character qualities that the extension has detected into a CSV file which
+                            can be opened in most spreadsheet programs. It includes your character's game state (the content of your 
+                            Myself and Possessions page) as well as any names you've given to your companions and other game objects. 
+                            Before sharing it with others, consider deleting all the columns except for <code>id</code>, <code>level</code>, 
+                            and <code>effectiveLevel</code> as well as any rows related to qualities you'd rather not share or which
+                            are not relevant to your reason for sharing the file.</p>
+                            <div style="text-align: center; margin-bottom: 10px;">
                                 <span id="flq-export-button" class="button button--primary button--no-margin">Export My Qualities</span>
                             </div>
+                            <p>This button takes a CSV file with first row headings <code>id</code>, <code>level</code>, and <code>effectiveLevel</code>
+                            (case sensitive, but position independent and additional columns will be ignored) and replace's the extension's 
+                            detected qualities with the provided list. This only affects the extension pages and not the wider game. 
+                            To clear the spoofing simply close the quests journal. It will return to normal when opened again.</p>
                             <div style="text-align: center;">
                                 <span id="flq-spoof-button" class="button button--primary button--no-margin">Spoof My Qualities</span>
                             </div>
