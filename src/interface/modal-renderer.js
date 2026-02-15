@@ -13,30 +13,33 @@ export class ModalRenderer {
         this.settings = SettingsManager.instance();
     }
 
-    makeElement(tag, className, childElements){
+    makeElement(tag, className, children){
         let result = document.createElement(tag);
         result.className = className;
-        if(childElements) {
-            childElements.forEach((elem) =>{
-                result.appendChild(elem);
-            });
-        }
+        this.appendChildren(result, children);
         return result;
     }
 
-    makeElementWithInnerHtml(tag, className, innerHtml){
-        let result = document.createElement(tag);
-        result.className = className;
-        result.innerHTML = innerHtml;
-        return result;
+    appendChildren(element, children) {
+        if(!children) {
+            return;
+        }
+
+        children.forEach(elem => {
+            element.appendChild(elem);
+        });
+    }
+
+    makeElementFromHTML(elementHtml) {
+        const div = document.createElement("div");
+        div.innerHTML = elementHtml.trim();
+        return div.firstChild;
     }
 
     makeTextElement(tag, className, text, markdownLite) {
-        return this.makeElementWithInnerHtml(
-            tag,
-            className,
-            TextFormatter.sanitizeAndFormat(text, markdownLite)
-        )
+        let result = this.makeElement(tag, className);
+        result.innerHTML = TextFormatter.sanitizeAndFormat(text, markdownLite);
+        return result;
     }
 
     makeQuestElement(quest)
@@ -44,25 +47,25 @@ export class ModalRenderer {
         let statusElem;
         switch(quest.state){
             case QuestStates.NotStart:
-                statusElem = this.makeElementWithInnerHtml("div", "flq-quest-status flq-notstarted", "<div>Not Started</div>");
+                statusElem = this.makeElementFromHTML(`<div class="flq-quest-status flq-notstarted"><div>Not Started</div></div>`);
                 break;
             case QuestStates.HiddenStatus:
-                statusElem = this.makeElementWithInnerHtml("div", "flq-quest-status flq-hiddenstatus", "<div>Hidden</div>");
+                statusElem = this.makeElementFromHTML(`<div class="flq-quest-status flq-hiddenstatus"><div>Hidden</div></div>`);
                 break;
             case QuestStates.InProgress:
-                statusElem = this.makeElementWithInnerHtml("div", "flq-quest-status flq-inprogress", "<div>In Progress</div>");
+                statusElem = this.makeElementFromHTML(`<div class="flq-quest-status flq-inprogress"><div>In Progress</div></div>`);
                 break;
             case QuestStates.Blocked:
-                statusElem = this.makeElementWithInnerHtml("div", "flq-quest-status flq-blocked", "<div>Blocked</div>");
+                statusElem = this.makeElementFromHTML(`<div class="flq-quest-status flq-blocked"><div>Blocked</div></div>`);
                 break;
             case QuestStates.Completed:
-                statusElem = this.makeElementWithInnerHtml("div", "flq-quest-status flq-completed", "<div>Completed</div>");
+                statusElem = this.makeElementFromHTML(`<div class="flq-quest-status flq-completed"><div>Completed</div></div>`);
                 break;
             default:
-                statusElem = this.makeElementWithInnerHtml("div", "flq-quest-status", "<div>ERROR</div>");
+                statusElem = this.makeElementFromHTML(`<div class="flq-quest-status"><div>ERROR</div></div>`);
         }
 
-        let toggleElem = this.makeElementWithInnerHtml("div", "flq-quest-toggle", "+");
+        let toggleElem = this.makeElementFromHTML(`<div class="flq-quest-toggle">+</div>`);
 
         let mainElem = this.makeElement("div", "flq-quest-main", [
             toggleElem,
@@ -83,9 +86,9 @@ export class ModalRenderer {
             quest.subtasks.forEach((task) =>{
                 let statusElem;
                 if(task.completed){
-                    statusElem = this.makeElementWithInnerHtml("div", "flq-subtask-status", ModalRenderer.CharacterCodes.Checkmark);
+                    statusElem = this.makeElementFromHTML(`<div class="flq-subtask-status">${ModalRenderer.CharacterCodes.Checkmark}</div>`);
                 } else {
-                    statusElem = this.makeElementWithInnerHtml("div", "flq-subtask-status", "");
+                    statusElem = this.makeElementFromHTML(`<div class="flq-subtask-status" />`);
                 }
 
                 let taskElem = this.makeElement("div", "flq-subtask", [
@@ -108,10 +111,10 @@ export class ModalRenderer {
             if(!detailsElem.style.display || detailsElem.style.display == "none")
             {
                 detailsElem.style.display = "block";
-                toggleElem.textContent = "-";
+                toggleElem.innerText = "-";
             } else {
                 detailsElem.style.display = "none";
-                toggleElem.textContent = "+";
+                toggleElem.innerText = "+";
             }
         };
 
@@ -135,7 +138,7 @@ export class ModalRenderer {
         });
 
         let titleElem = this.makeTextElement("div", "flq-cat-title", `${category.title} (${completed}/${category.quests.length})`, false);
-        let titleExpandElem = this.makeElementWithInnerHtml("div", "flq-cat-expand", ModalRenderer.CharacterCodes.TriangleUp)
+        let titleExpandElem = this.makeElementFromHTML(`<div class="flq-cat-expand">${ModalRenderer.CharacterCodes.TriangleUp}</div>`)
         let titleBarElem = this.makeElement("div", "flq-cat-titlebar", [titleElem, titleExpandElem]);
         let questsElem = this.makeElement("div", "flq-cat-quests", questElems);
 

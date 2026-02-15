@@ -430,16 +430,6 @@ export class ModalManager {
             });
         } catch (error) {
             this.setQuestTabError(error);
-            homeElem.innerHTML = `
-                <div id="flq-error-title">Error Rendering Quests</div>
-                <div id="flq-error-message"></div>
-                <div id="flq-error-trace"></div>
-            `;
-            let messageElem = document.getElementById("flq-error-message");
-            let traceElem = document.getElementById("flq-error-trace");
-
-            messageElem.innerText = error.message;
-            traceElem.innerText = error.stack;
         }
     }
 
@@ -453,8 +443,8 @@ export class ModalManager {
         let messageElem = document.getElementById("flq-error-message");
         let traceElem = document.getElementById("flq-error-trace");
 
-        messageElem.innerText = error.message;
-        traceElem.innerText = error.stack;
+        messageElem.innerHTML = TextFormatter.sanitizeAndFormat(error.message);
+        traceElem.innerHTML = TextFormatter.sanitizeAndFormat(error.stack);
     }
 
     renderSettings(quests) {
@@ -579,7 +569,7 @@ export class ModalManager {
             questsInfo += `\n    Error: Quest Read Failed`;
         } else {
             if(quests.version) {
-                questsInfo += `\n    Version: ${quests.version}`;
+                questsInfo += `\n    Version: ${TextFormatter.sanitizeAndFormat(quests.version)}`;
             }
             if(quests.date) {
                 questsInfo += `\n    Last Fetched: ${new Date(quests.date).toISOString()}`;
