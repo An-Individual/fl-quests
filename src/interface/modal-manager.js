@@ -40,12 +40,6 @@ export class ModalManager {
             }
         }
 
-    static CategoryState = {
-        Show: 0,
-        Collapsed: 1,
-        Hide: 2
-    }
-
     constructor() {
         this.qualities = QualityTracker.instance();
         this.settings = SettingsManager.instance();
@@ -98,7 +92,9 @@ export class ModalManager {
 
     attachSettingEvents() {
         this.settingsElems = {
+            revealHidden: document.getElementById("flq-revealhidden"),
             hideNotStarted: document.getElementById("flq-hidenotstarted"),
+            clearHomeEdits: document.getElementById("flq-clear-home-edits"),
             questSourceNone: document.getElementById("flq-qsource-none"),
             questSourceLocal: document.getElementById("flq-qsource-local"),
             questSourceGithub: document.getElementById("flq-qsource-github"),
@@ -106,15 +102,27 @@ export class ModalManager {
             questSourceAddress: document.getElementById("flq-qsource-address"),
             enableImport: document.getElementById("flq-enable-quest-import"),
             importPanel: document.getElementById("flq-quest-import-panel"),
-            importState: document.getElementById("flq-import-state"),
-            categorySettings: document.getElementById("flq-cat-settings")
+            importState: document.getElementById("flq-import-state")
         };
+
+        this.settingsElems.revealHidden.addEventListener('change', (event) =>{
+            if(!this.renderingSettings) {
+                this.settings.setRevealHidden(event.currentTarget.checked);
+            }
+        });
 
         this.settingsElems.hideNotStarted.addEventListener('change', (event) =>{
             if(!this.renderingSettings) {
                 this.settings.setHideNotStarted(event.currentTarget.checked);
             }
         });
+
+        this.settingsElems.clearHomeEdits.onclick = function() {
+            if(confirm("Are you sure you want to clear your ordering and visibility customizations?")) {
+                SettingsManager.instance().clearCategoryProperty("order");
+                SettingsManager.instance().clearCategoryProperty("hidden");
+            }
+        }
 
         this.settingsElems.questSourceNone.addEventListener('change', (event) =>{
             if(!this.renderingSettings && event.currentTarget.checked) {
@@ -411,23 +419,63 @@ export class ModalManager {
             return;
         }
 
+        
+
+        try {
+            let categories = this.questsRenderer.renderQuests(quests);
+            this.renderedCategories = categories;
+            this.renderQuestsCategories(categories);
+        } catch (error) {
+            this.setQuestTabError(error);
+        }
+    }
+
+    async rerenderQuests() {
+        if(this.renderedCategories) {
+            this.renderQuestsCategories(this.renderedCategories);
+        } else {
+            await this.renderUI();
+        }
+    }
+
+    renderQuestsCategories(categories) {
         const homeElem = document.getElementById("flq-home");
         this.clearChildren(homeElem);
 
         try {
-            let categories = this.questsRenderer.renderQuests(quests);
+            categories.forEach(cat => {
+                let orderOverride = this.settings.getCategoryProperty(cat.id, "order");
+                if(orderOverride) {
+                    cat.newOrder = orderOverride;
+                } else {
+                    delete cat.newOrder;
+                }
+            });
+
+            categories.sort((a,b) =>{
+                return (b.newOrder ?? b.order) - (a.newOrder ?? a.order)
+            });
+
             let categoryElems = [];
             let hideNotStarted = this.settings.getHideNotStarted();
+            let revealHidden = this.settings.getRevealHidden();
             // We do this in stages so we don't have to clear
             // existing category elements if an error occures.
             categories.forEach(cat =>{
-                let catState = this.settings.getCategoryState(cat.id);
-                if(catState != ModalManager.CategoryState.Hide) {
-                    if(!hideNotStarted || cat.quests.find(q => q.state != QuestStates.NotStart && q.state != QuestStates.HiddenStatus)) {
-                        categoryElems.push(this.renderer.makeCategoryElement(cat, catState == ModalManager.CategoryState.Collapsed));
+                if(!hideNotStarted || cat.quests.find(q => q.state != QuestStates.NotStart && q.state != QuestStates.HiddenStatus)) {
+                    let catHidden = this.settings.getCategoryProperty(cat.id, "hidden");
+                    if(!catHidden || revealHidden) {
+                        let catElem = this.renderer.makeCategoryElement(cat, 
+                            this.settings.getCategoryProperty(cat.id, "collapsed"),
+                            catHidden
+                        );
+                        if(catElem) {
+                            categoryElems.push(catElem);
+                        }
                     }
                 }
             });
+
             categoryElems.forEach(elem =>{
                 homeElem.appendChild(elem);
             });
@@ -453,6 +501,7 @@ export class ModalManager {
     renderSettings(quests) {
         this.renderingSettings = true;
         try {
+            this.settingsElems.revealHidden.checked = this.settings.getRevealHidden();
             this.settingsElems.hideNotStarted.checked = this.settings.getHideNotStarted();
             this.settingsElems.enableImport.checked = this.settings.getEnableImportedQuests();
             this.settingsElems.questSourceAddress.value = this.settings.getCustomQuestsSource() ?? "";
@@ -473,8 +522,6 @@ export class ModalManager {
             }
 
             this.updateSettingEnabledStates();
-
-            this.clearChildren(this.settingsElems.categorySettings);
             
             if(quests?.categories) {
                 let imported = [];
@@ -489,24 +536,6 @@ export class ModalManager {
                             imported.push(category);
                         }
                     }
-
-                    let checkboxElem = document.createElement("input");
-                    checkboxElem.setAttribute("type", "checkbox");
-                    checkboxElem.setAttribute("id", `hideCat${i}`);
-                    checkboxElem.setAttribute("name", `hideCat${i}`);
-                    checkboxElem.checked = this.settings.getCategoryState(category.id) == ModalManager.CategoryState.Hide;
-                    checkboxElem.addEventListener('change', (event) =>{
-                        this.settings.setCategoryState(category.id, event.currentTarget.checked ? ModalManager.CategoryState.Hide : ModalManager.CategoryState.Show);
-                    });
-
-                    let labelElem = document.createElement("label");
-                    labelElem.setAttribute("for", `hideCat${i}`);
-                    labelElem.innerHTML = `Hide ${TextFormatter.sanitizeAndFormat(category.title)}`;
-
-                    this.settingsElems.categorySettings.appendChild(checkboxElem);
-                    this.settingsElems.categorySettings.appendChild(document.createTextNode(" "));
-                    this.settingsElems.categorySettings.appendChild(labelElem);
-                    this.settingsElems.categorySettings.appendChild(document.createElement("br"));
                 }
 
                 let importString = "";
@@ -540,7 +569,6 @@ export class ModalManager {
             }
         } catch(error) {
             Logger.error(error);
-            this.clearChildren(this.settingsElems.categorySettings);
         } finally {
             this.renderingSettings = false;
         }

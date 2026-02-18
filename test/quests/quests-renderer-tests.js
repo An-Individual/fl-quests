@@ -907,6 +907,7 @@ describe("QuestsRenderer", function(){
                     {
                         id: "cat1",
                         title: "Category 1",
+                        order: 10,
                         quests: [
                             {
                                 title: "Quest 1",
@@ -931,6 +932,7 @@ describe("QuestsRenderer", function(){
             assert.equal(result.length, 1);
             assert.equal(result[0].id, "cat1");
             assert.equal(result[0].title, "Category 1");
+            assert.equal(result[0].order, 10);
             assert.equal(result[0].quests.length, 1);
             assert.equal(result[0].quests[0].title, "Quest 1");
             assert.equal(result[0].quests[0].state, QuestStates.InProgress);

@@ -114,12 +114,53 @@ export class StyleInjector {
         }
 
         .flq-cat-titlebar {
+            position: relative;
             display: flex;
             width: 100%;
             align-items: stretch;
             background-color: #636363;
             color: #ffffff;
             box-shadow: 0 1px 3px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.24);
+        }
+
+        .flq-cat-titlebar-sub {
+            flex: 1 1 auto;
+            display: flex;
+            align-items: stretch;
+        }
+
+        .flq-cat-menu-button {
+            width: 30px;
+            flex: 0 0 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.5em;
+        }
+
+        .flq-cat-menu {
+            position: absolute;
+            z-index: 501; /* The modal is 500 */
+            top: 0px;
+            left: 30px;
+            background-color: #000;
+            color: #d5d5d5;
+            box-shadow: 0 1px 3px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.24);
+        }
+        
+        .flq-cat-menu-item {
+            padding: 5px;
+        }
+
+        .flq-cat-menu-item span {
+            display: inline-block;
+            width: 18px;
+            text-align: center;
+        }
+
+        .flq-cat-menu-item:hover {
+            background-color: #3f3f3f;
         }
 
         .flq-cat-title {

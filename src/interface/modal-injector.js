@@ -23,13 +23,11 @@ export class ModalInjector {
                             <div class="flq-settings-group">
                                 <div class="flq-settings-title">General</div>
                                 <div class="flq-settings-body">
+                                    <input type="checkbox" id="flq-revealhidden" name="flq-revealhidden">
+                                    <label for="flq-revealhidden">Reveal hidden quests</label><br>
                                     <input type="checkbox" id="flq-hidenotstarted" name="flq-hidenotstarted">
-                                    <label for="flq-hidenotstarted">Hide quests that have not been started</label>
-                                </div>
-                            </div>
-                            <div class="flq-settings-group">
-                                <div class="flq-settings-title">Categories</div>
-                                <div id="flq-cat-settings" class="flq-settings-body">
+                                    <label for="flq-hidenotstarted">Conceal quests that have not been started</label><br>
+                                    <span id="flq-clear-home-edits" class="button button--primary button--no-margin" style="margin-top: 5px">Reset Home Tab</span>
                                 </div>
                             </div>
                             <div class="flq-settings-group">

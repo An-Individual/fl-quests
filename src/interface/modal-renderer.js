@@ -1,12 +1,18 @@
 import { QuestStates } from "../quests/quests-datatypes.js";
 import { SettingsManager } from "../settings.js";
+import { ModalManager } from "./modal-manager.js";
 import { TextFormatter } from "./text-formatter.js";
 
 export class ModalRenderer {
     static CharacterCodes = {
         TriangleUp: "&#9650;",
+        TriangleUpOutline: "&#9651;",
         TriangleDown: "&#9660;",
+        TriangleDownOutline: "&#9661",
         Checkmark: "&#10003;",
+        Bars: "&#8801;",
+        Eye: "&#x1F441;",
+        Close: "&#10006;"
     }
 
     constructor() {
@@ -124,7 +130,8 @@ export class ModalRenderer {
         ]);
     }
 
-    makeCategoryElement(category, collapsed){
+    makeCategoryElement(category, collapsed, isHidden){
+
         let questElems = [];
         let completed = 0;
         let hideNotStarted = this.settings.getHideNotStarted();
@@ -137,36 +144,159 @@ export class ModalRenderer {
             }
         });
 
+        if(questElems.length == 0) {
+            return;
+        }
+
+        let result = this.makeElement("div", "flq-cat", []);
+
         let titleElem = this.makeTextElement("div", "flq-cat-title", `${category.title} (${completed}/${category.quests.length})`, false);
-        let titleExpandElem = this.makeElementFromHTML(`<div class="flq-cat-expand">${ModalRenderer.CharacterCodes.TriangleUp}</div>`)
-        let titleBarElem = this.makeElement("div", "flq-cat-titlebar flq-clickable", [titleElem, titleExpandElem]);
+        let titleExpandElem = this.makeElementFromHTML(`<div class="flq-cat-expand">${ModalRenderer.CharacterCodes.TriangleUp}</div>`);
+        let expandableElem = this.makeElement("div", "flq-cat-titlebar-sub", [titleElem, titleExpandElem]);
+
+        let menuElem = this.makeEditMenu(result, isHidden);
+        menuElem.style.display = "none";
+        let menuButtonElem = this.makeElementFromHTML(`<div class="flq-cat-menu-button">${ModalRenderer.CharacterCodes.Bars}</div>`);
+
+        menuButtonElem.onclick = function() {
+            if(menuElem.style.display == "none") {
+                menuButtonElem.style.color = "#d5d5d5";
+                menuButtonElem.style.backgroundColor = "#000";
+                menuButtonElem.innerHTML = ModalRenderer.CharacterCodes.Close;
+                menuElem.style.display = "block";
+            } else {
+                menuButtonElem.style.color = "#ffffff";
+                menuButtonElem.style.backgroundColor = "#636363";
+                menuButtonElem.innerHTML = ModalRenderer.CharacterCodes.Bars;
+                menuElem.style.display = "none";
+            }
+        }
+
+        let titleBarElem = this.makeElement("div", "flq-cat-titlebar flq-clickable", [menuElem, menuButtonElem, expandableElem]);
         let questsElem = this.makeElement("div", "flq-cat-quests", questElems);
+
+        if(isHidden) {
+            menuButtonElem.style.opacity = 0.5;
+            expandableElem.style.opacity = 0.5;
+            questsElem.style.opacity = 0.5;
+        }
 
         if(collapsed) {
             questsElem.style.display = "none";
             titleExpandElem.innerHTML = ModalRenderer.CharacterCodes.TriangleDown;
         }
 
-        titleBarElem.onclick = function(){
+        expandableElem.onclick = function(){
             if(questsElem.style.display != "none")
             {
                 questsElem.style.display = "none";
                 titleExpandElem.innerHTML = ModalRenderer.CharacterCodes.TriangleDown;
-                SettingsManager.instance().setCategoryState(category.id, ModalManager.CategoryState.Collapsed);
+                SettingsManager.instance().setCategoryProperty(category.id, "collapsed", true);
             } else {
                 questsElem.style.display = "block";
                 titleExpandElem.innerHTML = ModalRenderer.CharacterCodes.TriangleUp;
-                SettingsManager.instance().setCategoryState(category.id, ModalManager.CategoryState.Show);
+                SettingsManager.instance().setCategoryProperty(category.id, "collapsed", false);
             }
         };
 
-        return this.makeElement("div", "flq-cat", [
-            titleBarElem,
-            questsElem
+        result.appendChild(titleBarElem);
+        result.appendChild(questsElem);
+
+        result.flqID = category.id;
+        result.flqOrder = category.order;
+        result.flqHidden = isHidden;
+        return result;
+    }
+
+    makeEditMenu(catElem, isHidden) {
+        let toTopElem = this.makeElementFromHTML(`<div class="flq-cat-menu-item"><span>${ModalRenderer.CharacterCodes.TriangleUp}</span> Move to Top</div>`);
+        toTopElem.onclick = function(){
+            ModalRenderer.moveCategoryUp(catElem, true);
+        }
+
+        let moveUpElem = this.makeElementFromHTML(`<div class="flq-cat-menu-item"><span>${ModalRenderer.CharacterCodes.TriangleUpOutline}</span> Move Up</div>`);
+        moveUpElem.onclick = function(){
+            ModalRenderer.moveCategoryUp(catElem, false);
+        }
+
+        let moveDownElem = this.makeElementFromHTML(`<div class="flq-cat-menu-item"><span>${ModalRenderer.CharacterCodes.TriangleDownOutline}</span> Move Down</div>`);
+        moveDownElem.onclick = function(){
+            ModalRenderer.moveCategoryDown(catElem, false);
+        }
+
+        let toBottomElem = this.makeElementFromHTML(`<div class="flq-cat-menu-item"><span>${ModalRenderer.CharacterCodes.TriangleDown}</span> Move to Bottom</div>`);
+        toBottomElem.onclick = function(){
+            ModalRenderer.moveCategoryDown(catElem, true);
+        }
+
+        let toggleVisible = this.makeElementFromHTML(`<div class="flq-cat-menu-item"><span>${ModalRenderer.CharacterCodes.Eye}</span> ${isHidden ? "Show" : "Hide"}</div>`);
+        toggleVisible.onclick = function(){
+            SettingsManager.instance().setCategoryProperty(catElem.flqID, "hidden", !catElem.flqHidden);
+            ModalManager.instance().rerenderQuests();
+        }
+
+        return this.makeElement("div", "flq-cat-menu", [
+            toTopElem,
+            moveUpElem,
+            moveDownElem,
+            toBottomElem,
+            toggleVisible
         ]);
     }
 
-    MakeCategoryConfigElems(categories) {
+    static moveCategoryUp(catElem, toTop) {
+        const shiftedElems = [];
+        let checkElem = catElem.previousSibling;
+        while(checkElem) {
+            if(checkElem.flqID && checkElem.flqOrder) {
+                shiftedElems.push(checkElem);
+                if(!checkElem.flqHidden && !toTop) {
+                    break;
+                }
+            }
+            checkElem = checkElem.previousSibling;
+        }
 
+        if(shiftedElems.length > 0) {
+            let settings = SettingsManager.instance();
+            settings.setCategoryProperty(catElem.flqID, "order", shiftedElems[shiftedElems.length - 1].flqOrder);
+            for(let i = shiftedElems.length - 1; i >= 0; i--) {
+                if(i == 0) {
+                    settings.setCategoryProperty(shiftedElems[i].flqID, "order", catElem.flqOrder);
+                } else {
+                    settings.setCategoryProperty(shiftedElems[i].flqID, "order", shiftedElems[i-1].flqOrder);
+                }
+            }
+        }
+
+        ModalManager.instance().rerenderQuests();
+    }
+
+    static moveCategoryDown(catElem, toBottom) {
+        const shiftedElems = [];
+        let checkElem = catElem.nextSibling;
+        while(checkElem) {
+            if(checkElem.flqID && checkElem.flqOrder) {
+                shiftedElems.push(checkElem);
+                if(!checkElem.flqHidden && !toBottom) {
+                    break;
+                }
+            }
+            checkElem = checkElem.nextSibling;
+        }
+
+        if(shiftedElems.length > 0) {
+            let settings = SettingsManager.instance();
+            settings.setCategoryProperty(catElem.flqID, "order", shiftedElems[shiftedElems.length - 1].flqOrder);
+            for(let i = shiftedElems.length - 1; i >= 0; i--) {
+                if(i == 0) {
+                    settings.setCategoryProperty(shiftedElems[i].flqID, "order", catElem.flqOrder);
+                } else {
+                    settings.setCategoryProperty(shiftedElems[i].flqID, "order", shiftedElems[i-1].flqOrder);
+                }
+            }
+        }
+
+        ModalManager.instance().rerenderQuests();
     }
 }

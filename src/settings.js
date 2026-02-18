@@ -17,8 +17,13 @@ export class SettingsManager {
         "CustomQuestsSource",
         "EnableImportedQuests",
         "ImportedQuests",
-        "SourceQuests"
+        "SourceQuests",
+        "RevealHidden"
     ];
+
+    getCategoryKey(catId, prop) {
+        return `cat:${catId}:${prop}`;
+    }
 
     getDefaultSettings() {
         return {
@@ -99,11 +104,24 @@ export class SettingsManager {
         return this.settings[name];
     }
 
-    getCategoryState(id) {
-        return this.get("catstate:" + id);
+    getCategoryProperty(id, property) {
+        return this.get(this.getCategoryKey(id, property));
     }
 
-    setCategoryState(id, state) {
-        this.set("catstate:" + id, state);
+    setCategoryProperty(id, property, value) {
+        this.set(this.getCategoryKey(id, property), value);
+    }
+
+    clearCategoryProperty(property) {
+        let props = [];
+        for(let key in this.settings) {
+            if(key.endsWith(":" + property)) {
+                props.push(key);
+            }
+        }
+        props.forEach(prop => {
+            delete this.settings[prop];
+        })
+        this.storeSettings();
     }
 }

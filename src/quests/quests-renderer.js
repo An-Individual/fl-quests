@@ -21,6 +21,7 @@ export class QuestsRenderer {
             let outputCat = {
                 "id": category.id,
                 "title": category.title,
+                "order": category.order,
                 "quests": []
             }
 
