@@ -5,7 +5,7 @@ export class ModalInjector {
         <div id="flq-modal" class="flq-modal-wrapper">
             <div class="flq-modal-box">
                 <div class="flq-outline">
-                    <span id="flq-close">&#10006;</span>
+                    <span class="flq-clickable" id="flq-close">&#10006;</span>
                     <img id="flq-marquee" />
                     <div class="flq-title">
                         Quests Journal

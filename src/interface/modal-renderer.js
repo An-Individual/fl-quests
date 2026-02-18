@@ -67,7 +67,7 @@ export class ModalRenderer {
 
         let toggleElem = this.makeElementFromHTML(`<div class="flq-quest-toggle">+</div>`);
 
-        let mainElem = this.makeElement("div", "flq-quest-main", [
+        let mainElem = this.makeElement("div", "flq-quest-main flq-clickable", [
             toggleElem,
             this.makeTextElement("div", "flq-quest-title", quest.title, false),
             statusElem
@@ -139,7 +139,7 @@ export class ModalRenderer {
 
         let titleElem = this.makeTextElement("div", "flq-cat-title", `${category.title} (${completed}/${category.quests.length})`, false);
         let titleExpandElem = this.makeElementFromHTML(`<div class="flq-cat-expand">${ModalRenderer.CharacterCodes.TriangleUp}</div>`)
-        let titleBarElem = this.makeElement("div", "flq-cat-titlebar", [titleElem, titleExpandElem]);
+        let titleBarElem = this.makeElement("div", "flq-cat-titlebar flq-clickable", [titleElem, titleExpandElem]);
         let questsElem = this.makeElement("div", "flq-cat-quests", questElems);
 
         if(collapsed) {
@@ -164,5 +164,9 @@ export class ModalRenderer {
             titleBarElem,
             questsElem
         ]);
+    }
+
+    MakeCategoryConfigElems(categories) {
+
     }
 }

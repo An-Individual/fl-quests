@@ -35,7 +35,8 @@ export class ModalManager {
             Class: {
                 Tab: "flq-tab",
                 Selected: "flq-tab-selected",
-                Clickable: "flq-tab-clickable"
+                NotSelected: "flq-tab-notselected",
+                Clickable: "flq-clickable"
             }
         }
 
@@ -357,12 +358,14 @@ export class ModalManager {
 
         for (let i = 0; i < tabElems.length; i++) {
             if (i == tab - 1) {
+                tabElems[i].classList.remove(ModalManager.TabData.Class.NotSelected);
                 tabElems[i].classList.remove(ModalManager.TabData.Class.Clickable);
                 tabElems[i].classList.add(ModalManager.TabData.Class.Selected);
                 bodyElems[i].style.display = "block";
             }
             else {
                 tabElems[i].classList.remove(ModalManager.TabData.Class.Selected);
+                tabElems[i].classList.add(ModalManager.TabData.Class.NotSelected);
                 tabElems[i].classList.add(ModalManager.TabData.Class.Clickable);
                 bodyElems[i].style.display = "none";
             }

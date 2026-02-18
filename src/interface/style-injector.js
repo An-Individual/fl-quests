@@ -57,7 +57,7 @@ export class StyleInjector {
         .flq-subtitle-links {
             text-align: center;
             margin-bottom: 5px;
-            font-size: 0.8em;
+            font-size: 1em;
             user-select: none;
         }
 
@@ -66,13 +66,13 @@ export class StyleInjector {
             font-weight: bold;
         }
 
-        .flq-tab-clickable
+        .flq-tab-notselected
         {
             font-weight: bold;
             color: #3f7277;
         }
 
-        .flq-tab-clickable:hover
+        .flq-tab-notselected:hover
         {
             color: #254245;
         }
@@ -91,14 +91,12 @@ export class StyleInjector {
             right: 10px;
         }
 
-        .flq-tab-clickable:hover,
-        .flq-tab-clickable:focus,
-        .flq-cat-titlebar:hover,
-        .flq-cat-titlebar:focus,
-        .flq-quest-main:hover,
-        .flq-quest-main:focus,
-        #flq-close:hover,
-        #flq-close:focus {
+        .flq-clickable {
+            user-select: none;
+        }
+
+        .flq-clickable:hover,
+        .flq-clickable:focus {
             text-decoration: none;
             cursor: pointer;
         }
@@ -119,7 +117,6 @@ export class StyleInjector {
             display: flex;
             width: 100%;
             align-items: stretch;
-            user-select: none;
             background-color: #636363;
             color: #ffffff;
             box-shadow: 0 1px 3px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.24);
@@ -145,7 +142,6 @@ export class StyleInjector {
             display: flex;
             width: 100%;
             align-items: stretch;
-            user-select: none;
             background-color: #e8dac3;
             box-shadow: 0 1px 3px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.24);
         }
