@@ -4,8 +4,11 @@
   "version": "1.0.0",
   "description": "Adds a quest tracker to the game Fallen London.",
   "icons": {
-    "48": "images/icon-48.png",
-    "128": "images/icon-128.png"
+    "16": "images/icon16.png",
+    "32": "images/icon32.png",
+    "48": "images/icon48.png",
+    "96": "images/icon96.png",
+    "128": "images/icon128.png"
   },
   "permissions": [],
   "content_scripts": [
