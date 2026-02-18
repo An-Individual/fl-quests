@@ -49,7 +49,7 @@ export class StyleInjector {
         .flq-title {
             margin-top: 20px;
             text-align: center;
-            font-size: 28px;
+            font-size: 2.5em;
             font-weight: bold;
             user-select: none;
         }
@@ -57,7 +57,7 @@ export class StyleInjector {
         .flq-subtitle-links {
             text-align: center;
             margin-bottom: 5px;
-            font-size: 12px;
+            font-size: 0.8em;
             user-select: none;
         }
 
@@ -83,7 +83,7 @@ export class StyleInjector {
 
         #flq-close {
             color: black;
-            font-size: 28px;
+            font-size: 2.5em;
             font-weight: bold;
             display: block;
             position: absolute;
@@ -130,7 +130,7 @@ export class StyleInjector {
             min-width: 0;
             padding: 5px;
             font-weight: bold;
-            font-size: 18px;
+            font-size: 1.5em;
         }
 
         .flq-cat-expand {
@@ -243,13 +243,13 @@ export class StyleInjector {
         }
         
         #flq-error-title {
-            font-size: 20px;
+            font-size: 2em;
             font-weight: bold;
         }
 
         #flq-error-trace {
             font-family: "Lucida Console", "Courier New", monospace;
-            font-size: 8px;
+            font-size: 0.7em;
             margin-left: 5px;
         }
 
@@ -328,8 +328,8 @@ export class StyleInjector {
         }
 
         #flq-marquee {
-            width: 24px;
-            height: 24px;
+            width: 30px;
+            height: 30px;
             display: block;
             opacity: 0;
             position: absolute;
