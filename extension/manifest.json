@@ -22,11 +22,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["quests.json"],
-      "matches": ["https://www.fallenlondon.com/*"]
-    },
-    {
-      "resources": ["images/refresh.svg"],
+      "resources": ["quests.json", "images/refresh.svg"],
       "matches": ["https://www.fallenlondon.com/*"]
     }
   ]
