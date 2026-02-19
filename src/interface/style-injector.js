@@ -245,7 +245,7 @@ export class StyleInjector {
         }
 
         .flq-quest-detail {
-            padding: 5px;
+            padding: 5px 10px;
         }
 
         .flq-quest-detail-line {
@@ -265,7 +265,7 @@ export class StyleInjector {
         .flq-subtask-description {
             flex: 1 1 auto;
             min-width: 0;
-            padding: 5px;
+            padding: 5px 10px;
         }
 
         .flq-subtask-status {
@@ -290,18 +290,18 @@ export class StyleInjector {
             margin-left: 5px;
         }
 
-        .flq-ul {
+        .flq-body ul {
             padding-left: 1rem;
             list-style-type: disc;
-            margin-bottom: 10px;
+            margin: 5px 0 5px;
         }
 
-        .flq-ul .flq-ul {
+        .flq-body ul ul {
             list-style-type: circle;
             margin-bottom: 0;
         }
 
-        .flq-ul .flq-ul .flq-ul {
+        .flq-body ul ul ul {
             list-style-type: square;
             margin-bottom: 0;
         }
@@ -384,10 +384,11 @@ export class StyleInjector {
         .flq-body h1 {
             font-size: 1.5em;
             font-weight: bold;
+            margin-top: 10px;
         }
 
         .flq-body p {
-            margin-bottom: 10px;
+            margin: 5px 0 5px;
         }
 
         .flq-body code {

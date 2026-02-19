@@ -1,7 +1,14 @@
 export class TextFormatter {
     static Expressions = {
-        Header: /^\s*(#{1,6}) /,
+        Header: /^\s*(#{1,6}) ?/,
         ListPoint: /^(\s*)([-+]|\* )/
+    }
+
+    static ChunkType = {
+        Unknown: 0,
+        Text: 1,
+        Heading: 2,
+        List: 3
     }
 
     /**
@@ -32,7 +39,7 @@ export class TextFormatter {
                 return;
             }
 
-            let headingMatch = TextFormatter.Expressions.Header.exec(chunk);
+            let headingMatch = chunk.match(TextFormatter.Expressions.Header);
             if(headingMatch) {
                 let hNum = headingMatch[1].length;
                 let hBody = chunk.substring(headingMatch[0].length);
@@ -77,17 +84,44 @@ export class TextFormatter {
         
         let chunks = [];
         let currentChunk;
+        let currentType = TextFormatter.ChunkType.Unknown;
         for(const i in lines) {
             if(!lines[i]) {
                 if(currentChunk) {
                     chunks.push(currentChunk);
                     currentChunk = null;
+                    currentType = TextFormatter.ChunkType.Unknown;
                 }
+                continue;
             }
-            else if(!currentChunk) {
-                currentChunk = lines[i];
+
+            let line = lines[i];
+            let type = TextFormatter.getLineType(line);
+            if(type == TextFormatter.ChunkType.Text) {
+                line = line.trim();
+                if(currentChunk) {
+                    currentChunk += " " + line;
+                } else {
+                    currentChunk = line;
+                    currentType = type;
+                }
             } else {
-                currentChunk += "\n" + lines[i];
+                line = line.trimEnd();
+                if(type != currentType || type == TextFormatter.ChunkType.Heading) {
+                    if(currentChunk) {
+                        chunks.push(currentChunk);
+                    }
+                    currentChunk = line;
+                    currentType = type;
+                } else {
+                    // If we get here we have chained
+                    // list item rows.
+                    if(currentChunk) {
+                        currentChunk += "\n" + line;
+                    } else {
+                        currentChunk = line;
+                    }
+                }
             }
 
             if(i == lines.length - 1 && currentChunk) {
@@ -98,6 +132,22 @@ export class TextFormatter {
         return chunks
     }
 
+    static getLineType(line) {
+        if(!line) {
+            return TextFormatter.ChunkType.Unknown;
+        }
+
+        if(line.match(TextFormatter.Expressions.Header)) {
+            return TextFormatter.ChunkType.Heading;
+        }
+
+        if(line.match(TextFormatter.Expressions.ListPoint)) {
+            return TextFormatter.ChunkType.ListPoint;
+        }
+
+        return TextFormatter.ChunkType.Text;
+    }
+
     static handleListChunk(chunk) {
         let lines = chunk.split("\n");
         let points = [];
@@ -106,7 +156,7 @@ export class TextFormatter {
             // risk breaking this. We're just going to assume
             // people aren't going to be typing those and 
             // let it break.
-            let match = TextFormatter.Expressions.ListPoint.exec(line);
+            let match = line.match(TextFormatter.Expressions.ListPoint);
             if(!match) {
                 if(points.length == 0) {
                     throw new Error("Cannot listify non-list chunk.");
@@ -160,11 +210,11 @@ export class TextFormatter {
             }
 
             if(point.depth == depth){
-                lines.push(`<li class="flq-li">${TextFormatter.formatTextChunk(point.chunk)}</li>`);
+                lines.push(`<li>${TextFormatter.formatTextChunk(point.chunk)}</li>`);
             }
         }
 
-        return `<ul class="flq-ul">${lines.join("")}</ul>`;
+        return `<ul>${lines.join("")}</ul>`;
     }
 
     /**
@@ -202,10 +252,10 @@ export class TextFormatter {
          * wrapper charactor, or an instance of the wrapper character that doesn't match the 
          * end sequence when you do a reverse lookbehind.
          */
-        const boldItalic = /\*{3}([^\*\s]([^\*]|(?<![^\*\s]\*\*)\*)*)(?<=[^\*])\*{3}/;
-        const bold = /\*{2}([^\*\s]([^\*]|(?<![^\*\s]\*)\*)*)(?<=[^\*])\*{2}/;
-        const italic = /\*([^\*\s]([^\*]|(?<![^\s\*])\*)*)(?<=[^\*])\*/;
-        const strikethrough = /~{2}([^~\s]([^~]|(?<![^~\s]~)~)*)(?<=[^~])~{2}/;
+        const boldItalic = /\*{3}([^\*\s]([^\*]|(?<![^\*\s]\*\*)\*)*)(?<=[^\*\s])\*{3}/;
+        const bold = /\*{2}([^\*\s]([^\*]|(?<![^\*\s]\*)\*)*)(?<=[^\*\s])\*{2}/;
+        const italic = /\*([^\*\s]([^\*]|(?<![^\s\*])\*)*)(?<=[^\*\s])\*/;
+        const strikethrough = /~{2}([^~\s]([^~]|(?<![^~\s]~)~)*)(?<=[^~\s])~{2}/;
 
         const patterns = [
             boldItalic,
