@@ -6,7 +6,7 @@ import { QuestsManager } from "../quests/quests-manager.js";
 import { QuestsRenderer } from "../quests/quests-renderer.js";
 import { QuestsCSVParser } from "../quests/quests-csv-parser.js";
 import { TextFormatter } from "./text-formatter.js";
-import { QuestsSourceType } from "../quests/quests-datatypes.js";
+import { QuestsSourceType, QuestStates } from "../quests/quests-datatypes.js";
 
 export class ModalManager {
     static singleInstance = null;
