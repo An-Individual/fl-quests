@@ -1,5 +1,5 @@
 category,Weekly Activities,weekly,200
 quest,A Gift from Balmoral,100,
 mappings,gift=141783,,
-5,You can receive a new gift from Balmoral,!gift,
-4,You have received this week's gift from Balmoral,gift,
+h,You can receive a new gift from Balmoral,!gift,
+c,You have received this week's gift from Balmoral,gift,

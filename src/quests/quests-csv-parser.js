@@ -1,5 +1,6 @@
 import { ConditionParser } from "./conditions/condition-parser.js";
 import { CSVReader, CSVError } from "../csv/csv-reader.js";
+import { QuestStates } from "./quests-datatypes.js";
 
 export class QuestsCSVParser {
     constructor() {
@@ -47,7 +48,7 @@ export class QuestsCSVParser {
                 this.parseMappingsRow(row, state);
             } else if(firstCell == "quest") {
                 this.parseQuestRow(row, state);
-            } else if(this.isIntegerString(firstCell)) {
+            } else if(this.getQuestState(firstCell)) {
                 this.parseQuestStateRow(row, state);
             } else if(!firstCell) {
                 this.parseTaskRow(row, state);
@@ -223,12 +224,12 @@ export class QuestsCSVParser {
         }
         this.undeclare(state, false, false, true);
 
-        let questState = parseInt(row[0]);
+        let questState = this.getQuestState(row[0]);
         if(questState < 1 || questState > 5) {
             throw new CSVError(
                 state.rowNumber, 
                 0, 
-                "Invalid quest state type: " + questState
+                "Invalid quest state type: " + row[0]
             );
         }
 
@@ -267,6 +268,33 @@ export class QuestsCSVParser {
 
         state.currentQuest.states.push(result);
         state.currentQuestState = result;
+    }
+
+    getQuestState(cell) {
+        switch(cell.trim().toLowerCase()) {
+            case "hidden":
+            case "h":
+                return QuestStates.HiddenStatus;
+            case "not started":
+            case "notstarted":
+            case "ns":
+                return QuestStates.NotStart;
+            case "started":
+            case "s":
+            case "in progress":
+            case "inprogress":
+            case "ip":
+                return QuestStates.InProgress;
+            case "blocked":
+            case "b":
+                return QuestStates.Blocked;
+            case "completed":
+            case "complete":
+            case "c":
+                return QuestStates.Completed;
+            default:
+                return QuestStates.Undefined;
+        }
     }
 
     parseTaskRow(row, state) {

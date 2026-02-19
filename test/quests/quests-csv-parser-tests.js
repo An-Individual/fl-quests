@@ -406,7 +406,7 @@ describe("QuestsCSVParser", function(){
             state.currentQuest = null;
             state.currentCategory = null;
             state.categories = [];
-            const row = ['4','State Description','val',''];
+            const row = ['c','State Description','val',''];
             state.mappings.val = 123;
             assert.throws(function(){
                 parser.parseQuestStateRow(row, state);
@@ -416,7 +416,7 @@ describe("QuestsCSVParser", function(){
         it("No Quest Declared - Error", function() {
             state.currentQuest = null;
             state.currentCategory.quests = [];
-            const row = ['4','State Description','val',''];
+            const row = ['c','State Description','val',''];
             state.mappings.val = 123;
             assert.throws(function(){
                 parser.parseQuestStateRow(row, state);
@@ -424,7 +424,7 @@ describe("QuestsCSVParser", function(){
         });
 
         it("Simple State Row - Parsed", function() {
-            const row = ['4','State Description','val',''];
+            const row = ['c','State Description','val',''];
             state.mappings.val = 123;
             parser.parseQuestStateRow(row, state);
             assert.equal(state.currentQuestState.state, QuestStates.Completed);
@@ -438,24 +438,121 @@ describe("QuestsCSVParser", function(){
             assert.equal(state.currentQuestState, state.currentQuest.states[0]);
         });
 
-        it("State Too Low - Error", function() {
-            const row = ['0','State Description','val',''];
+        it("State 'hidden' - Correct State", function() {
+            const row = ['hidden','State Description','val',''];
             state.mappings.val = 123;
-            assert.throws(function(){
-                parser.parseQuestStateRow(row, state);
-            }, e => e.message == `Error at cell A1: Invalid quest state type: 0`);
+            parser.parseQuestStateRow(row, state);
+            assert.equal(state.currentQuestState.state, QuestStates.HiddenStatus);
         });
 
-        it("State Too High - Error", function() {
-            const row = ['6','State Description','val',''];
+        it("State 'h' - Correct State", function() {
+            const row = ['h','State Description','val',''];
+            state.mappings.val = 123;
+            parser.parseQuestStateRow(row, state);
+            assert.equal(state.currentQuestState.state, QuestStates.HiddenStatus);
+        });
+
+        it("State 'not started' - Correct State", function() {
+            const row = ['not started','State Description','val',''];
+            state.mappings.val = 123;
+            parser.parseQuestStateRow(row, state);
+            assert.equal(state.currentQuestState.state, QuestStates.NotStart);
+        });
+
+        it("State 'notstarted' - Correct State", function() {
+            const row = ['notstarted','State Description','val',''];
+            state.mappings.val = 123;
+            parser.parseQuestStateRow(row, state);
+            assert.equal(state.currentQuestState.state, QuestStates.NotStart);
+        });
+
+        it("State 'ns' - Correct State", function() {
+            const row = ['ns','State Description','val',''];
+            state.mappings.val = 123;
+            parser.parseQuestStateRow(row, state);
+            assert.equal(state.currentQuestState.state, QuestStates.NotStart);
+        });
+
+        it("State 'in progress' - Correct State", function() {
+            const row = ['in progress','State Description','val',''];
+            state.mappings.val = 123;
+            parser.parseQuestStateRow(row, state);
+            assert.equal(state.currentQuestState.state, QuestStates.InProgress);
+        });
+
+        it("State 'inprogress' - Correct State", function() {
+            const row = ['inprogress','State Description','val',''];
+            state.mappings.val = 123;
+            parser.parseQuestStateRow(row, state);
+            assert.equal(state.currentQuestState.state, QuestStates.InProgress);
+        });
+
+        it("State 'ip' - Correct State", function() {
+            const row = ['ip','State Description','val',''];
+            state.mappings.val = 123;
+            parser.parseQuestStateRow(row, state);
+            assert.equal(state.currentQuestState.state, QuestStates.InProgress);
+        });
+        
+        it("State 'started' - Correct State", function() {
+            const row = ['started','State Description','val',''];
+            state.mappings.val = 123;
+            parser.parseQuestStateRow(row, state);
+            assert.equal(state.currentQuestState.state, QuestStates.InProgress);
+        });
+
+        it("State 's' - Correct State", function() {
+            const row = ['s','State Description','val',''];
+            state.mappings.val = 123;
+            parser.parseQuestStateRow(row, state);
+            assert.equal(state.currentQuestState.state, QuestStates.InProgress);
+        });
+
+        it("State 'blocked' - Correct State", function() {
+            const row = ['blocked','State Description','val',''];
+            state.mappings.val = 123;
+            parser.parseQuestStateRow(row, state);
+            assert.equal(state.currentQuestState.state, QuestStates.Blocked);
+        });
+
+        it("State 'b' - Correct State", function() {
+            const row = ['b','State Description','val',''];
+            state.mappings.val = 123;
+            parser.parseQuestStateRow(row, state);
+            assert.equal(state.currentQuestState.state, QuestStates.Blocked);
+        });
+
+        it("State 'completed' - Correct State", function() {
+            const row = ['completed','State Description','val',''];
+            state.mappings.val = 123;
+            parser.parseQuestStateRow(row, state);
+            assert.equal(state.currentQuestState.state, QuestStates.Completed);
+        });
+
+        it("State 'complete' - Correct State", function() {
+            const row = ['complete','State Description','val',''];
+            state.mappings.val = 123;
+            parser.parseQuestStateRow(row, state);
+            assert.equal(state.currentQuestState.state, QuestStates.Completed);
+        });
+
+        it("State 'c' - Correct State", function() {
+            const row = ['c','State Description','val',''];
+            state.mappings.val = 123;
+            parser.parseQuestStateRow(row, state);
+            assert.equal(state.currentQuestState.state, QuestStates.Completed);
+        });
+
+        it("State Too Low - Error", function() {
+            const row = ['invalid','State Description','val',''];
             state.mappings.val = 123;
             assert.throws(function(){
                 parser.parseQuestStateRow(row, state);
-            }, e => e.message == `Error at cell A1: Invalid quest state type: 6`);
+            }, e => e.message == `Error at cell A1: Invalid quest state type: invalid`);
         });
 
         it("Empty Description - Error", function() {
-            const row = ['4',' ','val',''];
+            const row = ['c',' ','val',''];
             state.mappings.val = 123;
             assert.throws(function(){
                 parser.parseQuestStateRow(row, state);
@@ -463,7 +560,7 @@ describe("QuestsCSVParser", function(){
         });
 
         it("No Condition - Error", function() {
-            const row = ['4','State Description','',''];
+            const row = ['c','State Description','',''];
             state.mappings.val = 123;
             assert.throws(function(){
                 parser.parseQuestStateRow(row, state);
@@ -471,7 +568,7 @@ describe("QuestsCSVParser", function(){
         });
 
         it("No Mapping - Error", function() {
-            const row = ['4','State Description','val',''];
+            const row = ['c','State Description','val',''];
             assert.throws(function(){
                 parser.parseQuestStateRow(row, state);
             }, e => e.message == `Error at cell C1: Condition error at position 0: No mapping for 'val'`);
@@ -483,7 +580,7 @@ describe("QuestsCSVParser", function(){
             state.currentQuest = getValidQuest(state.currentQuestState);
             state.currentCategory= getValidCategory(state.currentQuest);
             state.categories.push(state.currentCategory);
-            const row = ['4','State Description','val',''];
+            const row = ['c','State Description','val',''];
             state.mappings.val = 123;
             parser.parseQuestStateRow(row, state);
             assert.equal(state.currentQuestState.state, QuestStates.Completed);
