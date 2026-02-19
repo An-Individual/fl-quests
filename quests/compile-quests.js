@@ -16,7 +16,9 @@ const quests = {
     version: version,
     categories: []
 };
-const files = fs.readdirSync(definitionsDir);
+const files = fs.readdirSync(definitionsDir, {
+    recursive: true
+});
 for(let i = 0; i < files.length; i++) {
     const file = files[i];
     if(!file.endsWith(".csv")) {
@@ -24,7 +26,7 @@ for(let i = 0; i < files.length; i++) {
     }
     console.log(`Processing ${file}`);
     const csvString = fs.readFileSync(definitionsDir + file).toString();
-    const parsedQuests = parser.parse(csvString);
+    const parsedQuests = parser.parse(csvString, true);
     if(!parsedQuests) {
         throw new Error("No quests returned");
     }
@@ -36,10 +38,31 @@ for(let i = 0; i < files.length; i++) {
     }
 
     parsedQuests.categories.forEach(cat =>{
-        console.log(`    New Category: ${cat.id}`);
+        if(cat.isAug) {
+            console.log(`    Category Aug: ${cat.id} (${cat.quests.length} Quests)`);
+        } else {
+            console.log(`    New Category: ${cat.id} (${cat.quests.length} Quests)`);
+        }
         quests.categories.push(cat);
     });
 }
+
+let augCatIdx
+do {
+    augCatIdx = quests.categories.findIndex(cat => cat.isAug);
+    if(augCatIdx >= 0) {
+        const augCat = quests.categories[augCatIdx];
+        const origCat = quests.categories.find(cat => cat.id == augCat.id && !cat.isAug);
+        if(!origCat) {
+            throw new Error(`Category augmentation "${augCat.id}" does not augment an existing category.`);
+        }
+
+        augCat.quests.forEach(quest => {
+            origCat.quests.push(quest);
+        });
+        quests.categories.splice(augCatIdx, 1);
+    }
+} while (augCatIdx >= 0);
 
 console.log("Validating Quest JSON");
 validator.validate(quests);

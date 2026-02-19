@@ -1,4 +1,4 @@
-category,Vanity Activities,vanity,100
+augcat,vanity,,
 quest,Goat Farmer,100,
 mappings,"og=355,ug=102305,hg=118068",,
 5,Buy a goat. Do it! Get on the ladder.,!og&&!ug&&!hg,
@@ -17,12 +17,3 @@ mappings,"og=355,ug=102305,hg=118068",,
 ,Overgoat,og,
 ,Ubergoat,ug,
 ,Heptagoat,hg,
-quest,Cider Connoisseur,99,
-mappings,hc=410,,
-5,"It's just a firkin, what could it cost? 160,000 echoes?",!hc,
-4,AND SO SHALL YOU NEVER DIE,hc,
-category,Weekly Activities,weekly,200
-quest,A Gift from Balmoral,100,
-mappings,gift=141783,,
-5,You can receive a new gift from Balmoral,!gift,
-4,You have received this week's gift from Balmoral,gift,

@@ -112,6 +112,19 @@ describe("QuestsCSVParser", function(){
             }, e => e.message == `Error at cell A1: Category did not declare any quests.`);
         });
 
+        it("Open Category allow Splitting - Parsed", function(){
+            state.currentCategory = {
+                quests: []
+            };
+            const row = ['category','Category Name','testcat_1','10'];
+            parser.parseCategoryRow(row, state, true);
+            assert.equal(state.currentCategory.id, "testcat_1");
+            assert.equal(state.currentCategory.title, "Category Name");
+            assert.equal(state.currentCategory.order, 10);
+            assert.equal(state.currentCategory.quests.length, 0);
+            assert.equal(state.currentCategory, state.categories[0]);
+        });
+
         it("Open Quest - Error", function(){
             state.currentQuest = {
                 states: []
@@ -201,6 +214,90 @@ describe("QuestsCSVParser", function(){
         });
     });
 
+    describe("#parseAugCatRow", function(){
+        let parser;
+        let state;
+        beforeEach(function(){
+            parser = new QuestsCSVParser();
+            state = parser.getDefaultState();
+            state.rowNumber = 1;
+        });
+
+        it("Simple Valid Row - Parsed", function(){
+            const row = ['augcat','testcat_1','',''];
+            parser.parseAugCatRow(row, state);
+            assert.equal(state.currentCategory.id, "testcat_1");
+            assert.equal(state.currentCategory.quests.length, 0);
+            assert.equal(state.currentCategory, state.categories[0]);
+        });
+
+        it("Open Category - Parsed", function(){
+            state.currentCategory = {
+                quests: []
+            };
+            const row = ['augcat','testcat_1','',''];
+            parser.parseAugCatRow(row, state);
+            assert.equal(state.currentCategory.id, "testcat_1");
+            assert.equal(state.currentCategory.quests.length, 0);
+            assert.equal(state.currentCategory, state.categories[0]);
+        });
+
+        it("Open Quest - Error", function(){
+            state.currentQuest = {
+                states: []
+            };
+            state.currentCategory = {
+                quests: [
+                    state.currentQuest
+                ]
+            };
+            const row = ['augcat','testcat_1','',''];
+            assert.throws(function(){
+                parser.parseAugCatRow(row, state);
+            }, e => e.message == `Error at cell A1: Quest did not declare any states.`);
+        });
+
+        it("Existing Category - Current Replaced", function(){
+            state.currentQuestState = getValidState();
+            state.currentQuest = getValidQuest(state.currentQuestState);
+            state.currentCategory= getValidCategory(state.currentQuest);
+            state.categories.push(state.currentCategory);
+            const row = ['augcat','newcat','',''];
+            parser.parseAugCatRow(row, state);
+            assert.equal(state.currentCategory.id, "newcat");
+            assert.equal(state.currentCategory.quests.length, 0);
+            assert(!state.currentQuest);
+            assert(!state.currentQuestState);
+            assert.equal(state.categories.length, 2);
+            assert.equal(state.currentCategory, state.categories[1]);
+        });
+
+        it("Empty ID - Error", function(){
+            const row = ['augcat','','',''];
+            assert.throws(function(){
+                parser.parseAugCatRow(row, state);
+            }, e => e.message == `Error at cell B1: Category ID is not a valid ID string. ID strings include only letters, numbers, and underscores and have a maximum length of 500 characters.`);
+        });
+
+        it("Invalid ID Character - Error", function(){
+            const row = ['augcat','ab-cd','',''];
+            assert.throws(function(){
+                parser.parseAugCatRow(row, state);
+            }, e => e.message == `Error at cell B1: Category ID is not a valid ID string. ID strings include only letters, numbers, and underscores and have a maximum length of 500 characters.`);
+        });
+
+        it("Long ID - Error", function(){
+            let longId = "";
+            for(let i = 0; i < 501; i++) {
+                longId += "a"
+            }
+            const row = ['augcat',longId,'',''];
+            assert.throws(function(){
+                parser.parseAugCatRow(row, state);
+            }, e => e.message == `Error at cell B1: Category ID is not a valid ID string. ID strings include only letters, numbers, and underscores and have a maximum length of 500 characters.`);
+        });
+    });
+
     describe("#parseQuestRow", function(){
         let parser;
         let state;
@@ -255,6 +352,14 @@ describe("QuestsCSVParser", function(){
             parser.parseQuestRow(row, state);
             assert.equal(state.currentQuest.title, "Quest Title");
             assert(!Object.hasOwn(state.currentQuest, "order"));
+        });
+
+        it("No Order on Category Augmentation - Error", function() {
+            const row = ['quest','Quest Title','',''];
+            state.currentCategory.isAug = true;
+            assert.throws(function(){
+                parser.parseQuestRow(row, state);
+            }, e => e.message == `Error at cell C1: Quests inside Category augmentations must specify an order.`);
         });
 
         it("Invalid Order - Error", function() {
@@ -707,6 +812,56 @@ describe("QuestsCSVParser", function(){
             assert.throws(function(){
                 parser.parse(csvString);
             }, e => e.message == "Error at cell A7: Category did not declare any quests.");
+        });
+
+        it("End Category Not Closed - Error", function(){
+            const csvString = readDataFile("category-not-closed.csv");
+            assert.throws(function(){
+                parser.parse(csvString);
+            }, e => e.message == "Error at cell A7: Category did not declare any quests.");
+        });
+
+        it("Category Alone with Splitting - Parsed", function(){
+            const csvString = readDataFile("category-alone.csv");
+            const quests = parser.parse(csvString, true);
+            assert.equal(quests.categories.length, 1);
+            assert.equal(quests.categories[0].title, "Cat 1");
+            assert.equal(quests.categories[0].id, "cat1");
+            assert.equal(quests.categories[0].order, 20);
+            assert.equal(quests.categories[0].quests.length, 0);
+        });
+
+        it("Simple Category Augmentation - Parsed", function(){
+            const csvString = readDataFile("category-aug.csv");
+            const quests = parser.parse(csvString, true);
+            assert.equal(quests.categories.length, 1);
+            assert.equal(quests.categories[0].id, "cat1");
+            assert(!Object.hasOwn(quests.categories[0], "title"));
+            assert(!Object.hasOwn(quests.categories[0], "order"));
+            assert.equal(quests.categories[0].quests.length, 1);
+            assert.equal(quests.categories[0].quests[0].title, "Quest 1");
+            assert.equal(quests.categories[0].quests[0].order, 10);
+            assert.equal(quests.categories[0].quests[0].states.length, 1);
+            assert.equal(quests.categories[0].quests[0].states[0].state, QuestStates.Completed);
+            assert.equal(quests.categories[0].quests[0].states[0].description, "State 1");
+            assert.equal(quests.categories[0].quests[0].states[0].condition.type, LogicTypes.Comparison);
+            assert.equal(quests.categories[0].quests[0].states[0].condition.quality, 123);
+            assert.equal(quests.categories[0].quests[0].states[0].condition.comparison, ComparisonTypes.Greater);
+            assert.equal(quests.categories[0].quests[0].states[0].condition.value, 0);
+        });
+
+        it("Category Augmentation No Splitting - Error", function(){
+            const csvString = readDataFile("category-aug.csv");
+            assert.throws(function(){
+                parser.parse(csvString);
+            }, e => e.message == "Error at cell A1: Unexpected value");
+        });
+
+        it("Category Augmentation Empty Quest - Error", function(){
+            const csvString = readDataFile("category-aug-quest-empty.csv");
+            assert.throws(function(){
+                parser.parse(csvString, true);
+            }, e => e.message == "Error at cell A2: Quest did not declare any states.");
         });
     });
 });

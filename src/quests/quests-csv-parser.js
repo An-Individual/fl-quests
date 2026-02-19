@@ -17,7 +17,7 @@ export class QuestsCSVParser {
         };
     }
 
-    parse(csvString) {
+    parse(csvString, allowCategorySplitting) {
         let reader = new CSVReader(csvString);
 
         let state = this.getDefaultState();
@@ -36,7 +36,13 @@ export class QuestsCSVParser {
                 continue;
             }
             else if(firstCell == "category") {
-                this.parseCategoryRow(row, state);
+                // Category splitting is used while building the base JSON
+                // file so that large categories can be split across multiple
+                // files. It allows CSVs to delcare empty categories and
+                // build them in pieces from other files.
+                this.parseCategoryRow(row, state, allowCategorySplitting);
+            } else if(allowCategorySplitting && firstCell == "augcat") {
+                this.parseAugCatRow(row, state);
             } else if(firstCell == "mappings") {
                 this.parseMappingsRow(row, state);
             } else if(firstCell == "quest") {
@@ -50,7 +56,7 @@ export class QuestsCSVParser {
             }
         }
 
-        this.requireClosed(state, true, true);
+        this.requireClosed(state, !allowCategorySplitting, true);
 
         // Apply ordering to unordered quests.
         state.categories.forEach(cat =>{
@@ -74,11 +80,8 @@ export class QuestsCSVParser {
         return /^\w{1,500}$/.test(value);
     }
 
-    parseCategoryRow(row, state) {
-        let check = this.requireClosed(state, true, true);
-        if(check.error){
-            return check;
-        }
+    parseCategoryRow(row, state, allowCategorySplitting) {
+        this.requireClosed(state, !allowCategorySplitting, true);
         this.undeclare(state, true, true, true);
 
         let id = row[2]?.trim() ?? "";
@@ -112,6 +115,29 @@ export class QuestsCSVParser {
             id: id,
             title: row[1].trim(),
             order: order,
+            quests: []
+        };
+
+        state.categories.push(cat);
+        state.currentCategory = cat;
+    }
+
+    parseAugCatRow(row, state) {
+        this.requireClosed(state, false, true);
+        this.undeclare(state, true, true, true);
+
+        let id = row[1]?.trim() ?? "";
+        if(!this.isValidIDString(id)) {
+            throw new CSVError(
+                state.rowNumber, 
+                1, 
+                "Category ID is not a valid ID string. ID strings include only letters, numbers, and underscores and have a maximum length of 500 characters."
+            );
+        }
+
+        let cat = {
+            id: id,
+            isAug: true,
             quests: []
         };
 
@@ -176,6 +202,14 @@ export class QuestsCSVParser {
                 );
             }
             quest.order = parseInt(orderString);
+        } else {
+            if(state.currentCategory.isAug) {
+                throw new CSVError(
+                    state.rowNumber,
+                    2,
+                    "Quests inside Category augmentations must specify an order."
+                );
+            }
         }
 
         state.currentCategory.quests.push(quest);
