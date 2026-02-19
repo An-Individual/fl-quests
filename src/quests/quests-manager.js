@@ -1,7 +1,7 @@
 import { SettingsManager } from "../settings.js";
 import { QuestsValidator } from "./quests-validator.js";
 import { Logger } from "../logger.js";
-import { QuestsSourceType, LogicTypes, ComparisonTypes } from "./quests-datatypes.js";
+import { QuestsSourceType } from "./quests-datatypes.js";
 
 export class QuestsManager {
 

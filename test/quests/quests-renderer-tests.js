@@ -535,6 +535,7 @@ describe("QuestsRenderer", function(){
             renderer.qualities[1] = 10;
             const quest = {
                 title: "Quest Title",
+                order: 10,
                 states: [
                     {
                         state: QuestStates.Completed,
@@ -550,6 +551,7 @@ describe("QuestsRenderer", function(){
             };
             const result = renderer.renderQuest(quest);
             assert.equal(result.title, "Quest Title");
+            assert.equal(result.order, 10);
             assert.equal(result.state, QuestStates.Completed);
             assert.equal(result.details, "State Description");
             assert.equal(result.subtasks.length, 0);
@@ -558,6 +560,7 @@ describe("QuestsRenderer", function(){
         it("No Title - Undefined Title", function(){
             renderer.qualities[1] = 10;
             const quest = {
+                order: 10,
                 states: [
                     {
                         state: QuestStates.Completed,
@@ -573,6 +576,32 @@ describe("QuestsRenderer", function(){
             };
             const result = renderer.renderQuest(quest);
             assert.equal(result.title, undefined);
+            assert.equal(result.order, 10);
+            assert.equal(result.state, QuestStates.Completed);
+            assert.equal(result.details, "State Description");
+            assert.equal(result.subtasks.length, 0);
+        });
+
+        it("No Order - Zero Order", function(){
+            renderer.qualities[1] = 10;
+            const quest = {
+                title: "Quest Title",
+                states: [
+                    {
+                        state: QuestStates.Completed,
+                        description: "State Description",
+                        condition: {
+                            type: LogicTypes.Comparison,
+                            quality: 1,
+                            comparison: ComparisonTypes.Equal,
+                            value: 10
+                        }
+                    }
+                ]
+            };
+            const result = renderer.renderQuest(quest);
+            assert.equal(result.title, "Quest Title");
+            assert.equal(result.order, 0);
             assert.equal(result.state, QuestStates.Completed);
             assert.equal(result.details, "State Description");
             assert.equal(result.subtasks.length, 0);
@@ -818,6 +847,95 @@ describe("QuestsRenderer", function(){
         });
     });
 
+    describe("#sortQuests()", function(){
+        let renderer;
+        this.beforeEach(function(){
+            renderer = makeSpoofedRenderer();
+        });
+
+        it("No Parameters - No Error", function(){
+            assert.doesNotThrow(function(){
+                renderer.sortQuests();
+            });
+        });
+
+        it("Sort States - Sorted", function(){
+            const quests = [
+                {
+                    state: QuestStates.Completed,
+                    order: 1
+                },
+                {
+                    state: QuestStates.HiddenStatus,
+                    order: 1
+                },
+                {
+                    state: QuestStates.NotStart,
+                    order: 1
+                },
+                {
+                    state: QuestStates.InProgress,
+                    order: 1
+                },
+                {
+                    state: QuestStates.Blocked,
+                    order: 1
+                }
+            ];
+            renderer.sortQuests(quests);
+            assert.equal(quests[0].state, QuestStates.InProgress);
+            assert.equal(quests[1].state, QuestStates.Blocked);
+            assert.equal(quests[2].state, QuestStates.NotStart);
+            assert.equal(quests[3].state, QuestStates.HiddenStatus);
+            assert.equal(quests[4].state, QuestStates.Completed);
+        });
+
+        it("Sort States - Sorted", function(){
+            const quests = [
+                {
+                    state: QuestStates.Completed,
+                    order: 2
+                },
+                {
+                    state: QuestStates.Completed,
+                    order: 1
+                },
+                {
+                    state: QuestStates.Completed,
+                    order: 3
+                }
+            ];
+            renderer.sortQuests(quests);
+            assert.equal(quests[0].order, 3);
+            assert.equal(quests[1].order, 2);
+            assert.equal(quests[2].order, 1);
+        });
+
+        it("Sort Both States & Order - State Prioritized", function(){
+            const quests = [
+                {
+                    state: QuestStates.Completed,
+                    order: 2
+                },
+                {
+                    state: QuestStates.InProgress,
+                    order: 1
+                },
+                {
+                    state: QuestStates.Completed,
+                    order: 3
+                }
+            ];
+            renderer.sortQuests(quests);
+            assert.equal(quests[0].state, QuestStates.InProgress)
+            assert.equal(quests[0].order, 1);
+            assert.equal(quests[1].state, QuestStates.Completed)
+            assert.equal(quests[1].order, 3);
+            assert.equal(quests[2].state, QuestStates.Completed)
+            assert.equal(quests[2].order, 2);
+        });
+    });
+
     describe("#renderQuests()", function(){
         let renderer;
         this.beforeEach(function(){
@@ -937,6 +1055,59 @@ describe("QuestsRenderer", function(){
             assert.equal(result[0].quests[0].title, "Quest 1");
             assert.equal(result[0].quests[0].state, QuestStates.InProgress);
             assert.equal(result[0].quests[0].details, "State 1");
+        });
+
+        it("Category with Multiple Quests - Quests Sorted", function(){
+            renderer.qualities[1] = 10;
+            const quests = {
+                categories: [
+                    {
+                        id: "cat1",
+                        title: "Category 1",
+                        order: 10,
+                        quests: [
+                            {
+                                title: "Quest 1",
+                                states: [
+                                    {
+                                        state: QuestStates.Completed,
+                                        description: "State 1",
+                                        condition: {
+                                            type: LogicTypes.Comparison,
+                                            quality: 1,
+                                            comparison: ComparisonTypes.Equal,
+                                            value: 10
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                title: "Quest 2",
+                                states: [
+                                    {
+                                        state: QuestStates.InProgress,
+                                        description: "State 1",
+                                        condition: {
+                                            type: LogicTypes.Comparison,
+                                            quality: 1,
+                                            comparison: ComparisonTypes.Equal,
+                                            value: 10
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            };
+            const result = renderer.renderQuests(quests);
+            assert.equal(result.length, 1);
+            assert.equal(result[0].id, "cat1");
+            assert.equal(result[0].title, "Category 1");
+            assert.equal(result[0].order, 10);
+            assert.equal(result[0].quests.length, 2);
+            assert.equal(result[0].quests[0].title, "Quest 2");
+            assert.equal(result[0].quests[1].title, "Quest 1");
         });
     });
 });

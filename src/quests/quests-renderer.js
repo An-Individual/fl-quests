@@ -1,5 +1,5 @@
 import { QualityTracker } from "../qualities/quality-tracker.js";
-import { LogicTypes, ComparisonTypes } from "./quests-datatypes.js";
+import { LogicTypes, ComparisonTypes, QuestSortPriority } from "./quests-datatypes.js";
 
 export class QuestsRenderer {
     constructor(){
@@ -33,11 +33,22 @@ export class QuestsRenderer {
             });
 
             if(outputCat.quests.length > 0) {
+                this.sortQuests(outputCat.quests);
                 result.push(outputCat);
             }
         }
 
         return result;
+    }
+
+    sortQuests(questList) {
+        questList?.sort((a,b) => {
+            let typeDif = QuestSortPriority[a.state] - QuestSortPriority[b.state];
+            if(typeDif != 0){
+                return typeDif;
+            }
+            return b.order - a.order;
+        })
     }
 
     renderQuest(quest)
@@ -47,8 +58,9 @@ export class QuestsRenderer {
         }
 
         let result = {
-            "title": quest.title,
-            "subtasks": []
+            title: quest.title,
+            order: quest.order ?? 0,
+            subtasks: []
         }
 
         let state;

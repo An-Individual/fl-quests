@@ -7,6 +7,15 @@ export const QuestStates = {
     HiddenStatus: 5
 }
 
+export const QuestSortPriority = {
+    [QuestStates.InProgress]: 1,
+    [QuestStates.Blocked]: 2,
+    [QuestStates.NotStart]: 3,
+    [QuestStates.HiddenStatus]: 4,
+    [QuestStates.Completed]: 5,
+    [QuestStates.Undefined]: 6
+}
+
 export const LogicTypes = {
     Undefined: 0,
     Comparison: 1,
