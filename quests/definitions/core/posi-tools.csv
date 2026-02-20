@@ -21,3 +21,18 @@ b,Pursue *A Journey of Scientific Discovery* to regain access to The University.
 ip,Complete your first experiment.,lab && !prestige
 ip,Complete your second experiment.,lab && prestige=1
 c,You have your own lab at The University!,lab && prestige>=2
+//,**********************************************************************,
+quest,A Base-Camp in Parabola,310
+mappings,"camp=140705,specs=105466,alf=273,adeck=140943,mynp=1020",
+ns,Gain access to *The University Lab* to proceed.,posi
+ns,Complete the **Find a Route to Parabola** experiment in your University Lab.,lab
+ns,Establish a base-camp from **The Honey-Dens of Veilgarden**.,mynp && specs && !lab
+ns,"Establish a base-camp from **The Honey-Dens of Veilgarden** or complete the
+**Find a Route to Parabola** experiment in your University Lab.",mynp && specs && lab
+ns,Pursue your Ambition to establish a base-camp.,alf>=205 && alf<=207 && !lab
+ns,"Pursue your Ambition or complete the **Find a Route to Parabola** experiment
+in your University Lab.",alf>=205 && alf<=207 && lab
+ns,Pursue your Ambition to establish a base-camp.,adeck>=17 && adeck<=20 && !lab
+ns,"Pursue your Ambition or complete the **Find a Route to Parabola** experiment
+in your University Lab.",adeck>=17 && adeck<=20 && lab
+c,You have access to a Parabolan Base-Camp.,camp
