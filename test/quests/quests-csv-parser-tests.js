@@ -150,6 +150,13 @@ describe("QuestsCSVParser", function(){
             assert.equal(state.currentCategory, state.categories[0]);
         });
 
+        it("Only 3 Columns - Error", function(){
+            const row = ['category','Category Name','testcat_1'];
+            assert.throws(function(){
+                parser.parseCategoryRow(row, state);
+            }, e => e.message == `Error at cell D1: Category does not specify an order.`);
+        });
+
         it("Empty ID - Error", function(){
             const row = ['category','Category Name','','10']
             assert.throws(function(){
@@ -424,7 +431,7 @@ describe("QuestsCSVParser", function(){
         });
 
         it("Simple State Row - Parsed", function() {
-            const row = ['c','State Description','val',''];
+            const row = ['c','State Description','val'];
             state.mappings.val = 123;
             parser.parseQuestStateRow(row, state);
             assert.equal(state.currentQuestState.state, QuestStates.Completed);

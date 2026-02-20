@@ -25,7 +25,7 @@ export class QuestsCSVParser {
 
         while(reader.readRow()) {
             let row = reader.row;
-            if(row.length < 4) {
+            if(row.length < 3) {
                 throw new Error("CSV includes fewer than 4 columns");
             }
 
@@ -94,6 +94,13 @@ export class QuestsCSVParser {
             );
         }
 
+        if(row.length < 4) {
+            throw new CSVError(
+                state.rowNumber,
+                3,
+                "Category does not specify an order."
+            );
+        }
         let orderString = row[3]?.trim() ?? "";
         if(!this.isIntegerString(orderString)) {
             throw new CSVError(
@@ -334,18 +341,20 @@ export class QuestsCSVParser {
             completed: completeCondition
         }
 
-        let visibleCondition = null;
-        try {
-            visibleCondition = this.conditionParser.parse(row[3], state.mappings);
-        } catch(error) {
-            throw new CSVError(
-                state.rowNumber, 
-                3, 
-                error.message
-            );
-        }
-        if(visibleCondition) {
-            result.visible = visibleCondition;
+        if(row.length >= 4) {
+            let visibleCondition = null;
+            try {
+                visibleCondition = this.conditionParser.parse(row[3], state.mappings);
+            } catch(error) {
+                throw new CSVError(
+                    state.rowNumber, 
+                    3, 
+                    error.message
+                );
+            }
+            if(visibleCondition) {
+                result.visible = visibleCondition;
+            }
         }
 
         state.currentQuestState.tasks.push(result);
