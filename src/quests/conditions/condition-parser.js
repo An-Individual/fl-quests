@@ -16,7 +16,7 @@ export class ConditionParser {
         return this.parseStatement(reader, mappings);
     }
 
-    parseStatement(reader, mappings, prevResult, bracketDepth)
+    parseStatement(reader, mappings, prevResult, bracketDepth, nextOnly)
     {
         // We assume that the next thing we need
         // to parse has already been read. This is
@@ -84,7 +84,7 @@ export class ConditionParser {
             // decided is fine for the sake of keeping the
             // code reasonably simple.
             reader.nextThrowIfEnd();
-            let subResult = this.parseStatement(reader, mappings, null, bracketDepth);
+            let subResult = this.parseStatement(reader, mappings, null, bracketDepth, true);
             if(!subResult) {
                 throw new ConditionError(reader.lastIndex, "No statement following a NOT.");
             }
@@ -106,7 +106,11 @@ export class ConditionParser {
             throw new ConditionError(reader.lastIndex, `Unknown element '${elem}'`);
         }
 
-        return this.parseStatement(reader, mappings, result, bracketDepth);
+        if(nextOnly) {
+            return result;
+        } else {
+            return this.parseStatement(reader, mappings, result, bracketDepth);
+        }
     }
 
     parseComparision(elem, reader, mappings) {

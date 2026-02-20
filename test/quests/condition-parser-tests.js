@@ -322,6 +322,46 @@ describe("ConditionParser", function(){
             assert(!condition.statement.property);
         });
 
+        it(`"!a && b" - Not`, function(){
+            const condition = parser.parse("!a && b", {
+                a: 1,
+                b: 2
+            });
+
+            assert.equal(condition.type, LogicTypes.And);
+            assert.equal(condition.left.type, LogicTypes.Not);
+            assert.equal(condition.left.statement.type, LogicTypes.Comparison);
+            assert.equal(condition.left.statement.quality, 1);
+            assert.equal(condition.left.statement.comparison, ComparisonTypes.Greater);
+            assert.equal(condition.left.statement.value, 0);
+            assert(!condition.left.statement.property);
+            assert.equal(condition.right.type, LogicTypes.Comparison);
+            assert.equal(condition.right.quality, 2);
+            assert.equal(condition.right.comparison, ComparisonTypes.Greater);
+            assert.equal(condition.right.value, 0);
+            assert(!condition.right.property);
+        });
+
+        it(`"!(a && b)" - Not`, function(){
+            const condition = parser.parse("!(a && b)", {
+                a: 1,
+                b: 2
+            });
+
+            assert.equal(condition.type, LogicTypes.Not);
+            assert.equal(condition.statement.type, LogicTypes.And);
+            assert.equal(condition.statement.left.type, LogicTypes.Comparison);
+            assert.equal(condition.statement.left.quality, 1);
+            assert.equal(condition.statement.left.comparison, ComparisonTypes.Greater);
+            assert.equal(condition.statement.left.value, 0);
+            assert(!condition.statement.left.property);
+            assert.equal(condition.statement.right.type, LogicTypes.Comparison);
+            assert.equal(condition.statement.right.quality, 2);
+            assert.equal(condition.statement.right.comparison, ComparisonTypes.Greater);
+            assert.equal(condition.statement.right.value, 0);
+            assert(!condition.statement.right.property);
+        });
+
         it(`"!" - Error`, function(){
             assert.throws(function(){
                 const condition = parser.parse("!", {
