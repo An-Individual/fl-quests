@@ -8,7 +8,7 @@ export class ModalInjector {
                     <span class="flq-clickable" id="flq-close">&#10006;</span>
                     <img id="flq-marquee" />
                     <div class="flq-title">
-                        Quests Journal
+                        Quests Guide
                     </div>
                     <div class="flq-subtitle-links">
                         <span id="flq-to-home" class="flq-tab">Home</span> | 
