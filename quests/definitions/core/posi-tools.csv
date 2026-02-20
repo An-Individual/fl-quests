@@ -1,5 +1,5 @@
 augcat,core,
-quest,Acquire a Ship,310
+quest,Acquire a Ship,330
 mappings,"boat=770,posi=716,explorer=771",
 ns,Head to Wolfstack Docks to get started.,!boat && posi
 ip,Look for **One Step Closer to Owning a Ship** in Wolfstack Docks.,boat=1
@@ -12,3 +12,12 @@ mappings,"zpeed=142287,zub=142457,lux=142755",
 c,You've got the zoomies!,explorer && zpeed.effectiveLevel>60
 c,The lap of luxury!,explorer && lux.effectiveLevel
 c,Zub Club! Zub Club! Zub Club!,explorer && zub.effectiveLevel
+//,**********************************************************************,
+quest,The University Lab,320
+mappings,"unwelcome=649,lab=140725,route=604,prestige=127257",
+ns,Look for *Your Own Lab* at The University to get started.,posi
+b,Pursue *A Name in Seven Secret Alphabets* to gain access to The University.,posi && !route
+b,Pursue *A Journey of Scientific Discovery* to regain access to The University.,posi && unwelcome
+ip,Complete your first experiment.,lab && !prestige
+ip,Complete your second experiment.,lab && prestige=1
+c,You have your own lab at The University!,lab && prestige>=2
