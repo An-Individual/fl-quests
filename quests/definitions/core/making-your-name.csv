@@ -1,0 +1,30 @@
+augcat,core,,,
+mappings,"myn=1018,nmc=144074,ott=144073,tttc=144075,eiac=10632",,,"The wiki is kind of unclear on whether
+case are tracked with Engaged in a Case (eiac)
+or Engaged in a Name-Making Case (nmc). So 
+where I've found values for both I've used both
+and ORed them."
+quest,Making Your Name: A Name in Seven Secret Alphabets,100,,
+ns,Look for a Making Your Name storylet on Ladybones Road.,!myn,,
+ip,Pursue the Honey-Addled Detective on Moloch Street.,!myn && (nmc=1 || eiac=2),,
+ip,Look for a Making Your Name storylet on Ladybones Road.,myn=1,,
+ip,Pursue the Tattooed Courier on Moloch Street.,myn=1 && nmc=2,,
+ip,Locate the Tattooed Courier at Mrs Plenty's Carnival.,myn=1 && tttc=4,,
+ip,"The Honey-Addled Detective has a Making Your Name 
+case for you on Moloch Street.",myn=2,,
+ip,Pursue the Case of the Absconding Devil on Moloch Street.,myn=2 && (nmc=3 || eiac=3),,
+ip,Another case awaits within Life on Ladybones Road.,myn=3,,
+ip,Pursue the Case of the Disappearing Heiress on Moloch Street.,myn=3 && eiac=5,,
+ip,Look for a Making Your Name storylet on Ladybones Road.,myn=4,,
+mappings,"arch=503,cstones=506",,,
+ip,Head to the Forgotten Quarter or Base-Camp. Learn the traditions.,myn=5,,The quality that tracks if Base-Camp is visible is hidden.
+ip,"Embark on expeditions from your Forgotten Quarter 
+base-camp to increase Archaeologist.",myn=5 && arch,,
+ip,"Embark on an expedition to The Tomb of the Seven from your 
+Forgotten Quarter base-camp.",myn=5 && arch >= 3,,
+ip,"Look for a Making Your Name storylet in your Forgotten Quarter
+base-camp.",myn=5 && cstones,,
+mappings,univtales=600,,,
+ip,Head to The University,myn=6,,
+ip,Look for Making Your Name storylets in The University.,myn=6 && univtales>4,,
+c,You've completed the Watchful branch of Making Your Name!,myn>=7,,
