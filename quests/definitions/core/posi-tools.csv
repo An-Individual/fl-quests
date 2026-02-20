@@ -1,0 +1,14 @@
+augcat,core,
+quest,Acquire a Ship,310
+mappings,"boat=770,posi=716,explorer=771",
+ns,Head to Wolfstack Docks to get started.,!boat && posi
+ip,Look for **One Step Closer to Owning a Ship** in Wolfstack Docks.,boat=1
+ip,Look for **Repairs and Supplies** in Wolfstack Docks,boat=2
+ip,Look for **Finding a Crew** in Wolfstack Docks.,boat=3
+ip,Look for **Pick a Ship** in Wolfstack Docks.,boat=4
+ip,You are acquiring a ship in Wolfstack Docks.,boat>4
+c,You have a boat!,explorer
+mappings,"zpeed=142287,zub=142457,lux=142755",
+c,You've got the zoomies!,explorer && zpeed.effectiveLevel>60
+c,The lap of luxury!,explorer && lux.effectiveLevel
+c,Zub Club! Zub Club! Zub Club!,explorer && zub.effectiveLevel
