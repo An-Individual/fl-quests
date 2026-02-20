@@ -21,3 +21,18 @@ ip,Meet the Ambitious Barrister in the Bazaar Side-Streets,consequence=10
 ip,Acquire a Velocipede in the Bazaar Side-Streets.,consequence=11
 ip,Finish up in the Bazaar Side-Streets.,consequence=12
 c,Congratulations! You are a Person of Some Importance.,importance
+//,**********************************************************************,
+quest,A Person of Even Greater Importance,210
+b,"Raise your base Watchful, Shadowy, Dangerous or Persuasive 
+to 200. This does not include equipment.",watchful>=170 || shadowy>=170 || dangerous>=170 || persuasive>=170
+ns,"Find the **Unfinished Business** storylet at one of the below
+locations to achieve a specialization. You may need to
+do some shopping first. You can only pick one. It is possible,
+though not easy, to change it later.",watchful>=200 || shadowy>=200 || dangerous>=200 || persuasive>=200
+,Ladybones Road,watchful>=200
+,Spite,shadowy>=200
+,Watchmaker's Hill,dangerous>=200
+,Veilgarden,persuasive>=200
+b,"You must become *A Person of Some Importance* before you can
+become A Person of Even Greater Importance.",!importance
+c,You've become a person of even greater importance!,importance>2
