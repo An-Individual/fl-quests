@@ -1,0 +1,23 @@
+augcat,core,
+quest,A Person of Some Importance,200
+mappings,"watchful=209,shadowy=210,dangerous=211,persuasive=212,consequence=715,importance=716",
+b,"You need Watchful, Shadowy, Dangerous or Persuasive 100
+to begin this. This includes bonuses from equipment.",watchful>=70 || shadowy>=70 || dangerous>=70 || persuasive>=70
+ns,"Watch for a gold bordered card in the London Opportunities deck
+that mentions a *coincidence*.",watchful.effectiveLevel>=100 || shadowy.effectiveLevel>=100 || dangerous.effectiveLevel>=100 || persuasive.effectiveLevel>=100
+ip,Meet the Ambitious Barrister in Your Lodgings.,consequence
+ip,Stroll around Watchmaker's Hill.,consequence=3
+ip,Wander through Veilgarden.,consequence=4
+ip,Tour Spite.,consequence=5
+ip,Walk down Ladybones Road.,consequence=6
+ip,"Look for any one of these cards in the London Opportunities deck:
+- A matter of the wardrobe
+- A respectable address
+- A little hideaway
+- Friends and acquaintances",consequence=7
+ip,Look for **Sufficient Importance** in Your Lodgings.,consequence=8
+ip,There's an interesting briefcase in Your Lodgings.,consequence=9
+ip,Meet the Ambitious Barrister in the Bazaar Side-Streets,consequence=10
+ip,Acquire a Velocipede in the Bazaar Side-Streets.,consequence=11
+ip,Finish up in the Bazaar Side-Streets.,consequence=12
+c,Congratulations! You are a Person of Some Importance.,importance
