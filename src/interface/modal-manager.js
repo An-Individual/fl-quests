@@ -278,6 +278,7 @@ export class ModalManager {
                 if(oldRaw) {
                     let oldImported = JSON.parse(oldRaw);
                     this.mergeQuests(oldImported, current);
+                    current = oldImported;
                 }
 
                 this.settings.setImportedQuests(JSON.stringify(current));
