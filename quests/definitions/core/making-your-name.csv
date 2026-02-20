@@ -28,6 +28,7 @@ mappings,univtales=600,,,
 ip,Head to The University,myn=6,,
 ip,Look for Making Your Name storylets in The University.,myn=6 && univtales>4,,
 c,You've completed the Watchful branch of Making Your Name!,myn>=7,,
+//,**********************************************************************,,,
 quest,Making Your Name: A Name Whispered in Darkness,113,,
 mappings,"myn=1016,muckraking=731",,,
 ns,Look for a Making Your Name storylet in Spite.,!myn,,
@@ -49,3 +50,32 @@ mappings,illusion=575,,,
 ip,Head to **The Heights of Chicanery** in The Flit.,myn=6 && illusion<6,,
 ip,Head to **Bats and Cats** in The Flit.,myn=6 && illusion>=6,,
 c,You've completed the Shadowy branch of Making Your Name!,myn>=7,,
+//,**********************************************************************,,,
+quest,Making Your Name: A Name Scrawled in Blood,112,,
+mappings,"myn=1015,quarry=22333,spiders=241,vermin=109668",,,
+ns,"Look for a Making Your Name storylet on Watchmaker's Hill and
+head to The Department of Menace Eradication.",!myn,,Another case where a route quality is hidden
+ip,Hunt a Worryingly Large Rat in The Department of Menace Eradication.,!myn && quarry=1,,
+ip,"Another Making Your Name hunt is available in The Department of
+Menace Eradication.",myn=1,,
+ip,Battle Sorrow-Spiders in The Department of Menace Eradication.,myn=1 && spiders,,
+ip,Look for a Making Your Name storylet on Watchmaker's Hill.,myn=2,,
+ip,Your lodgings have been infested with rats!,myn=2 && vermin,,
+ip,Look for a Making Your Name storylet on Watchmaker's Hill.,myn=3,,
+ip,Look for a Making Your Name storylet in Wolfstack Docks.,myn=4,,
+mappings,"blackribbon=547,duelist=548",,,
+ip,Look for a Making Your Name storylet in Wolfstack Docks.,myn=5,,
+ip,Look for a Making Your Name storylet in The Blind Helmsman,myn=5 && blackribbon=1,,
+ip,Become a more fearsome duelist in The Blind Helmsman.,myn=5 && blackribbon>=2 && duelist < 5,,
+mappings,"tigers=569,beasts=570,labyrinth=623",,,
+ip,Look for a Making Your Name storylet in Wolfstack Docks.,myn=6,,
+ip ,"You must become a greater Procurer of Savage Beasts. 
+**Hunt Dangerous Prey** in Wolfstack Docks. Prey can be found in:
+
+- Watchmaker's Hill
+- Spite
+- The Flit
+- Veilgarden
+- Wolfstack Docks",myn=6 && tigers && beasts<5,,
+ip,Find Mr. Inch in The Labyrinth of Tigers,myn=6 && labyrinth,,
+c,You've completed the Dangerous branch of Making Your Name!,myn>=7,,
