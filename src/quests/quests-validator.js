@@ -58,7 +58,6 @@ export class QuestsValidator {
 
     validateQuest(quest) {
         this.isValidStringProperty(quest.title, "Title Error");
-        this.isValidInteger(quest.order, "Order Error");
         this.isValidArray(quest.states, "States Error", true);
         
         for(let i = 0; i < quest.states.length; i++) {

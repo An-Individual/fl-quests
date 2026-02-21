@@ -177,15 +177,6 @@ export class QuestsManager {
             });
         }
 
-        const sortOrderDescending = function(a,b) {
-            return b.order - a.order;
-        }
-
-        sourceQuests.categories.sort(sortOrderDescending);
-        sourceQuests.categories.forEach(cat => {
-            cat.quests.sort(sortOrderDescending)
-        });
-
         return sourceQuests;
     }
 

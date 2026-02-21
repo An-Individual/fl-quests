@@ -51,7 +51,6 @@ describe("QuestsValidator", function(){
     function getValidQuest() {
         return {
             title: "Quest Title",
-            order: 10,
             states: [
                 getValidState()
             ]
@@ -60,7 +59,6 @@ describe("QuestsValidator", function(){
 
     function getInvalidQuest() {
         return {
-            order: 10,
             states: [
                 getValidState()
             ]
@@ -730,7 +728,6 @@ describe("QuestsValidator", function(){
         it("Simple Quest - Valid", function(){
             const quest = {
                 title: "Quest Title",
-                order: 10,
                 states: [
                     getValidState()
                 ]
@@ -740,7 +737,6 @@ describe("QuestsValidator", function(){
 
         it("Quest with No Title - Error", function(){
             const quest = {
-                order: 10,
                 states: [
                     getValidState()
                 ]
@@ -753,7 +749,6 @@ describe("QuestsValidator", function(){
         it("Quest with Empty Title - Error", function(){
             const quest = {
                 title: " ",
-                order: 10,
                 states: [
                     getValidState()
                 ]
@@ -766,7 +761,6 @@ describe("QuestsValidator", function(){
         it("Quest with Number Title - Error", function(){
             const quest = {
                 title: 123,
-                order: 10,
                 states: [
                     getValidState()
                 ]
@@ -776,35 +770,9 @@ describe("QuestsValidator", function(){
             }, e => e.message == `Title Error: Not a string`);
         });
 
-        it("Quest with No Order - Error", function(){
-            const quest = {
-                title: "Quest Title",
-                states: [
-                    getValidState()
-                ]
-            }
-            assert.throws(function(){
-                validator.validateQuest(quest);
-            }, e => e.message == `Order Error: Is not an Integer`);
-        });
-
-        it("Quest with String Order - Error", function(){
-            const quest = {
-                title: "Quest Title",
-                order: "123",
-                states: [
-                    getValidState()
-                ]
-            }
-            assert.throws(function(){
-                validator.validateQuest(quest);
-            }, e => e.message == `Order Error: Is not an Integer`);
-        });
-
         it("Quest with No States Property - Error", function(){
             const quest = {
-                title: "Quest Title",
-                order: 10
+                title: "Quest Title"
             }
             assert.throws(function(){
                 validator.validateQuest(quest);
@@ -814,7 +782,6 @@ describe("QuestsValidator", function(){
         it("Quest with Empty States - Error", function(){
             const quest = {
                 title: "Quest Title",
-                order: 10,
                 states: []
             }
             assert.throws(function(){
@@ -825,7 +792,6 @@ describe("QuestsValidator", function(){
         it("Quest with Invalid State - Error", function(){
             const quest = {
                 title: "Quest Title",
-                order: 10,
                 states: [
                     getInvalidState()
                 ]

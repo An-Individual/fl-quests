@@ -338,10 +338,9 @@ describe("QuestsCSVParser", function(){
         });
 
         it("Simple Quest Row - Parsed", function() {
-            const row = ['quest','Quest Title','10',''];
+            const row = ['quest','Quest Title','',''];
             parser.parseQuestRow(row, state);
             assert.equal(state.currentQuest.title, "Quest Title");
-            assert.equal(state.currentQuest.order, 10);
             assert.equal(state.currentQuest.states.length, 0);
             assert.equal(state.currentCategory.quests.length, 1);
             assert.equal(state.currentQuest, state.currentCategory.quests[0])
@@ -354,38 +353,15 @@ describe("QuestsCSVParser", function(){
             }, e => e.message == `Error at cell B1: Quest title is empty.`);
         });
 
-        it("No Order - No Order Property", function() {
-            const row = ['quest','Quest Title','',''];
-            parser.parseQuestRow(row, state);
-            assert.equal(state.currentQuest.title, "Quest Title");
-            assert(!Object.hasOwn(state.currentQuest, "order"));
-        });
-
-        it("No Order on Category Augmentation - Error", function() {
-            const row = ['quest','Quest Title','',''];
-            state.currentCategory.isAug = true;
-            assert.throws(function(){
-                parser.parseQuestRow(row, state);
-            }, e => e.message == `Error at cell C1: Quests inside Category augmentations must specify an order.`);
-        });
-
-        it("Invalid Order - Error", function() {
-            const row = ['quest','Quest Title','1a',''];
-            assert.throws(function(){
-                parser.parseQuestRow(row, state);
-            }, e => e.message == `Error at cell C1: Quest order is not a valid integer.`);
-        });
-
         it("Existing Quest - Current Replaced", function(){
             state.categories = [];
             state.currentQuestState = getValidState();
             state.currentQuest = getValidQuest(state.currentQuestState);
             state.currentCategory= getValidCategory(state.currentQuest);
             state.categories.push(state.currentCategory);
-            const row = ['quest','New Quest','20',''];
+            const row = ['quest','New Quest','',''];
             parser.parseQuestRow(row, state);
             assert.equal(state.currentQuest.title, "New Quest");
-            assert.equal(state.currentQuest.order, 20);
             assert.equal(state.currentQuest.states.length, 0);
             assert(!state.currentQuestState);
             assert.equal(state.currentCategory.quests.length, 2);
@@ -731,7 +707,6 @@ describe("QuestsCSVParser", function(){
             assert.equal(quests.categories[0].order, 20);
             assert.equal(quests.categories[0].quests.length, 2);
             assert.equal(quests.categories[0].quests[0].title, "Quest 1");
-            assert.equal(quests.categories[0].quests[0].order, 2);
             assert.equal(quests.categories[0].quests[0].states.length, 1);
             assert.equal(quests.categories[0].quests[0].states[0].state, QuestStates.Completed);
             assert.equal(quests.categories[0].quests[0].states[0].description, "State 1");
@@ -747,7 +722,6 @@ describe("QuestsCSVParser", function(){
             assert.equal(quests.categories[0].quests[0].states[0].tasks[0].completed.value, 321);
             assert(!quests.categories[0].quests[0].states[0].tasks[0].visible);
             assert.equal(quests.categories[0].quests[1].title, "Quest 2");
-            assert.equal(quests.categories[0].quests[1].order, 1);
             assert.equal(quests.categories[0].quests[1].states.length, 1);
             assert.equal(quests.categories[0].quests[1].states[0].state, QuestStates.NotStart);
             assert.equal(quests.categories[0].quests[1].states[0].description, "State 2");
@@ -761,7 +735,6 @@ describe("QuestsCSVParser", function(){
             assert.equal(quests.categories[1].order, 10);
             assert.equal(quests.categories[1].quests.length, 1);
             assert.equal(quests.categories[1].quests[0].title, "Quest 3");
-            assert.equal(quests.categories[1].quests[0].order, 1);
             assert.equal(quests.categories[1].quests[0].states.length, 2);
             assert.equal(quests.categories[1].quests[0].states[0].state, QuestStates.InProgress);
             assert.equal(quests.categories[1].quests[0].states[0].description, "State 3");
@@ -797,7 +770,6 @@ describe("QuestsCSVParser", function(){
             assert.equal(quests.categories[0].order, 20);
             assert.equal(quests.categories[0].quests.length, 2);
             assert.equal(quests.categories[0].quests[0].title, "Quest 1");
-            assert.equal(quests.categories[0].quests[0].order, 2);
             assert.equal(quests.categories[0].quests[0].states.length, 1);
             assert.equal(quests.categories[0].quests[0].states[0].state, QuestStates.Completed);
             assert.equal(quests.categories[0].quests[0].states[0].description, "State 1");
@@ -813,7 +785,6 @@ describe("QuestsCSVParser", function(){
             assert.equal(quests.categories[0].quests[0].states[0].tasks[0].completed.value, 321);
             assert(!quests.categories[0].quests[0].states[0].tasks[0].visible);
             assert.equal(quests.categories[0].quests[1].title, "Quest 2");
-            assert.equal(quests.categories[0].quests[1].order, 1);
             assert.equal(quests.categories[0].quests[1].states.length, 1);
             assert.equal(quests.categories[0].quests[1].states[0].state, QuestStates.NotStart);
             assert.equal(quests.categories[0].quests[1].states[0].description, "State 2");
@@ -827,7 +798,6 @@ describe("QuestsCSVParser", function(){
             assert.equal(quests.categories[1].order, 10);
             assert.equal(quests.categories[1].quests.length, 1);
             assert.equal(quests.categories[1].quests[0].title, "Quest 3");
-            assert.equal(quests.categories[1].quests[0].order, 1);
             assert.equal(quests.categories[1].quests[0].states.length, 2);
             assert.equal(quests.categories[1].quests[0].states[0].state, QuestStates.InProgress);
             assert.equal(quests.categories[1].quests[0].states[0].description, "State 3");
@@ -863,7 +833,6 @@ describe("QuestsCSVParser", function(){
             assert.equal(quests.categories[0].order, 20);
             assert.equal(quests.categories[0].quests.length, 2);
             assert.equal(quests.categories[0].quests[0].title, "Quest 1");
-            assert.equal(quests.categories[0].quests[0].order, 2);
             assert.equal(quests.categories[0].quests[0].states.length, 1);
             assert.equal(quests.categories[0].quests[0].states[0].state, QuestStates.Completed);
             assert.equal(quests.categories[0].quests[0].states[0].description, "State 1");
@@ -879,7 +848,6 @@ describe("QuestsCSVParser", function(){
             assert.equal(quests.categories[0].quests[0].states[0].tasks[0].completed.value, 321);
             assert(!quests.categories[0].quests[0].states[0].tasks[0].visible);
             assert.equal(quests.categories[0].quests[1].title, "Quest 2");
-            assert.equal(quests.categories[0].quests[1].order, 1);
             assert.equal(quests.categories[0].quests[1].states.length, 1);
             assert.equal(quests.categories[0].quests[1].states[0].state, QuestStates.NotStart);
             assert.equal(quests.categories[0].quests[1].states[0].description, "State 2");
@@ -893,7 +861,6 @@ describe("QuestsCSVParser", function(){
             assert.equal(quests.categories[1].order, 10);
             assert.equal(quests.categories[1].quests.length, 1);
             assert.equal(quests.categories[1].quests[0].title, "Quest 3");
-            assert.equal(quests.categories[1].quests[0].order, 1);
             assert.equal(quests.categories[1].quests[0].states.length, 1);
             assert.equal(quests.categories[1].quests[0].states[0].state, QuestStates.Blocked);
             assert.equal(quests.categories[1].quests[0].states[0].description, "State 4");
@@ -944,7 +911,6 @@ describe("QuestsCSVParser", function(){
             assert(!Object.hasOwn(quests.categories[0], "order"));
             assert.equal(quests.categories[0].quests.length, 1);
             assert.equal(quests.categories[0].quests[0].title, "Quest 1");
-            assert.equal(quests.categories[0].quests[0].order, 10);
             assert.equal(quests.categories[0].quests[0].states.length, 1);
             assert.equal(quests.categories[0].quests[0].states[0].state, QuestStates.Completed);
             assert.equal(quests.categories[0].quests[0].states[0].description, "State 1");

@@ -38,6 +38,8 @@ export class QuestsRenderer {
             }
         }
 
+        result.sort((a,b) => b.order - a.order);
+
         return result;
     }
 
@@ -47,7 +49,13 @@ export class QuestsRenderer {
             if(typeDif != 0){
                 return typeDif;
             }
-            return b.order - a.order;
+            if(a.title < b.title) {
+                return -1;   
+            }
+            if(a.title > b.title) {
+                return 1;
+            }
+            return 0;
         })
     }
 
@@ -59,7 +67,6 @@ export class QuestsRenderer {
 
         let result = {
             title: quest.title,
-            order: quest.order ?? 0,
             subtasks: []
         }
 

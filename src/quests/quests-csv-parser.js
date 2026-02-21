@@ -200,26 +200,6 @@ export class QuestsCSVParser {
             states: []
         };
 
-        let orderString = row[2]?.trim() ?? "";
-        if(orderString) {
-            if(!this.isIntegerString(orderString)) {
-                throw new CSVError(
-                    state.rowNumber, 
-                    2, 
-                    "Quest order is not a valid integer."
-                );
-            }
-            quest.order = parseInt(orderString);
-        } else {
-            if(state.currentCategory.isAug) {
-                throw new CSVError(
-                    state.rowNumber,
-                    2,
-                    "Quests inside Category augmentations must specify an order."
-                );
-            }
-        }
-
         state.currentCategory.quests.push(quest);
         state.currentQuest = quest;
     }
