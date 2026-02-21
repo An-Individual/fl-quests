@@ -1,4 +1,4 @@
-import { QualityTracker } from "../qualities/quality-tracker.js";
+import { QualityTracker, QualitySource } from "../qualities/quality-tracker.js";
 import { SettingsManager } from "../settings.js";
 import { Logger } from "../logger.js";
 import { ModalRenderer } from "./modal-renderer.js";
@@ -384,6 +384,14 @@ export class ModalManager {
     }
 
     async show(){
+        if(this.qualities.source != QualitySource.Myself) {
+            let searchElem = document.getElementsByClassName("input--item-search")[0];
+            if(searchElem && searchElem.getAttribute("value")) {
+                alert("Please clear the qualities search before opening the quest guide. The search interferes with quality scraping.");
+                return;
+            }
+            this.qualities.scrapeQualities();
+        }
         this.selectTab(ModalManager.TabData.Tab.Home);
         const modalElem = document.getElementById("flq-modal");
 
@@ -419,8 +427,6 @@ export class ModalManager {
             this.setQuestTabError(quests.error);
             return;
         }
-
-        
 
         try {
             let categories = this.questsRenderer.renderQuests(quests);
@@ -476,6 +482,12 @@ export class ModalManager {
                     }
                 }
             });
+
+            if(this.qualities.source == QualitySource.Scaped) {
+                let warningElem = document.createElement("div");
+                warningElem.innerHTML = `<p><b><i>WARNING: The qualities list was build by scraping the page. Some quests may not render correctly.</b></i></p>`;
+                homeElem.appendChild(warningElem);
+            }
 
             categoryElems.forEach(elem =>{
                 homeElem.appendChild(elem);

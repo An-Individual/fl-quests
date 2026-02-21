@@ -23,12 +23,12 @@ ip,Complete your second experiment.,lab && prestige=1
 c,You have your own lab at The University!,lab && prestige>=2
 //,**********************************************************************,
 quest,A Base-Camp in Parabola,310
-mappings,"camp=140705,specs=105466,alf=273,adeck=140943,mynp=1020",
+mappings,"camp=140705,prof=13615,alf=273,adeck=140943,mynp=1020",
 ns,Gain access to *The University Lab* to proceed.,posi
 ns,Complete the **Find a Route to Parabola** experiment in your University Lab.,lab
-ns,Establish a base-camp from **The Honey-Dens of Veilgarden**.,mynp && specs && !lab
+ns,Establish a base-camp from **The Honey-Dens of Veilgarden**.,mynp && prof=34 && !lab
 ns,"Establish a base-camp from **The Honey-Dens of Veilgarden** or complete the
-**Find a Route to Parabola** experiment in your University Lab.",mynp && specs && lab
+**Find a Route to Parabola** experiment in your University Lab.",mynp && prof=34 && lab
 ns,Pursue your Ambition to establish a base-camp.,alf>=205 && alf<=207 && !lab
 ns,"Pursue your Ambition or complete the **Find a Route to Parabola** experiment
 in your University Lab.",alf>=205 && alf<=207 && lab

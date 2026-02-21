@@ -1,5 +1,12 @@
 import { CSVBuilder } from "../csv/csv-builder.js";
 import { CSVReader } from "../csv/csv-reader.js";
+import { QualityScrapper } from "./quality-scrapper.js";
+
+export const QualitySource = {
+    None: 0,
+    Scaped: 1,
+    Myself: 2
+}
 
 export class QualityTracker {
     constructor() {
@@ -64,6 +71,7 @@ export class QualityTracker {
             });
         });
 
+        this.source = QualitySource.Myself;
         this.qualities = newQualities;
     }
 
@@ -83,6 +91,13 @@ export class QualityTracker {
                 this.qualities[quality.id] = quality;
             });
         }
+    }
+
+    scrapeQualities() {
+        const scraped = QualityScrapper.scrapeQualities();
+
+        this.source = QualitySource.Scaped;
+        this.qualities = scraped;
     }
 
     exportToCSV()
