@@ -202,8 +202,14 @@ export class ModalRenderer {
         result.appendChild(titleBarElem);
         result.appendChild(questsElem);
 
+        let order = category.order;
+        let orderOverride = this.settings.getCategoryProperty(category.id, "order");
+        if(orderOverride) {
+            order = orderOverride;
+        }
+
         result.flqID = category.id;
-        result.flqOrder = category.order;
+        result.flqOrder = order;
         result.flqHidden = isHidden;
         return result;
     }
