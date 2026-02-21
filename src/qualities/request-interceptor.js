@@ -2,104 +2,45 @@ import { QualityTracker } from "./quality-tracker.js";
 
 export class RequestInterceptor
 {
-    // It's important that we use inline script text like this
-    // instead of grabbing the script text from an external
-    // file because that external file grab opens up the main
-    // page code to execution creating a race condition between
-    // getting the interception code in place and the initial
-    // "myself" request. If we miss that initial request the
-    // quality list won't be properly built until something
-    // else triggers that request again.
-    static interceptorScript = `
-        (function () {
-            console.debug("[FL Quests] Executing injected code...");
-            function parseResponse(response) {
-                if (this.readyState !== 4) {
-                    return;
-                }
+    /**
+     * Alright, let's talk about the request interception system because
+     * boy has that been an adventure to figure out. The setup is this.
+     * A content script running in the MAIN world overrides XMLHttpRequest.open()
+     * to intercept the responses to web request and pass those into the
+     * isolated extension context. This sounds way simpler than it was
+     * to figure out because MAIN world content scripts seem to be a
+     * newer tool so most of the advice around injecting scripts either runs
+     * afoul of CSP or is too slow to to capture the initial /myself
+     * call that is key to the functioning of this extension.
+     * 
+     * The reason the whole thing isn't just running in the MAIN context
+     * is that it would lose access to extension specific tools. Primarily,
+     * the runtime.getURL() method that gets the URL of the local quests.json
+     * file.
+     */
+    static listenForInterceptions() {
+        window.addEventListener('message', (event) => {
+            // Security check: Only trust messages from this window
+            if (event.source !== window) return;
 
-                if(response.currentTarget.responseURL.includes("/api/character/myself")){
-                    var messengerElem = document.getElementById('__questsInterceptedMyself');
-                    messengerElem.innerText = this.response;
-                }
-
-                if(response.currentTarget.responseURL.includes("/api/storylet/choosebranch")){
-                    var messengerElem = document.getElementById('__questsInterceptedBranch');
-                    messengerElem.innerText = this.response;
-                }
-
-                if(response.currentTarget.responseURL.includes("/api/agents/branch")){
-                    var messengerElem = document.getElementById('__questsInterceptedBranch');
-                    messengerElem.innerText = this.response;
-                }
-
-                if(response.currentTarget.responseURL.includes("/api/exchange/sell")){
-                    var messengerElem = document.getElementById('__questsInterceptedExchange');
-                    messengerElem.innerText = this.response;
-                }
-
-                if(response.currentTarget.responseURL.includes("/api/exchange/buy")){
-                    var messengerElem = document.getElementById('__questsInterceptedExchange');
-                    messengerElem.innerText = this.response;
+            // Filter for your specific message structure
+            if (event.data && event.data.source === 'flq-interceptor') {
+                const message = event.data.payload;
+                const jsonData = JSON.parse(message.data);
+                switch(message.type) {
+                    case "myself":
+                        QualityTracker.instance().onMyself(jsonData);
+                        break;
+                    case "branch":
+                        QualityTracker.instance().onBranch(jsonData);
+                        break;
+                    case "onExchange":
+                        QualityTracker.instance().onMyself(jsonData);
+                        break;
+                    default:
+                        break;
                 }
             }
-
-            function openBypass(original_function) {
-                return function (method, url, async) {
-                    this.addEventListener("readystatechange", parseResponse);
-                    return original_function.apply(this, arguments);
-                };
-            }
-
-            XMLHttpRequest.prototype.open = openBypass(XMLHttpRequest.prototype.open);
-        }())
-        `;
-
-    static injectInterceptors() {
-        let xhrOverrideScript = document.createElement('script');
-        xhrOverrideScript.type = 'text/javascript';
-        xhrOverrideScript.innerHTML = this.interceptorScript;
-
-        xhrOverrideScript.onload = function () {
-            this.remove();
-        };
-        (document.head || document.documentElement).appendChild(xhrOverrideScript);
-
-        this.makeInterceptElement('__questsInterceptedMyself', function(){
-            var elem = document.getElementById('__questsInterceptedMyself');
-            let payload = JSON.parse(elem.innerText);
-            QualityTracker.instance().onMyself(payload);
-        });
-
-        this.makeInterceptElement('__questsInterceptedBranch', function(){
-            var elem = document.getElementById('__questsInterceptedBranch');
-            let payload = JSON.parse(elem.innerText);
-            QualityTracker.instance().onBranch(payload);
-        });
-
-        this.makeInterceptElement('__questsInterceptedExchange', function(){
-            var elem = document.getElementById('__questsInterceptedExchange');
-            let payload = JSON.parse(elem.innerText);
-            QualityTracker.instance().onExchange(payload);
-        });
-
-        console.log("[FL Quests] Request interception installed");
-    }
-
-    static makeInterceptElement(id, callback) {
-        const MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
-        let elem = document.createElement('div');
-        elem.id = id;
-        elem.style.height = 0;
-        elem.style.overflow = 'hidden';
-        document.documentElement.appendChild(elem);
-
-        elem = document.getElementById(id);
-        let observer = new MutationObserver(callback);
-        observer.observe(elem, {
-            subtree: true,
-            childList: true,
-            characterData: true 
         });
     }
 }
