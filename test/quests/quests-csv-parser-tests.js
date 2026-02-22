@@ -933,5 +933,23 @@ describe("QuestsCSVParser", function(){
                 parser.parse(csvString, true);
             }, e => e.message == "Error at cell A2: Quest did not declare any states.");
         });
+
+        it("Mapping singular - Parsed", function(){
+            const csvString = readDataFile("mapping.csv");
+            const quests = parser.parse(csvString);
+            assert.equal(quests.categories.length, 1);
+            assert.equal(quests.categories[0].id, "cat1");
+            assert.equal(quests.categories[0].title, "Cat 1");
+            assert.equal(quests.categories[0].order, 20);
+            assert.equal(quests.categories[0].quests.length, 1);
+            assert.equal(quests.categories[0].quests[0].title, "Quest 1");
+            assert.equal(quests.categories[0].quests[0].states.length, 1);
+            assert.equal(quests.categories[0].quests[0].states[0].state, QuestStates.Completed);
+            assert.equal(quests.categories[0].quests[0].states[0].description, "State 1");
+            assert.equal(quests.categories[0].quests[0].states[0].condition.type, LogicTypes.Comparison);
+            assert.equal(quests.categories[0].quests[0].states[0].condition.quality, 123);
+            assert.equal(quests.categories[0].quests[0].states[0].condition.comparison, ComparisonTypes.Greater);
+            assert.equal(quests.categories[0].quests[0].states[0].condition.value, 0);
+        });
     });
 });

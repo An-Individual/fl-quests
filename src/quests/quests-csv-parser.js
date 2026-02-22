@@ -44,7 +44,7 @@ export class QuestsCSVParser {
                 this.parseCategoryRow(row, state, allowCategorySplitting);
             } else if(allowCategorySplitting && firstCell == "augcat") {
                 this.parseAugCatRow(row, state);
-            } else if(firstCell == "mappings") {
+            } else if(firstCell == "mappings" || firstCell == "mapping") {
                 this.parseMappingsRow(row, state);
             } else if(firstCell == "quest") {
                 this.parseQuestRow(row, state);
